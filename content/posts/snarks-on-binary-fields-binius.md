@@ -4,7 +4,7 @@ date = 2023-12-01
 slug = "snarks-on-binary-fields-binius"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_The_Fire_of_Rome_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_The_Fire_of_Rome_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 +++
 

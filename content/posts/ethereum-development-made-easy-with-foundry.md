@@ -4,7 +4,7 @@ date = 2022-08-01
 slug = "ethereum-development-made-easy-with-foundry"
 
 [extra]
-feature_image = "/content/images/2025/12/Jason_and_Medea_-_John_William_Waterhouse.jpg"
+feature_image = "/images/2025/12/Jason_and_Medea_-_John_William_Waterhouse.jpg"
 authors = ["LambdaClass"]
 +++
 

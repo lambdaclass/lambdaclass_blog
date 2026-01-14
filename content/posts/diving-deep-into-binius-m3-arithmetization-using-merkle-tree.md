@@ -4,7 +4,7 @@ date = 2025-06-23
 slug = "diving-deep-into-binius-m3-arithmetization-using-merkle-tree"
 
 [extra]
-feature_image = "/content/images/2025/12/Joshua_Commanding_the_Sun_to_Stand_Still_upon_Gibeon_-1816-_John_Martin_-_NGA_2004.64.1.jpg"
+feature_image = "/images/2025/12/Joshua_Commanding_the_Sun_to_Stand_Still_upon_Gibeon_-1816-_John_Martin_-_NGA_2004.64.1.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -183,7 +183,7 @@ And finally, the second Merkle path:
 
 So, our Merkle tree should look like the one below. To make the graph more readable, we only wrote the first byte of each node, even though we should have written all 32 bytes. The first path is shown in green, and the second one in blue. You may be wondering how we know the content of the middle nodes "181" and "67", since they are neither the leaves, the root, nor part of the Merkle paths. We got that information from prints we'll make later.
 
-![image](https://hackmd.io/_uploads/BJe-hoFQlx.png)
+![image](/images/external/BJe-hoFQlx.png)
 
 In the remainder of this post, we'll explain the three types of tables used in a `MerkleTreeCS`: **NodesTable** , **RootTable** and **IncrLookup**.
 
@@ -340,9 +340,9 @@ This should print, first the left events:
     
 
 This event is a left one because the node that has to be pulled out from the channel is the left child "67":  
-![image](https://hackmd.io/_uploads/r19SajY7ee.png)  
+![image](/images/external/r19SajY7ee.png)  
 The same with the second event. Here, the node that has to be pulled is the left child "118":  
-![image](https://hackmd.io/_uploads/HJF1CjYXee.png)
+![image](/images/external/HJF1CjYXee.png)
 
 On the other hand, you should also see the prints of the right events:
     
@@ -371,9 +371,9 @@ On the other hand, you should also see the prints of the right events:
     
 
 In these cases the nodes that have to be pulled are the right children:  
-![image](https://hackmd.io/_uploads/S19_AiY7ge.png)
+![image](/images/external/S19_AiY7ge.png)
 
-![image](https://hackmd.io/_uploads/ByT3DLk4gg.png)
+![image](/images/external/ByT3DLk4gg.png)
 
 Finally, you'll find a print of a both left and right event:
     
@@ -392,7 +392,7 @@ Finally, you'll find a print of a both left and right event:
     
 
 In this case, if you are looking at the blue path, the right child node "70" has to be pulled, but if you are looking at the green path, the left child "124" has to be pulled. That's why this event is both left and right:  
-![image](https://hackmd.io/_uploads/SJV1r2tmxx.png)
+![image](/images/external/SJV1r2tmxx.png)
 
 ## RootTable
 
@@ -609,7 +609,7 @@ $$100000010.$$
 $$100000010 = 258.$$
 
 Now, what is has to do all of this with our Merkle tree? Well, this index $258$ is representing the parent's and children's depths in the following event:  
-![image](https://hackmd.io/_uploads/ryf9s5lEgl.png)
+![image](/images/external/ryf9s5lEgl.png)
 
 Since the parent's depth is 2, the input will be $00000010$. And since the children depth is the parent's plus one, the carry is $1$. You can see this better at the initialization of every `NodesTable` ([here](https://github.com/IrreducibleOSS/binius/blob/main/crates/m3/src/gadgets/merkle_tree/mod.rs#L249)), in this specific part:
     
@@ -629,7 +629,7 @@ Here the `input` is `parent_depth`and the `carry_in` is `one`.
            * `carry_in = 1` because children's depth is parent's depth plus 1.
            * Concatenate to get the index: $100000001 = 257$.  
 This index corresponds to the following event:  
-![image](https://hackmd.io/_uploads/Skm17oe4ll.png)
+![image](/images/external/Skm17oe4ll.png)
 
 Now, let's see what else the function `tally()` printed. You should also see this:
     
@@ -640,7 +640,7 @@ Now, let's see what else the function `tally()` printed. You should also see thi
     
 
 Note that we have here the same indeces as before. That's because the right events have the same parent depths as the left ones:  
-![image](https://hackmd.io/_uploads/SkTU7oxNeg.png)
+![image](/images/external/SkTU7oxNeg.png)
 
 After that you should see in your terminal the following:
     
@@ -650,7 +650,7 @@ After that you should see in your terminal the following:
     
 
 Here, note that $$0\text{x}10100 = 00010000000100000000.$$ Then, `input = 00000000` and that means parent's depth is 0. The index $256 = 100000000$ is representing this both left and right event:  
-![image](https://hackmd.io/_uploads/rkTmBjxElx.png)
+![image](/images/external/rkTmBjxElx.png)
 
 Finally, you should see printed the following:
     

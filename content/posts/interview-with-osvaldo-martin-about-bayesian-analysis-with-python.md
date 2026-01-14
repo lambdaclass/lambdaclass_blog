@@ -5,14 +5,14 @@ slug = "interview-with-osvaldo-martin-about-bayesian-analysis-with-python"
 description = "Like our previous interviewee Osvaldo Martin is one of the developers of PyMC3 and ArviZ. He is a researcher specialized in Bayesian…"
 
 [extra]
-feature_image = "/content/images/2025/12/1873.jpeg"
+feature_image = "/images/2025/12/1873.jpeg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Data Science", "Python", "Probabilistic Programming"]
 +++
 
-![](/content/images/max/2000/1-NpQf9G3ZdnMXLT-QT3sErQ.jpeg)
+![](/images/max/2000/1-NpQf9G3ZdnMXLT-QT3sErQ.jpeg)
 
 Like our [previous interviewee](https://notamonadtutorial.com/inteview-with-thomas-wiecki-about-probabilistic-programming-and-pymc-66a12b6f3f2e) [Osvaldo Martin](https://twitter.com/aloctavodia) is one of the developers of PyMC3 and ArviZ. He is a researcher specialized in Bayesian statistics and data science. He will be speaking at our [BuzzConf](https://github.com/lambdaclass/buzzconf) this year. I hope you like this interview as much as we did!
 

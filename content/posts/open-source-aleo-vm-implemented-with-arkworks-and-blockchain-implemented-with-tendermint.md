@@ -4,7 +4,7 @@ date = 2023-02-03
 slug = "open-source-aleo-vm-implemented-with-arkworks-and-blockchain-implemented-with-tendermint"
 
 [extra]
-feature_image = "/content/images/2025/12/Ani--bal_vencedor_que_por_primera_vez_mira_Italia_desde_los_Alpes_-_Francisco_Goya.jpg"
+feature_image = "/images/2025/12/Ani--bal_vencedor_que_por_primera_vez_mira_Italia_desde_los_Alpes_-_Francisco_Goya.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -40,7 +40,7 @@ You can see the code for this implementation [here](https://github.com/AleoHQ/al
 
 ### Design considerations
 
-![](https://github.com/lambdaclass/aleo_lambda_blockchain/blob/main/doc/architecture.png?raw=true)
+![](/images/external/architecture.png?raw=true)
 
 Considering the VM implementation and the requirements from the blockchain, we had to make several design decisions on the consensus layer. Here's a general overview of how Tendermint Core was implemented:
 

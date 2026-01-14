@@ -4,7 +4,7 @@ date = 2024-02-05
 slug = "mina-to-ethereum-bridge"
 
 [extra]
-feature_image = "/content/images/2025/12/The-Death-of-Socrates-Jacques-Louis-David-.jpg"
+feature_image = "/images/2025/12/The-Death-of-Socrates-Jacques-Louis-David-.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -34,7 +34,7 @@ The bridge has the following components:
         5. A solidity contract utility that smart contract developers or users can execute on an EVM chain to feed in a Mina state lookup proof that will check the state lookup against the latest posted Mina state proof to verify that this Mina state is valid.
 
 The flow is shown in the following picture. For more details related to the architecture, see the [bridge's readme](https://github.com/lambdaclass/mina_bridge/blob/main/README.md).  
-![flow](https://hackmd.io/_uploads/HJ6DjwYcT.jpg)
+![flow](/images/external/HJ6DjwYcT.jpg)
 
 ## SNARKs
 

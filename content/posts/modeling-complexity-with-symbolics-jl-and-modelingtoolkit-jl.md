@@ -5,7 +5,7 @@ slug = "modeling-complexity-with-symbolics-jl-and-modelingtoolkit-jl"
 description = "An interview with Chris Rackauckas"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.40.17---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.40.17---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Julia", "Programming", "Simulation", "Symbolic Programming", "Data Scie
 
 #### An interview with Chris Rackauckas
 
-![](/content/images/max/2000/1-sHzrVkhNvHxdiJ2IBmfVPA.png)
+![](/images/max/2000/1-sHzrVkhNvHxdiJ2IBmfVPA.png)
 
 As we often mentioned on Not a Monad Tutorial, the world is complex, and we increasingly understand where our tools fall short when trying to model this complexity.
 

@@ -4,7 +4,7 @@ date = 2023-01-11
 slug = "the-hunting-of-the-zk-snark"
 
 [extra]
-feature_image = "/content/images/2025/12/An_Incident_in_the_story_of_Don_Quixote-_by_Robert_Hillingford.jpg"
+feature_image = "/images/2025/12/An_Incident_in_the_story_of_Don_Quixote-_by_Robert_Hillingford.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

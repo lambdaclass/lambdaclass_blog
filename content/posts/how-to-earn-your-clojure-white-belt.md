@@ -5,14 +5,14 @@ slug = "how-to-earn-your-clojure-white-belt"
 description = "I tend to think that if I do not know how to implement something then I do not undestand completely how it works. That is why I want to…"
 
 [extra]
-feature_image = "/content/images/2025/12/Louis_XIV_of_France.jpg"
+feature_image = "/images/2025/12/Louis_XIV_of_France.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Programming", "Clojure"]
 +++
 
-![](/content/images/max/2000/1-uFlthCHz1YbmOvzhdVBrFw.jpeg)
+![](/images/max/2000/1-uFlthCHz1YbmOvzhdVBrFw.jpeg)
 
 I tend to think that if I do not know how to implement something then I do not undestand completely how it works. That is why I want to learn so many things: new frameworks, programming languages, garbage collectors, type systems, compilers, editors, operating systems, protocols, kernel development. The road to enlightenment is long and difficult. To make things worse, you need to invest time on keeping up to date with technologies you thought you already knew. I usually feel like Mario in one of those levels where he needs to jump between moving clouds to reach the finish line.
 

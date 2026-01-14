@@ -5,7 +5,7 @@ slug = "interview-with-jesper-louis-andersen-about-erlang-haskell-ocaml-go-idris
 description = "This is part II of the interview with Jesper Louis Andersen. You can read part I here. This part of the interview is mostly about Erlang…"
 
 [extra]
-feature_image = "/content/images/2025/12/Anton_van_Dyck_-_Samson_and_Delilah_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Anton_van_Dyck_-_Samson_and_Delilah_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ tags = ["Functional Programming", "Erlang", "Java"]
 
 This is part II of the interview with [Jesper Louis Andersen](https://twitter.com/jlouis666). You can read [part I here.](https://medium.com/this-is-not-a-monad-tutorial/interview-with-jesper-louis-andersen-about-erlang-haskell-ocaml-go-idris-the-jvm-software-and-b0de06440fbd#.4gidstolk) This part of the interview is mostly about Erlang, one of my favorite languages. If you want to learn Erlang, take a look at [Spawned Shelter](http://spawnedshelter.com/), a website I made for Erlang newcomers.
 
-![](/content/images/max/2000/1-DCzEYU60hk2pO7WCJj3GoQ.jpeg)
+![](/images/max/2000/1-DCzEYU60hk2pO7WCJj3GoQ.jpeg)
 
 **What are the advantages of the Erlang VM over the JVM and vice versa?**
 

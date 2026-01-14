@@ -4,7 +4,7 @@ date = 2024-09-24
 slug = "lambdaworks-recap-and-updated-roadmap"
 
 [extra]
-feature_image = "/content/images/2025/12/Steuben_-_Bataille_de_Poitiers.png"
+feature_image = "/images/2025/12/Steuben_-_Bataille_de_Poitiers.png"
 authors = ["LambdaClass"]
 +++
 

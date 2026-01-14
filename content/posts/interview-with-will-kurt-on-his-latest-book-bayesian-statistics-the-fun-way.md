@@ -5,14 +5,14 @@ slug = "interview-with-will-kurt-on-his-latest-book-bayesian-statistics-the-fun-
 description = "As most devs I have a diverse set of  interests: functional programming, operating systems, type systems, distributed systems, and data…"
 
 [extra]
-feature_image = "/content/images/2025/12/Parisian_Cafe_by_Repin.jpg"
+feature_image = "/images/2025/12/Parisian_Cafe_by_Repin.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Machine Learning", "Statistics", "Books"]
 +++
 
-![](/content/images/max/2000/1-LDJcJQMeyOPU9lqAs98JBQ.jpeg)
+![](/images/max/2000/1-LDJcJQMeyOPU9lqAs98JBQ.jpeg)
 
 Like most devs, I have a diverse set of interests: functional programming, operating systems, type systems, distributed systems, and data science. That is why I was excited when I learned that [Will Kurt](https://twitter.com/willkurt), the author of [_Get Programming with Haskell,_](https://www.manning.com/books/get-programming-with-haskell)__ wrote a a bayesian statistics book that is being published by No Starch Press. There aren’t many people that write books on different topics. I was sure that Will had something interesting to share in this new book. I wasn’t disappointed. The book is an excellent introduction, specially for those of us that have a rough time with advanced math but that want to advance in the data science field. I recommend reading the book after reading Think Stats, but before reading Bayesian Methods for Hackers, Bayesian Analysis with Python and Doing Bayesian Data Analysis.
 
@@ -54,7 +54,7 @@ One way I’ve been thinking about the relationship between Bayesian Statistics 
 
 Bayesian statistics is the other part of calculus, solving really tricky integrals. The Stan developer Michael Betancourt made a great comment that basically all Bayesian analysis is really computing expectations, which is solving integrals. Bayesian analysis leaves you with a posterior distribution but you can’t use a distribution for anything unless you integrate over it to get a concrete answer. Thankfully no one makes snarky comments about integrals because everyone knows that it can be really tricky in the simplest case. This xkcd makes that point nicely:
 
-![](/content/images/max/2000/1-vska22BJzFePmtcrzokZ0A.png)
+![](/images/max/2000/1-vska22BJzFePmtcrzokZ0A.png)
 
 So in this strange way the current state Machine Learning and Bayesian Statistics are what happens when you push basic calculus ideas to the limits of what we can compute.
 

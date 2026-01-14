@@ -4,7 +4,7 @@ date = 2023-01-20
 slug = "incrementally-verifiable-computation-nova"
 
 [extra]
-feature_image = "/content/images/2025/12/Edmund_blair_leighton_accolade.jpg"
+feature_image = "/images/2025/12/Edmund_blair_leighton_accolade.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

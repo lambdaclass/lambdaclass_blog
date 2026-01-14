@@ -4,7 +4,7 @@ date = 2025-06-26
 slug = "bitvm-enabling-efficient-verifiable-computation-in-bitcoin"
 
 [extra]
-feature_image = "/content/images/2025/12/John_Martin_-_Ruins_of_an_Ancient_City_-_Cleveland_Art_Museum.jpg"
+feature_image = "/images/2025/12/John_Martin_-_Ruins_of_an_Ancient_City_-_Cleveland_Art_Museum.jpg"
 authors = ["LambdaClass"]
 +++
 

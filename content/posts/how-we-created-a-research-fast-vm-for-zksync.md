@@ -4,7 +4,7 @@ date = 2024-08-05
 slug = "how-we-created-a-research-fast-vm-for-zksync"
 
 [extra]
-feature_image = "/content/images/2025/12/Horace_Vernet_-_The_Vesuvius_Erupting-_the_Artist_and_His_Father-_Carle_Vernet-_in_the_Foreground_-_2014.254_-_Museum_of_Fine_Arts.jpg"
+feature_image = "/images/2025/12/Horace_Vernet_-_The_Vesuvius_Erupting-_the_Artist_and_His_Father-_Carle_Vernet-_in_the_Foreground_-_2014.254_-_Museum_of_Fine_Arts.jpg"
 authors = ["LambdaClass"]
 +++
 

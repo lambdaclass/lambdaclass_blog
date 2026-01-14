@@ -4,7 +4,7 @@ date = 2025-08-28
 slug = "optimizing-sumcheck"
 
 [extra]
-feature_image = "/content/images/2025/12/Prayer-in-the-Mosque---The-Metropolitan-Museum-of-Art.jpg"
+feature_image = "/images/2025/12/Prayer-in-the-Mosque---The-Metropolitan-Museum-of-Art.jpg"
 authors = ["LambdaClass"]
 +++
 

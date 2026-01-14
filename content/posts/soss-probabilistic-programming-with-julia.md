@@ -5,7 +5,7 @@ slug = "soss-probabilistic-programming-with-julia"
 description = "An interview with its creator, Chad Scherrer"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-19-at-12.10.27---PM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-19-at-12.10.27---PM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ tags = ["Julia", "Probabilistic Programming", "Pymc3", "Data Science"]
 
 By: Javier Rodríguez Chatruc and Federico Carrone
 
-![](/content/images/max/2000/1-m6924vcooeuQEu7FiBOI5A.png)Credit: Chad Scherrer
+![](/images/max/2000/1-m6924vcooeuQEu7FiBOI5A.png)Credit: Chad Scherrer
 
 Probabilistic programming is at this point an established field both for research and industry applications, but like everything else (especially in the tech industry), it is undergoing constant evolution. This is where [Julia](https://julialang.org/) comes in — designed for high performance in the world of data science, it seems to be the perfect fit for probabilistic programming.
 

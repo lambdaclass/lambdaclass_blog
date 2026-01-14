@@ -5,11 +5,11 @@ slug = "is-ruby-nil-or-ruby-hype-dead-a-current-overview-of-ruby"
 description = "The main languages I’ve used this year"
 
 [extra]
-feature_image = "/content/images/2025/12/Sir_Horatio_Nelson_when_wounded_at_Teneriffe.jpg"
+feature_image = "/images/2025/12/Sir_Horatio_Nelson_when_wounded_at_Teneriffe.jpg"
 authors = ["LambdaClass"]
 +++
 
-![](/content/images/2025/12/1-9vg-qHXQqxgYWVwtmo_V1A.jpeg)
+![](/images/2025/12/1-9vg-qHXQqxgYWVwtmo_V1A.jpeg)
 
 #### The main languages I’ve used this year
 
@@ -33,7 +33,7 @@ Oh my dear Ruby, son of Lisp, Perl, Eiffel and Smalltalk, time has passed but I 
 
 Let’s start with some graphs. Everybody loves graphs!
 
-![](/content/images/max/2000/1-QCE2zU-R9MKX6Sqj5lZNyQ.png)
+![](/images/max/2000/1-QCE2zU-R9MKX6Sqj5lZNyQ.png)
 
 **Programming language popularity indexes**
 
@@ -43,7 +43,7 @@ As reported by the [TIOBE Index](https://en.wikipedia.org/wiki/TIOBE_index), Rub
 
 [TIOBE ratings for Ruby](http://www.tiobe.com/index.php/content/paperinfo/tpci/Ruby.html)
 
-![](/content/images/max/2000/1-gt6Mt5Fq20JpvL3DNwYBNA.png)
+![](/images/max/2000/1-gt6Mt5Fq20JpvL3DNwYBNA.png)
 
 According to the [Popularity of Programming Language index](https://sites.google.com/site/pydatalog/pypl/PyPL-PopularitY-of-Programming-Language) (PYPL), Ruby is the ninth most popular programming language. PYPL is created by analyzing how often language tutorials are searched on Google.
 
@@ -67,29 +67,29 @@ The absolute number of conferences kept on growing, however the growth speed dim
 
 [Module counts](http://modulecounts.com/)
 
-![](/content/images/max/2000/1-syyHrXaZtCo9O1V6iTtTEQ.png)
+![](/images/max/2000/1-syyHrXaZtCo9O1V6iTtTEQ.png)
 
 The number of modules seems to have kept growing at about the same speed for the last years.
 
 [Ruby’s lines of code](https://www.ohloh.net/p/ruby)
 
-![](/content/images/max/2000/1-Dibiyr75hsGDLCatZTiRxQ.png)
+![](/images/max/2000/1-Dibiyr75hsGDLCatZTiRxQ.png)
 
 Ohloh reports that the Ruby language number of lines has grown at a steady speed.
 
 [Interest over time reported by Google Trends](https://www.google.com/trends/explore#cat=0-5&q=%2Fm%2F06ff5&cmpt=q):
 
-![](/content/images/max/2000/1-bHHmLXNdXqaT9IbDoEcfpg.png)
+![](/images/max/2000/1-bHHmLXNdXqaT9IbDoEcfpg.png)
 
 However the interest over time registered by Google seems to have plunked.
 
 [Ruby and Javascript Indeed job trends (absolute](http://www.indeed.com/jobtrends?q=ruby))
 
-![](/content/images/max/2000/1-kFX3kYHAfcR7_NuXO0PtbA.png)
+![](/images/max/2000/1-kFX3kYHAfcR7_NuXO0PtbA.png)
 
 [Ruby and Javascript Indeed job trends (relative](http://www.indeed.com/jobtrends?q=ruby%2C+javascript&l=&relative=1))
 
-![](/content/images/max/2000/1-IwJKDz6AwEQxl93gKlvM7g.png)
+![](/images/max/2000/1-IwJKDz6AwEQxl93gKlvM7g.png)
 
 Nevertheless, even if Ruby job postings are way down compared to JavaScript, they are still on the rise and its percentage growth continues to be quite important. In the startup world, there are at least [five startups](https://angel.co/javascript/jobs)registered on AngelList that need a JavaScript developer for [each startup](https://angel.co/ruby/jobs)that needs at least someone with Ruby knowledge.
 
@@ -101,7 +101,7 @@ These statistics show that even though Ruby is not as popular as it was a few ye
 
 So far, we have seen some numbers. Now it’s a good time to check other indicators that account for liveliness of Ruby.
 
-![](/content/images/max/2000/1-P_BdP89ac9dcWAMDTBoaPw.png)
+![](/images/max/2000/1-P_BdP89ac9dcWAMDTBoaPw.png)
 
 Let me mention a few interesting tools created in Ruby apart from Rails and other web frameworks such as Sinatra or Padrino. I think this might give an idea about Ruby’s usage. [Homebrew](http://brew.sh/), coded in Ruby, is the simplest and more useful package manager for Mac OS X. Even if I prefer other alternatives, created in Nodejs, such as [Docpad](https://github.com/bevry/docpad), Jekyll, which is coded in Ruby, was one of the main reasons for the popularity of static page generators. [Discourse](http://www.discourse.org/), the best discussion platform. [Artoo](http://artoo.io/) is a micro-framework for robotics. I don’t know a heck about it. Ruby also has got the two most used IT automation tools that exist: [Chef](http://www.getchef.com/chef/) and [Puppet](http://puppetlabs.com/). These are two really big players that won’t disappear anytime soon and it doesn’t look as though they want to move away from Ruby.
 
@@ -208,7 +208,7 @@ The best concurrency model I know in the Ruby land is the one provided by the fa
 
 #### **Why I like Ruby**
 
-![](/content/images/max/2000/1-U24Mc9wNeiSNp2_eOYIGWg.png)
+![](/images/max/2000/1-U24Mc9wNeiSNp2_eOYIGWg.png)
 
 Time to land on Earth. We have spent too much time floating on the sky. I have never explained why I use and like Ruby.
 

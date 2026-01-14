@@ -4,7 +4,7 @@ date = 2023-03-06
 slug = "diving-deep-fri"
 
 [extra]
-feature_image = "/content/images/2025/12/Peter_Paul_Rubens_-_The_Fall_of_Phaeton_-National_Gallery_of_Art-.jpg"
+feature_image = "/images/2025/12/Peter_Paul_Rubens_-_The_Fall_of_Phaeton_-National_Gallery_of_Art-.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

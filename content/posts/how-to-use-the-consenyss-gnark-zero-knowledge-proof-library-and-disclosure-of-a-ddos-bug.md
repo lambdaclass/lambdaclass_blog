@@ -4,7 +4,7 @@ date = 2023-03-17
 slug = "how-to-use-the-consenyss-gnark-zero-knowledge-proof-library-and-disclosure-of-a-ddos-bug"
 
 [extra]
-feature_image = "/content/images/2025/12/Bartholomeus_van_der_Helst-_Banquet_of_the_Amsterdam_Civic_Guard_in_Celebration_of_the_Peace_of_Mu--nster.jpg"
+feature_image = "/images/2025/12/Bartholomeus_van_der_Helst-_Banquet_of_the_Amsterdam_Civic_Guard_in_Celebration_of_the_Peace_of_Mu--nster.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -36,7 +36,7 @@ In the following sections we're going to explain and show some example usage of 
 
 ## (Always look on) the bright side
 
-![](https://i.imgur.com/Xs1ASoT.png)
+![](/images/external/Xs1ASoT.png)
 
 ### High-level API
 
@@ -72,7 +72,7 @@ After you have your circuit structure built you need to define the circuits beha
 
 ## (Join) the dark side
 
-![](https://i.imgur.com/P4W3s57.png)
+![](/images/external/P4W3s57.png)
 
 ### Low-level API
 

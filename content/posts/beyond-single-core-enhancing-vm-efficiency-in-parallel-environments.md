@@ -4,7 +4,7 @@ date = 2024-03-22
 slug = "beyond-single-core-enhancing-vm-efficiency-in-parallel-environments"
 
 [extra]
-feature_image = "/content/images/2025/12/Entre--e_de_HENRI_IV_dans_Paris_le_22_mars_1594.jpg"
+feature_image = "/images/2025/12/Entre--e_de_HENRI_IV_dans_Paris_le_22_mars_1594.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -12,7 +12,7 @@ At LambdaClass, benchmarks and performance analysis are critical aspects of our 
 
 The [Cairo virtual machine](https://github.com/lambdaclass/cairo-vm) is not an exception since it is a core part of the [Starknet](https://www.starknet.io/en) network. In this post, we will delve into how we investigated a performance regression and then optimized a core data structure in the library to improve its multicore performance.
 
-![Screenshot 2024-03-15 at 17.58.47](https://hackmd.io/_uploads/Ske40pOAa.png)
+![Screenshot 2024-03-15 at 17.58.47](/images/external/Ske40pOAa.png)
 
 ## A first look
 
@@ -22,7 +22,7 @@ Last week, the [Pathfinder](https://github.com/eqlabs/pathfinder) team from Equi
 
 When several instances of the CairoVM with the lambda works-felt feature enabled are executed on a hyperthreading-enabled processor, execution time does not scale with the number of enabled threads as well as without the lambda works-felt feature.
 
-![Untitled \(2\)](https://hackmd.io/_uploads/ByrB06O0T.png)
+![Untitled \(2\)](/images/external/ByrB06O0T.png)
 
 The figure, contributed by the Pathfinder team, shows the results of a benchmark performed on a Ryzen 5900X. As you can see, the CairoVM with the lambdaworks-felt feature performs better when you execute it with fewer threads. Still, the run with defaults implementation (Felt type implemented using the [num_bigint](https://docs.rs/num-bigint/latest/num_bigint/) crate) scales better as the number of threads increases.
 
@@ -112,7 +112,7 @@ To address this, we refactored that structure to a more cache-friendly represent
 
 After this change, when we re-execute some old Sepolia testnet blocks, we can see that the new cache-friendly `MemoryCell` scales better when using hyper threading. Outperforming both the old `MemoryCell` with a `BigUint` -backed Felt and our previous implementation of the `MemoryCell` with the `Lambdaworks` felt.
 
-![benchs_x86 \(2\)](https://hackmd.io/_uploads/HkqL06d0a.png)
+![benchs_x86 \(2\)](/images/external/HkqL06d0a.png)
 
 Benchmarks run on AMD Ryzen 9 5950X 16-Core Processor, Architecture:x86, CPU(s): 32
 
@@ -225,7 +225,7 @@ We also ran `perf stat` to check the cache misses using this new version, and it
 
 While we have seen a performance regression related to cache misses in multi-threaded environments for x86_64 architectures, it's important to note that this issue is not prevalent in systems utilizing ARM CPUs. Our benchmarks, conducted on a MacBook M3 Pro equipped with 18 GB of RAM and 11 cores, showcase a different performance profile.
 
-![benchs_mac_2 \(1\)](https://hackmd.io/_uploads/S1tUaVi0p.png)
+![benchs_mac_2 \(1\)](/images/external/S1tUaVi0p.png)
 
 In the image, you can notice that:
 

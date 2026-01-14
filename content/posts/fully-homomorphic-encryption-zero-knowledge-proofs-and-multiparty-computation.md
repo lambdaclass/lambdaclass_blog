@@ -5,7 +5,7 @@ slug = "fully-homomorphic-encryption-zero-knowledge-proofs-and-multiparty-comput
 description = "ZKP can provide integrity of computations, FHE allows data sharing and calculation without compromising it and MPC gives the power to delegate expensive computations to other parties. In this post, we explain the basic ideas behind these primitives."
 
 [extra]
-feature_image = "/content/images/2025/12/Akropolis_by_Leo_von_Klenze.jpg"
+feature_image = "/images/2025/12/Akropolis_by_Leo_von_Klenze.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

@@ -4,7 +4,7 @@ date = 2023-05-24
 slug = "please-stop-drinking-the-rust-kool-aid"
 
 [extra]
-feature_image = "/content/images/2025/12/The-Marriage-of-Alexander-the-Great-and-Roxane-of-Bactria.jpg"
+feature_image = "/images/2025/12/The-Marriage-of-Alexander-the-Great-and-Roxane-of-Bactria.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -12,7 +12,7 @@ We've been using Rust since 2014. We're big fans of Rust. This doesn't imply tha
 
 Some days ago, Péter Szilágyi, team lead at Ethereum, said that the C version of the KZG library crashed on some systems:
 
-[![](/content/images/2023/05/twitter.png)](https://twitter.com/peter_szilagyi/status/1650608687810068480)
+[![](/images/2023/05/twitter.png)](https://twitter.com/peter_szilagyi/status/1650608687810068480)
 
 If we want to build safe and robust systems, they need to take into account the possibility of crashes, whether they’re written in C, Rust, Erlang or Java. Rust Language is one of the most used for new performant systems.
 
@@ -42,7 +42,7 @@ In a long-living program, many memory leaks can lead to a denial of service beca
 
 Rust has some tools for error handling, encoding the error value in the _Result_ enum. There are no _exceptions_ like in other languages. On the other side, Rust has the concept of panicking.
 
-![](https://i.imgur.com/kgwvbvw.png)
+![](/images/external/kgwvbvw.png)
 
 Panics terminate the running program.
 

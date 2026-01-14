@@ -4,7 +4,7 @@ date = 2023-01-09
 slug = "multiscalar-multiplication-strategies-and-challenges"
 
 [extra]
-feature_image = "/content/images/2025/12/Belisarius_by_Francois-Andre_Vincent.jpg"
+feature_image = "/images/2025/12/Belisarius_by_Francois-Andre_Vincent.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

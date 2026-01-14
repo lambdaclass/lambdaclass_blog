@@ -5,17 +5,17 @@ slug = "the-eleventh-year-what-to-do-after-having-taught-yourself-programming-in
 description = "You have followed the “Teach Yourself Programming in Ten Years” advice. Now what?"
 
 [extra]
-feature_image = "/content/images/2025/12/Poussin_-_Paysage_avec_saint_Jean_a--_Patmos_-_Chicago_Art_Institute.jpg"
+feature_image = "/images/2025/12/Poussin_-_Paysage_avec_saint_Jean_a--_Patmos_-_Chicago_Art_Institute.jpg"
 authors = ["LambdaClass"]
 +++
 
-![](/content/images/2025/12/1-ITiI4UpZDr3uVhpAqtmzIw.png)
+![](/images/2025/12/1-ITiI4UpZDr3uVhpAqtmzIw.png)
 
 You have followed the “[Teach Yourself Programming in Ten Years](http://norvig.com/21-days.html)” advice. Now what?
 
 * * *
 
-![](/content/images/max/2000/1-oNMoLW1PYnEIcHQaHkDD_w.jpeg)__“when you don’t create things, you become defined by your tastes rather than ability. your tastes only narrow & exclude people. so create.”―__****Why The Lucky  Stiff****
+![](/images/max/2000/1-oNMoLW1PYnEIcHQaHkDD_w.jpeg)__“when you don’t create things, you become defined by your tastes rather than ability. your tastes only narrow & exclude people. so create.”―__****Why The Lucky  Stiff****
 
 Christmas and the new year’s eve have passed. Now you are a few kilograms fatter. You have spent the last few days reading Hacker News and Reddit and playing League of Legends or GTA V for the PS4. Finally, even if you will never accomplish all of them, you know that it is time to write your goals for this new year.
 
@@ -45,7 +45,7 @@ swank-js for editing Javascript…
 
 and undo-tree for treating history as tree.
 
-![](/content/images/max/2000/1-xcDvxVvdrTYMR_WMunTlqw.png)
+![](/images/max/2000/1-xcDvxVvdrTYMR_WMunTlqw.png)
 
 This video shows really well how easy it is to hack with Emacs and lisp:
 
@@ -87,7 +87,7 @@ Someday I hope that I can implement an Erlang clone that runs on the [really](ht
 
 Since I am noob in this area and I like to share what I learn I will continue interviewing language developers and good devs for my [Indie Programming Languages](https://medium.com/indie-programming-languages) collection. I will publish two interviews in the following weeks. In the meanwhile you can read:
 
-[Indie languages — Interview with Timothy Baldridge, Pixie’s language creatorPlease tell us a little bit about Pixie’s inception and the road to the current status I’ve been a language hacker for…medium.com![](/content/images/fit/c/160/160/1-jYqNf1VQpmxhv7WwkPm1Ag.jpeg)](https://medium.com/p/cadbc36418dc)
+[Indie languages — Interview with Timothy Baldridge, Pixie’s language creatorPlease tell us a little bit about Pixie’s inception and the road to the current status I’ve been a language hacker for…medium.com![](/images/fit/c/160/160/1-jYqNf1VQpmxhv7WwkPm1Ag.jpeg)](https://medium.com/p/cadbc36418dc)
 
 ### Do you need a cool project?
 
@@ -99,4 +99,4 @@ As you have read, in my free time I am not trying to code anything groundbreakin
 
 Even if this is not your eleventh year in the world of development and you are pretty new, I cannot stress enough how much functional programming will open your mind. At least in my case it has been a mind-blowing experience since it has opened me the hell’s gate of distributed systems and programming languages implementation and design. Someday it might be time to return to the old and powerful C, but not yet…
 
-![](/content/images/max/2000/1-zIUcPGRK3us1N3oFwJ8y5w.jpeg)
+![](/images/max/2000/1-zIUcPGRK3us1N3oFwJ8y5w.jpeg)

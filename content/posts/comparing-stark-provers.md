@@ -4,7 +4,7 @@ date = 2024-01-12
 slug = "comparing-stark-provers"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_1773_-_Finding_of_the_Laocoon.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_1773_-_Finding_of_the_Laocoon.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -59,7 +59,7 @@ The AIR for the Miden vm is contained [here](https://github.com/0xPolygonMiden/m
         * Dynamic
 
 Here we show the diagram of a single step of the main trace for the plain layout in Starknet, without the auxiliary trace (for more information, see [our analysis](https://github.com/lambdaclass/lambdaworks/blob/main/docs/src/starks/stone_prover/trace_plain_layout.md)):  
-![main_trace](https://hackmd.io/_uploads/ry0W20A_T.png)
+![main_trace](/images/external/ry0W20A_T.png)
 
 The Stone Prover packs several registers in a single column, creating virtual columns. For example, all 16 flags are grouped under one column. The memory's addresses and values are also grouped in an interleaved way in another column. This reduces the amount of columns in the trace (we merge $16$ columns in $1$), but the trace length becomes $16$ times larger. When we want to find the trace polynomials, we perform one Fast Fourier Transform (FFT) of size $16n$, instead of $16$ FFT of size $n$.
 

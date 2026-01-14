@@ -4,7 +4,7 @@ date = 2025-07-22
 slug = "gkr-protocol-implementation-deep-dive-into-the-code"
 
 [extra]
-feature_image = "/content/images/2025/12/The_fall_of_Babylon-_Cyrus_the_Great_defeating_the_Chaldean_Wellcome_V0034440.jpg"
+feature_image = "/images/2025/12/The_fall_of_Babylon-_Cyrus_the_Great_defeating_the_Chaldean_Wellcome_V0034440.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -22,7 +22,7 @@ If you're not familiar with the protocol or need a refresher, we recommend start
 
 A GKR circuit is composed of layers. Each layer contains gates, and each gate operates on outputs from the previous layer. Gates can be either addition or multiplication. For protocol compatibility, each layer must have a power-of-two number of gates.
 
-![image](https://hackmd.io/_uploads/BkLEjCjIlx.png)  
+![image](/images/external/BkLEjCjIlx.png)  
 _The arithmetic circuit used in the previous post as an example_
 
 In some cases, we can work with more efficient versions if all the gates are, for example, multiplications.
@@ -67,7 +67,7 @@ For example:
     let gate_2 = Gate::new(GateType::Add, [2, 3]); // Adds outputs at indices 2 and 3 from the previous layer.
     
 
-![image](https://hackmd.io/_uploads/SkRvRAjIlx.png)
+![image](/images/external/SkRvRAjIlx.png)
 
 ### Example: The Blog Post Circuit
 

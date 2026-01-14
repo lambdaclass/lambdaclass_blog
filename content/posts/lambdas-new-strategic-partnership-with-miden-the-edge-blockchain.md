@@ -4,7 +4,7 @@ date = 2025-05-05
 slug = "lambdas-new-strategic-partnership-with-miden-the-edge-blockchain"
 
 [extra]
-feature_image = "/content/images/2025/12/La_Bataille_du_Pont_d-Arcole.jpg"
+feature_image = "/images/2025/12/La_Bataille_du_Pont_d-Arcole.jpg"
 authors = ["LambdaClass"]
 +++
 

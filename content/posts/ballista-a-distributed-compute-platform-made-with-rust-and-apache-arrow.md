@@ -5,7 +5,7 @@ slug = "ballista-a-distributed-compute-platform-made-with-rust-and-apache-arrow"
 description = "An interview with its creator, Andy Grove"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.49.47---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.49.47---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,13 +14,13 @@ tags = ["Ballista", "Rust", "Apache Arrow", "Distributed Computing"]
 
 #### An interview with its creator, Andy Grove
 
-![](/content/images/max/2000/1-L6SAuZiiRQ4bBaCCiDaP_w.png)Ballista demo. Source: [Andy Grove](https://andygrove.io/2020/07/ballista-one-year-on/)
+![](/images/max/2000/1-L6SAuZiiRQ4bBaCCiDaP_w.png)Ballista demo. Source: [Andy Grove](https://andygrove.io/2020/07/ballista-one-year-on/)
 
 > "I have become frustrated over the years with the proliferation of Big Data tools built in JVM languages. I understand the reasons for this — Java, and especially Kotlin and Scala, are productive languages to work in, the ecosystem is very mature, and skills are widespread. However, it really isn’t the best language for these platforms. The most obvious alternative has been C++ for a long time, but I thought it would be really interesting to see what was possible with Rust." — Andy Grove
 
 As distributed computing platforms continue to become more relevant and new programming languages emerge with a modern approach and a focus on features that more traditional languages aren’t suited for, new and interesting technologies start appearing. In this interview, Andy Grove, software engineer and creator of [Ballista](https://github.com/ballista-compute/ballista), a fresh distributed computing platform built primarily on Rust and powered by Apache Arrow technologies, provides some insight on the motivations behind the project as well as the technical details and features that make Ballista different.
 
-![](/content/images/max/2000/1-kYa4OnwY6NrvClA6wPpjZQ.png)Ballista is a work in progress. Once completed, its integrations will work like this. (Source: official documentation)
+![](/images/max/2000/1-kYa4OnwY6NrvClA6wPpjZQ.png)Ballista is a work in progress. Once completed, its integrations will work like this. (Source: official documentation)
 
 * * *
 

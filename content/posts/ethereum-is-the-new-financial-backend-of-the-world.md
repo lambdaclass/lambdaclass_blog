@@ -4,7 +4,7 @@ date = 2025-12-11
 slug = "ethereum-is-the-new-financial-backend-of-the-world"
 
 [extra]
-feature_image = "/content/images/2025/12/G7tLE9GXUAArZD0.jpeg"
+feature_image = "/images/2025/12/G7tLE9GXUAArZD0.jpeg"
 authors = ["LambdaClass"]
 +++
 

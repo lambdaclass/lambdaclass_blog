@@ -5,7 +5,7 @@ slug = "scientific-machine-learning-with-julia-the-sciml-ecosystem"
 description = "Interview with Chris Rackauckas"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.41.30---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.41.30---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Julia", "Machine Learning", "Scientific Computing", "Programming", "Sci
 
 #### Interview with Chris Rackauckas
 
-![](/content/images/max/2000/1-zBLCNU10DE1qv5PG4wdwbg.png)
+![](/images/max/2000/1-zBLCNU10DE1qv5PG4wdwbg.png)
 
 We live in a complex world. For those scientists who dare to immerse themselves in that complexity and generate a deeper understanding of it, it is very common to have to deal with differential equation models that are not possible to solve without the use of a computer.
 
@@ -24,7 +24,7 @@ We interviewed the creator of SciML, Chris Rackauckas, to get to know a little m
 
 * * *
 
-![](/content/images/max/2000/1-bCCWEZqP_ORcTiLPPV13rw.png)Source: DifferentialEquations.jl documentation
+![](/images/max/2000/1-bCCWEZqP_ORcTiLPPV13rw.png)Source: DifferentialEquations.jl documentation
 
 #### Please tell us a bit about yourself. What is your background? what is your current position?
 
@@ -34,7 +34,7 @@ I am an applied mathematics instructor at MIT, the Director of Scientific Resear
 
 Before the “SciML” organization, there was just DifferentialEquations.jl and JuliaDiffEq, but it grew beyond just a single project. There were methods for symbolically manipulating equations, sparse automatic differentiation, automated model discovery, neural PDE solvers, and even packages in Python and R for using these tools. So the name didn’t fit and we did a reorganization around the central principle: scientific machine learning. Scientific machine learning is a burgeoning field that mixes scientific computing, like differential equation modeling, with machine learning. That is the essence of the organization: many tools for scientific simulation with differential equation solvers, chemical reaction network tools and N-body simulators, but all of them can compose with machine learning.
 
-![](/content/images/max/2000/1-YtKzMw7VOvNbOCsOkXwU0A.png)
+![](/images/max/2000/1-YtKzMw7VOvNbOCsOkXwU0A.png)
 
 #### Scientific Computing and Machine Learning are often perceived as very different areas. What would you say are the strengths and weaknesses of each one and how does SciML take advantage of them?
 
@@ -44,7 +44,7 @@ Data-driven modeling, like machine learning, takes a completely opposite approac
 
 Scientific machine learning is about pairing together these two paradigms. Incorporating mechanism into machine learning makes it more interpretable, more data efficient, and better able to predict beyond the training data, all without requiring that you know all of the mechanisms. We’re using this in cases like pharmacometrics, where in the first clinical trial we may not know everything about how the drug works, but we can start with a pretty good guess by using mechanistic models derived for similar drugs, and use the incoming data to train models which transforms the prior model towards the data.
 
-![](/content/images/max/2000/1-ihyMT0ujkdDopf3M8eiXUw.png)
+![](/images/max/2000/1-ihyMT0ujkdDopf3M8eiXUw.png)
 
 #### What are Neural ODEs? When is it appropiate to work with one? Do you fear that accuracy or interpretability is lost by introducing a Neural Network as part of the equation? Aren’t there other learning methodologies suited for such a thing?
 
@@ -68,7 +68,7 @@ The differential equation solvers, and actually all of the SciML ecosystem, work
 
 While this was made for the specific case of multi-scale biological modeling in mind, other users have since come up with other great examples. CuArrays are CUDA-accelerated arrays that live on the GPU that can be dropped in as a replacement to the standard array, or ComponentArrays.jl defines an array type similar to MultiScaleArrays which is backed by a real vector, so it’s faster for standard computations but slower for size changes. A lot of new features can thus be directly added and optimized in the ODE solver just by changing the input types!
 
-![](/content/images/max/2000/1-crRcFtHznAsYXDCb1uh4oQ.png)
+![](/images/max/2000/1-crRcFtHznAsYXDCb1uh4oQ.png)
 
 #### Are the processes of solving differential equations and training a Neural Networks similar? How do you put together both frameworks?
 
@@ -84,7 +84,7 @@ How important is it? Somewhat. There are problems which are extremely GPU-parall
 
 Bayesian analysis gives you a posterior distribution which has a sense of uncertainty quantification, i.e. it doesn’t just give you the “best parameter” but also a distribution which you can use to understand the error bars on your parameter estimate. In many cases this is a fundamentally interesting quantity. For example, in pharmacology we often want to know the probability that the drug concentration is in the safe zone. To evaluate this, we need a probabilistic fit of the model since only by including the uncertainty of our parameters can we get an accurate guess of the probabilities of the dynamics.
 
-![](/content/images/max/2000/1-c8-WwVO2Mlef4QqXP7SvSA.png)
+![](/images/max/2000/1-c8-WwVO2Mlef4QqXP7SvSA.png)
 
 #### Are there any relevant books or papers you would like to recommend for digging deeper in these topics?
 

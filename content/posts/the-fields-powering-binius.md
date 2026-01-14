@@ -4,7 +4,7 @@ date = 2025-06-12
 slug = "the-fields-powering-binius"
 
 [extra]
-feature_image = "/content/images/2025/12/Jan_Vermeer_-_The_Art_of_Painting_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Jan_Vermeer_-_The_Art_of_Painting_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 +++
 

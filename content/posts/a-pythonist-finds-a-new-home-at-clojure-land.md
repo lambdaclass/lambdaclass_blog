@@ -5,7 +5,7 @@ slug = "a-pythonist-finds-a-new-home-at-clojure-land"
 description = "Welcome back to another interview of Not a Monad Tutorial. In this opportunity I decided to interview Facundo Olano, a friend, a teammate…"
 
 [extra]
-feature_image = "/content/images/2025/12/Marc_Antony-s_Oration_at_Caesar-s_Funeral_by_George_Edward_Robertson.jpg"
+feature_image = "/images/2025/12/Marc_Antony-s_Oration_at_Caesar-s_Funeral_by_George_Edward_Robertson.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ Welcome back to another interview of [Not a Monad Tutorial](https://notamonadtut
 
 Vote and discuss at [lobsters](https://lobste.rs/s/nz28ef/pythonist_finds_new_home_at_clojure_land), [reddit](https://www.reddit.com/r/programming/comments/65ct5j/a_pythonist_finds_a_new_home_at_clojure_land/), [hn](https://news.ycombinator.com/item?id=14114624).
 
-![](/content/images/max/2000/1-4XmtTGqxc82DyQwcpmr9pw.jpeg)A wallpaper I created for my OpenBSD laptop. Lisp, BSD, Erlang, Rust. We live in the best of all possible worlds.
+![](/images/max/2000/1-4XmtTGqxc82DyQwcpmr9pw.jpeg)A wallpaper I created for my OpenBSD laptop. Lisp, BSD, Erlang, Rust. We live in the best of all possible worlds.
 
 **You are quite in love with Python. Why is that?**
 

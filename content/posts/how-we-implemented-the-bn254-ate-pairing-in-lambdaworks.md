@@ -4,7 +4,7 @@ date = 2024-08-20
 slug = "how-we-implemented-the-bn254-ate-pairing-in-lambdaworks"
 
 [extra]
-feature_image = "/content/images/2025/12/Vernet-_Horace_-_The_pope_Iulius_II_orders_the_works_of_Vatican_and_Saint-Peter_basilica_-_Louvre_INV_8364.jpg"
+feature_image = "/images/2025/12/Vernet-_Horace_-_The_pope_Iulius_II_orders_the_works_of_Vatican_and_Saint-Peter_basilica_-_Louvre_INV_8364.jpg"
 authors = ["LambdaClass"]
 +++
 

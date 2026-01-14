@@ -4,7 +4,7 @@ date = 2023-01-02
 slug = "weird-ways-to-multiply-really-fast-with-karatsuba-toom-cook-and-fourier"
 
 [extra]
-feature_image = "/content/images/2025/12/Edwin_Austin_Abbey_-1852-1911--y.jpg"
+feature_image = "/images/2025/12/Edwin_Austin_Abbey_-1852-1911--y.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

@@ -5,7 +5,7 @@ slug = "the-big-old-reliable-elephant-talking-about-postgres-with-craig-kerstien
 description = "In this opportunity I interviewed Craig Kerstiens. Craig works for citusdata, a company that helps customers scale databases beyond a…"
 
 [extra]
-feature_image = "/content/images/2025/12/Justus_van_Egmont_-_Venus_gives_weapons_to_Aeneas.jpg"
+feature_image = "/images/2025/12/Justus_van_Egmont_-_Venus_gives_weapons_to_Aeneas.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -18,7 +18,7 @@ Craig helped me decide what postgres features to use and how, thanks to [his blo
 
 _Discuss and vote at_[ _lobsters_](https://lobste.rs/s/y0k2h5/big_old_reliable_elephant_talking_about) _,_[_reddit_](https://www.reddit.com/r/programming/comments/67owq6/the_big_old_reliable_elephant_talking_about/) _and_[ _hn_](https://news.ycombinator.com/item?id=14203940) _._
 
-![](/content/images/max/2000/1-xBJtkf59c2V5ncf-Q-1_Eg.jpeg)
+![](/images/max/2000/1-xBJtkf59c2V5ncf-Q-1_Eg.jpeg)
 
 **Why do you prefer PostgreSQL over other SQL databases?**
 

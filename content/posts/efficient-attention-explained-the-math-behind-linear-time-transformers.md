@@ -4,7 +4,7 @@ date = 2025-10-13
 slug = "efficient-attention-explained-the-math-behind-linear-time-transformers"
 
 [extra]
-feature_image = "/content/images/2025/12/the-astronomer.jpg"
+feature_image = "/images/2025/12/the-astronomer.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -32,7 +32,7 @@ Both the $Q$ and $K$ matrices must have the same embedding dimension, so we can 
 
 The softmax function works by mapping each element of an arbitrary, real numbers array into the range $(0, 1)$ - this is how it looks for a given input element:
 
-![Im 1](https://github.com/lambdaclass/linear_attention_blog/blob/main/images/softmax.png?raw=true)
+![Im 1](/images/external/softmax.png?raw=true)
 
 The $\sqrt{d_k}$ scaling factor is present to prevent the softmax function from saturating – as $d_k$ becomes larger, the dot products in $QK^T$ grows larger in magnitude, pushing the softmax function into regions where it is essentially flat and thus has extremely small gradients. While using backpropagation for training, this may turn into stability issues, slow training or even leaving some parameters entirely frozen for the whole training process.
 
@@ -240,11 +240,11 @@ For reference, these benchmarks were run on a machine with the following specs:
         * **OS:** Ubuntu 22.04 LTS (Kernel 5.15.0-157)
         * **CPU:** 8 × Intel(R) Xeon(R) Gold 5315Y @ 3.20 GHz
 
-![Im 2](https://github.com/lambdaclass/linear_attention_blog/blob/main/images/execution_time.png?raw=true)
+![Im 2](/images/external/execution_time.png?raw=true)
 
 Similarly, below is the comparison for the memory resources
 
-![Im 3](https://github.com/lambdaclass/linear_attention_blog/blob/main/images/memory_usage.png?raw=true)
+![Im 3](/images/external/memory_usage.png?raw=true)
 
 As one can see, at the beginning, the memory and performance are similar for both (although better for the linear attention implementation), but for larger sequence lengths, both the time and memory requirements of the original implementation grow exponentially (plots are in log-log scale, so a greater slope means greater exponent), whilst the Efficient Attention implementation doesn’t.
 

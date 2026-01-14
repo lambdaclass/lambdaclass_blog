@@ -4,7 +4,7 @@ date = 2023-01-05
 slug = "fully-private-applications-a-zexe-protocol"
 
 [extra]
-feature_image = "/content/images/2025/12/Blake_Dante_Hell_V.jpg"
+feature_image = "/images/2025/12/Blake_Dante_Hell_V.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

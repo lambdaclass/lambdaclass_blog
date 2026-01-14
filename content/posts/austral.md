@@ -5,7 +5,7 @@ slug = "austral"
 description = "Austral is a new systems programming language. It uses linear types to provide memory safety and capability-secure code, and is designed to be simple enough to be understood by a single person, with a focus on readability, maintainability, and modularity."
 
 [extra]
-feature_image = "/content/images/2025/12/Salvator_Rosa_-_Pythagoras_Emerging_from_the_Underworld_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Salvator_Rosa_-_Pythagoras_Emerging_from_the_Underworld_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

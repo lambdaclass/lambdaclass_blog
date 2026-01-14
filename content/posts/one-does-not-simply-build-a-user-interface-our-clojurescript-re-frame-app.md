@@ -5,7 +5,7 @@ slug = "one-does-not-simply-build-a-user-interface-our-clojurescript-re-frame-ap
 description = "Part I of this article discussed the motivation to build HolidayPing and the design and development process of the back end Erlang…"
 
 [extra]
-feature_image = "/content/images/2025/12/Vaclav_Brozik_-_Volba.jpg"
+feature_image = "/images/2025/12/Vaclav_Brozik_-_Volba.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ tags = ["Clojure", "Clojurescript", "React", "Holidayping"]
 
 _Discuss and vote at_[ _lobsters_](https://lobste.rs/s/qlblgh/one_does_not_simply_build_user_interface) _,_[_reddit_](https://www.reddit.com/r/programming/comments/7hhrb1/one_does_not_simply_build_a_user_interface_our/) _and_[ _hn_](https://news.ycombinator.com/item?id=15844203) _._
 
-![](/content/images/max/2000/1-BdFV-bGWhQ5HiIL6VfY5xg.png)
+![](/images/max/2000/1-BdFV-bGWhQ5HiIL6VfY5xg.png)
 
 Before getting into the details, a couple of disclaimers are in order:
 

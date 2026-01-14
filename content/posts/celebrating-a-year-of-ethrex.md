@@ -5,7 +5,7 @@ slug = "celebrating-a-year-of-ethrex"
 description = "We celebrate a year of development on ethrex and talk about what sets it apart."
 
 [extra]
-feature_image = "/content/images/2025/12/Jean-Le--on_Ge--ro--me_-_Louis_XIV_and_Moliere.jpg"
+feature_image = "/images/2025/12/Jean-Le--on_Ge--ro--me_-_Louis_XIV_and_Moliere.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

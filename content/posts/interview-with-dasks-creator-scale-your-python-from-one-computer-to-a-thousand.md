@@ -5,7 +5,7 @@ slug = "interview-with-dasks-creator-scale-your-python-from-one-computer-to-a-th
 description = "My love for building distributed systems with Erlang, databases and fetching huge volumes of data still lives on. But nowadays I want to…"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-19-at-12.18.43---PM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-19-at-12.18.43---PM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]

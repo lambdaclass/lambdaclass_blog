@@ -4,7 +4,7 @@ date = 2023-03-06
 slug = "our-small-contribution-to-paradigms-reth-to-diversify-ethereum-clients"
 
 [extra]
-feature_image = "/content/images/2025/12/Peter_Paul_Rubens_-_Hercules_as_Heroic_Virtue_Overcoming_Discord_-cropped-.jpg"
+feature_image = "/images/2025/12/Peter_Paul_Rubens_-_Hercules_as_Heroic_Virtue_Overcoming_Discord_-cropped-.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -26,7 +26,7 @@ In Reth, the staged sync pipeline executes queued stages serially. An external c
 
 The [reth docs](https://github.com/paradigmxyz/reth/blob/main/crates/stages/src/pipeline/mod.rs#L28) for the pipeline have an excellent diagram detailing how the stages work.
 
-![](https://i.imgur.com/yMGxizE.png)
+![](/images/external/yMGxizE.png)
 
 Of course, nothing is written in stone, and may change as possible improvements are detected and implemented, and as the project takes on it’s own direction.
 

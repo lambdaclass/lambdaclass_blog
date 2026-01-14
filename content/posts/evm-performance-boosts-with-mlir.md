@@ -4,7 +4,7 @@ date = 2024-06-14
 slug = "evm-performance-boosts-with-mlir"
 
 [extra]
-feature_image = "/content/images/2025/12/GericaultHorseman.jpg"
+feature_image = "/images/2025/12/GericaultHorseman.jpg"
 authors = ["LambdaClass"]
 +++
 

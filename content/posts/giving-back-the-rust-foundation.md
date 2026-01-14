@@ -4,7 +4,7 @@ date = 2024-07-31
 slug = "giving-back-the-rust-foundation"
 
 [extra]
-feature_image = "/content/images/2025/12/Jura_de_Santa_Gadea--1-.jpg"
+feature_image = "/images/2025/12/Jura_de_Santa_Gadea--1-.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -17,4 +17,4 @@ Another slice of our history is that Lambda hails from South America and specifi
 
 In short, we are proud to give back to the community that helped us grow, grateful to the Rust Foundation for channeling contributions, and we hope to continue contributing as our means allow.
 
-![](/content/images/2025/12/rustlatam-everyone.jpg)
+![](/images/2025/12/rustlatam-everyone.jpg)

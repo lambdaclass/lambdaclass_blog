@@ -4,7 +4,7 @@ date = 2024-05-03
 slug = "aligned-layer-first-aligned-testnet-in-eigenlayer"
 
 [extra]
-feature_image = "/content/images/2025/12/Baron_Franc--ois_Pascal_Simon_Ge--rard_-_Marius_Returning_to_Rome_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Baron_Franc--ois_Pascal_Simon_Ge--rard_-_Marius_Returning_to_Rome_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 +++
 

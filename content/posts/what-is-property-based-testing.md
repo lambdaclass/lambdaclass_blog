@@ -4,7 +4,7 @@ date = 2023-02-03
 slug = "what-is-property-based-testing"
 
 [extra]
-feature_image = "/content/images/2025/12/Francisco_de_Zurbara--n_053.jpg"
+feature_image = "/images/2025/12/Francisco_de_Zurbara--n_053.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

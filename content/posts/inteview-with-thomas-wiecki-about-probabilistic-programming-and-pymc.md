@@ -5,7 +5,7 @@ slug = "inteview-with-thomas-wiecki-about-probabilistic-programming-and-pymc"
 description = "After studying and working with distributed systems my interests drifted into data science, artificial intelligence, machine learning and…"
 
 [extra]
-feature_image = "/content/images/2025/12/The_State_Barge_of_Cardinal_Richelieu_on_the_Rho--ne.png"
+feature_image = "/images/2025/12/The_State_Barge_of_Cardinal_Richelieu_on_the_Rho--ne.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Machine Learning"]
 
 ### Inteview with Thomas Wiecki about PyMC and probabilistic programming
 
-![](/content/images/max/2000/1-Ke59y1Iyox6MUJ1HpEkLyg.jpeg)“A colleague of von Neumann and Ulam, Nicholas Metropolis, suggested using the name __Monte Carlo__ , which refers to the Monte Carlo Casino in Monaco where Ulam’s uncle would borrow money from relatives to gamble”
+![](/images/max/2000/1-Ke59y1Iyox6MUJ1HpEkLyg.jpeg)“A colleague of von Neumann and Ulam, Nicholas Metropolis, suggested using the name __Monte Carlo__ , which refers to the Monte Carlo Casino in Monaco where Ulam’s uncle would borrow money from relatives to gamble”
 
 After studying and working with distributed systems my interests drifted into data science, artificial intelligence, machine learning and now statistics. After a while I found I really liked applying what I have learnt into finance. That is how I learnt about probabilistic programming and [PyMC](https://docs.pymc.io/) while reading Thomas Wiecki posts at [Quantopian blog](https://blog.quantopian.com/). That’s why we decided to interview Thomas. I hope you like this interview as much as we did.
 

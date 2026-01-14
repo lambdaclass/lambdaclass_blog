@@ -4,7 +4,7 @@ date = 2023-01-18
 slug = "message-authentication-codes"
 
 [extra]
-feature_image = "/content/images/2025/12/Frederich_August_Moritz_Retzsch.jpg"
+feature_image = "/images/2025/12/Frederich_August_Moritz_Retzsch.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

@@ -5,7 +5,7 @@ slug = "how-we-wrote-a-hands-on-bayesian-data-science-book-in-6-months"
 description = "Learn about data science and Julia while solving real-life problems"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.41.58---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.41.58---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ tags = ["Data Science", "Julia", "Hackers", "Book", "Machine Learning"]
 
 **Read our book "Data Science in Julia for Hackers" at:**[**https://datasciencejuliahackers.com/**](https://datasciencejuliahackers.com/)
 
-![](/content/images/max/2000/1-t93INVDo-XNSm7iObeXODQ.png)
+![](/images/max/2000/1-t93INVDo-XNSm7iObeXODQ.png)
 
 * * *
 

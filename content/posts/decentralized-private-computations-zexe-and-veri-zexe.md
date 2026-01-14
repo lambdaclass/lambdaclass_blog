@@ -4,7 +4,7 @@ date = 2023-01-13
 slug = "decentralized-private-computations-zexe-and-veri-zexe"
 
 [extra]
-feature_image = "/content/images/2025/12/Charles_Le_Brun_-_Entry_of_Alexander_into_Babylon.jpeg"
+feature_image = "/images/2025/12/Charles_Le_Brun_-_Entry_of_Alexander_into_Babylon.jpeg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -83,7 +83,7 @@ We can get the final result by finally adding over the \\( m \\) buckets,
 
 ## Further improvements from HyperPlonk?
 
-![](https://i.imgur.com/xymqID7.jpg)
+![](/images/external/xymqID7.jpg)
 
 VERI-ZEXE uses PLONK with lookup tables, resulting in fewer constraints and shorter proving times. Two weeks ago, HyperPLONK came out, providing linear time prover and high-degree custom gates. One of the key changes is the shift from univariate polynomials (polynomials in one variable, \\(x \\), such as \\(a_0+a_1x+a_2x2+...a_dxd \\)) to multivariate linear polynomials (polynomials in several variables, where the degree of each \\( x_k \\) is at most one, such as \\( a_0 +a_1x_1+a_2x_2+a_{12}x_1x_2+a_{145}x_1x_4x_5 \\)). This change avoids using the fast Fourier transform (FFT) for very large systems (with over \\(2^{20} \\) constraints), which has a superlinear cost (roughly speaking, the FFT for \\( n \\) points needs \\( n\log(n) \\) operations). Preliminary studies have shown that this new PLONK version performs better for circuits with more than 16000 constraints compared to optimized versions of the original proposal. We will cover this topic in an upcoming post.
 

@@ -5,7 +5,7 @@ slug = "responsible-disclosure-a-potential-sequencer-prover-inconsistency-in-the
 description = "On January 26th Starkware informed us that they had found a critical issue in the Cairo VM related to a program that would successfully execute on the VM but would violate the AIR constraints. A fix was already implemented in a PR, merged, and a release was made and deployed."
 
 [extra]
-feature_image = "/content/images/2025/12/Delacroix_barque_of_dante_1822_louvre_189cmx246cm_950px.jpg"
+feature_image = "/images/2025/12/Delacroix_barque_of_dante_1822_louvre_189cmx246cm_950px.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

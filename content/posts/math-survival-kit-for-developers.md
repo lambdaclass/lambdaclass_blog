@@ -4,7 +4,7 @@ date = 2022-08-19
 slug = "math-survival-kit-for-developers"
 
 [extra]
-feature_image = "/content/images/2025/12/Gallen_Kallela_The_Forging_of_the_Sampo.jpg"
+feature_image = "/images/2025/12/Gallen_Kallela_The_Forging_of_the_Sampo.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

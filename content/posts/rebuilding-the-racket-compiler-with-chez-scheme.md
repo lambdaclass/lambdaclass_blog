@@ -5,7 +5,7 @@ slug = "rebuilding-the-racket-compiler-with-chez-scheme"
 description = "An interview on Racket CS with programmers Gustavo Massaccesi Matthew Flatt"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.51.21---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.51.21---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Chez Scheme", "Lisp", "Racket", "Racket Cs", "C"]
 
 #### An interview on Racket CS with programmers Gustavo Massaccesi Matthew Flatt
 
-![](/content/images/max/2000/1-so5Q8KpDmcaIAKUHU5V9mw.png)Still from a [2018 talk by Matthew Flatt](https://www.youtube.com/watch?v=t09AJUK6IiM), intervened by us
+![](/images/max/2000/1-so5Q8KpDmcaIAKUHU5V9mw.png)Still from a [2018 talk by Matthew Flatt](https://www.youtube.com/watch?v=t09AJUK6IiM), intervened by us
 
 Racket flaunts the title of being _the programmable programming language_. With extensibility at its core, it takes metaprogramming to the next level by encouraging developers to implement their own DSLs to solve the problem at hand.
 
@@ -22,7 +22,7 @@ Following this same principle, its development team attacks the complexity of wr
 
 On the other hand, the project had many legacy components written in C that became a development bottleneck, so in 2017, Matthew Flatt made an announcement on a Racket Developers group:
 
-![](/content/images/max/2000/1-oXZFdbH7adA58JPU4Cu2tw.png)[Source](https://groups.google.com/g/racket-dev/c/2BV3ElyfF8Y/m/4RSd3XbECAAJ?pli=1)
+![](/images/max/2000/1-oXZFdbH7adA58JPU4Cu2tw.png)[Source](https://groups.google.com/g/racket-dev/c/2BV3ElyfF8Y/m/4RSd3XbECAAJ?pli=1)
 
 Chez is a Scheme implementation which was open sourced by Cisco in 2016. Its performance has no match among other schemes and it has a long history of being used in production.
 

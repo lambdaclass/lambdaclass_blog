@@ -4,7 +4,7 @@ date = 2023-01-27
 slug = "proof-aggregation-schemes"
 
 [extra]
-feature_image = "/content/images/2025/12/A-Roman-Feast.jpg"
+feature_image = "/images/2025/12/A-Roman-Feast.jpg"
 authors = ["LambdaClass"]
 +++
 

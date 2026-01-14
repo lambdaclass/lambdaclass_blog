@@ -4,7 +4,7 @@ date = 2023-09-27
 slug = "lambdas-engineering-philosophy"
 
 [extra]
-feature_image = "/content/images/2025/12/Last_Judgement_by_Michelangelo.jpg"
+feature_image = "/images/2025/12/Last_Judgement_by_Michelangelo.jpg"
 authors = ["LambdaClass"]
 +++
 

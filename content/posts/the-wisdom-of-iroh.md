@@ -5,7 +5,7 @@ slug = "the-wisdom-of-iroh"
 description = "We interview the team developing Iroh, a Rust peer-to-peer library that just works. "
 
 [extra]
-feature_image = "/content/images/2025/12/Carl_Blechen_-_Waldweg_bei_Spandau_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Carl_Blechen_-_Waldweg_bei_Spandau_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

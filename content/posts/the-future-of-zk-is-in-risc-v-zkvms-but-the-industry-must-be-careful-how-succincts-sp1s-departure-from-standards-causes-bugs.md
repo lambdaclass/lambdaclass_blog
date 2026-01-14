@@ -4,7 +4,7 @@ date = 2024-12-21
 slug = "the-future-of-zk-is-in-risc-v-zkvms-but-the-industry-must-be-careful-how-succincts-sp1s-departure-from-standards-causes-bugs"
 
 [extra]
-feature_image = "/content/images/2025/12/Horace_Vernet_-_Italian_Brigands_Surprised_by_Papal_Troops_-_Walters_3754.jpg"
+feature_image = "/images/2025/12/Horace_Vernet_-_Italian_Brigands_Surprised_by_Papal_Troops_-_Walters_3754.jpg"
 authors = ["LambdaClass"]
 +++
 

@@ -4,20 +4,20 @@ date = 2015-08-08
 slug = "eric-merritt-erlang-and-distributed-systems-expert-gives-his-views-on-beam-languages-hindley"
 
 [extra]
-feature_image = "/content/images/2025/12/Le_Jugement_de_Salomon_-_1649_-_Nicolas_Poussin_-_Louvre_-_INV_7277_-_MR_2316.jpg"
+feature_image = "/images/2025/12/Le_Jugement_de_Salomon_-_1649_-_Nicolas_Poussin_-_Louvre_-_INV_7277_-_MR_2316.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Erlang", "Programming", "Ocaml"]
 +++
 
-![](/content/images/max/2000/1-Bvd7l2Q-OmEhkVC2qcclJA.png)
+![](/images/max/2000/1-Bvd7l2Q-OmEhkVC2qcclJA.png)
 
 ### Eric Merritt, Erlang and distributed systems expert, gives his views on BEAM languages, Hindley–Milner type systems and new technologies
 
 In this case, [This is not a Monad tutorial](https://medium.com/this-is-not-a-monad-tutorial) interviewed [Eric Merritt](https://twitter.com/ericbmerritt), author of [Erlang and OTP in Action](http://www.manning.com/logan/), [Joxa](http://joxa.org/) (a small semantically clean, functional lisp running on the Erlang VM), [relx](https://github.com/erlware/relx) (best release creation tool in Erlang).
 
-![](/content/images/max/2000/1-XCrgX6wctMhx0GLjNQS9nw.jpeg)
+![](/images/max/2000/1-XCrgX6wctMhx0GLjNQS9nw.jpeg)
 
 In the following weeks we will be talking with Robert Virding — Erlang co-inventor and [Lisp Flavored Erlang](http://lfe.io/) creator — , [Brian McKenna](https://github.com/puffnfresh) —[Roy](https://github.com/puffnfresh/roy) language creator— and with [MirageOS unikernel](https://mirage.io/) dev team. Stay tuned!
 
@@ -63,7 +63,7 @@ I love lazyness in concept. I think the idea that computation only occurs when i
 
 **Why do you like Hindley–Milner type system? [the type system used in the ML family (Standard ML, Caml, OCaml, F#) and Haskell]**
 
-![](/content/images/max/2000/1-TKFIhHLhfGTz5uMBn6NfkQ.png) Image stolen from [http://learnyousomeerlang.com/](http://learnyousomeerlang.com/)
+![](/images/max/2000/1-TKFIhHLhfGTz5uMBn6NfkQ.png) Image stolen from [http://learnyousomeerlang.com/](http://learnyousomeerlang.com/)
 
 Essentially, it’s because I am lazy. Much like resource management, contract management is a slow, manual painful process. By contract management, I mean verifying that the form of data a function recieves is the form of data that it expects. A Hindley-Milner style type system allows me to offload that tedious work to the compiler. Computers are essentially better at that kind of tedious work than humans.
 

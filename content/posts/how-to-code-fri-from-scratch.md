@@ -4,7 +4,7 @@ date = 2023-08-18
 slug = "how-to-code-fri-from-scratch"
 
 [extra]
-feature_image = "/content/images/2025/12/Aeneas-Crowning-Cloanthus.jpg"
+feature_image = "/images/2025/12/Aeneas-Crowning-Cloanthus.jpg"
 authors = ["LambdaClass"]
 +++
 

@@ -4,7 +4,7 @@ date = 2023-09-02
 slug = "dont-trust-verify-or-why-you-should-you-care-about-benchmarks"
 
 [extra]
-feature_image = "/content/images/2025/12/The-Idolatry-of-King-Solomon.jpg"
+feature_image = "/images/2025/12/The-Idolatry-of-King-Solomon.jpg"
 authors = ["LambdaClass"]
 +++
 

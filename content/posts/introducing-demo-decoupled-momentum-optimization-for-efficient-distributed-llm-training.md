@@ -4,7 +4,7 @@ date = 2024-12-06
 slug = "introducing-demo-decoupled-momentum-optimization-for-efficient-distributed-llm-training"
 
 [extra]
-feature_image = "/content/images/2025/12/Horace_Vernet_-1789-1863-_-_Arabs_Travelling_in_the_Desert_-_P584_-_The_Wallace_Collection.jpg"
+feature_image = "/images/2025/12/Horace_Vernet_-1789-1863-_-_Arabs_Travelling_in_the_Desert_-_P584_-_The_Wallace_Collection.jpg"
 authors = ["LambdaClass"]
 +++
 
@@ -143,7 +143,7 @@ Using these conjectures, the authors modify the SGD method with momentum to deco
 ## How does DeMo work?
 
 The starting point is the Stochastic Gradient Descent (SGD) with momentum algorithm. Instead of computing the overall gradient, we will compute local gradients and use them to update the (decoupled) momentum. Then, we will extract the $k$ fastest components for each momentum and subtract them from the decoupled momentum. Finally, we will communicate and synchronize all the fast components and update the parameters using this synchronized gradient. This is the algorithm as described in the [paper](https://arxiv.org/pdf/2411.19870):  
-![Screenshot 2024-12-04 at 2.35.32 PM](https://hackmd.io/_uploads/SJeEXz07ye.png)
+![Screenshot 2024-12-04 at 2.35.32 PM](/images/external/SJeEXz07ye.png)
 
 The extraction of the fast components is critical for the algorithm's performance. While the Kosambi–Karhunen–Loève Transform provides a way to achieve the decorrelation, separation, and extraction of the main components, the DCT offers an excellent approximation under the hypothesis provided above. The advantages of DCT lie in its efficient computation and high degree of parallelization. Besides, it is computed on a fixed orthogonal basis, which allows us to decode a DCT-encoded signal efficiently without additional information.
 

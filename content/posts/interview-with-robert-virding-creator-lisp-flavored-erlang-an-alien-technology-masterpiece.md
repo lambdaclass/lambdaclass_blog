@@ -5,14 +5,14 @@ slug = "interview-with-robert-virding-creator-lisp-flavored-erlang-an-alien-tech
 description = "This time I interviewed Robert Virding, co-creator of Erlang and creator of Lisp Flavored Erlang (LFE). I am an Erlang developer and Lisp…"
 
 [extra]
-feature_image = "/content/images/2025/12/William-Adolphe_Bouguereau_-1825-1905-_-_Not_Too_Much_To_Carry_-1895-.jpg"
+feature_image = "/images/2025/12/William-Adolphe_Bouguereau_-1825-1905-_-_Not_Too_Much_To_Carry_-1895-.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Functional Programming", "Erlang", "Development"]
 +++
 
-![](/content/images/max/2000/1-0_N8_5MqdROjW5duRb6Dpw.png)As you might know zombies, skeletons and momies are good friends of aliens
+![](/images/max/2000/1-0_N8_5MqdROjW5duRb6Dpw.png)As you might know zombies, skeletons and momies are good friends of aliens
 
 This time I interviewed [Robert Virding](https://twitter.com/rvirding), co-creator of Erlang and creator of [Lisp Flavored Erlang](http://lfe.io/) (LFE). I am an Erlang developer and Lisp fan — if you are learning Clojure check out my post [How to earn your Clojure white belt](https://medium.com/this-is-not-a-monad-tutorial/how-to-earn-your-clojure-white-belt-7e7db68a71e5#.dtmcog9gk) — so logically I am very excited about LFE.
 

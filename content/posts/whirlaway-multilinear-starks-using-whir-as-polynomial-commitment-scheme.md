@@ -4,7 +4,7 @@ date = 2025-08-29
 slug = "whirlaway-multilinear-starks-using-whir-as-polynomial-commitment-scheme"
 
 [extra]
-feature_image = "/content/images/2025/12/Reception-of-le-gran-conde.jpg"
+feature_image = "/images/2025/12/Reception-of-le-gran-conde.jpg"
 authors = ["LambdaClass"]
 +++
 

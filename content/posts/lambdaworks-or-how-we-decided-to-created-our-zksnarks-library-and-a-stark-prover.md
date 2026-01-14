@@ -4,7 +4,7 @@ date = 2023-03-01
 slug = "lambdaworks-or-how-we-decided-to-created-our-zksnarks-library-and-a-stark-prover"
 
 [extra]
-feature_image = "/content/images/2025/12/Peter_Paul_Rubens_110.jpg"
+feature_image = "/images/2025/12/Peter_Paul_Rubens_110.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
