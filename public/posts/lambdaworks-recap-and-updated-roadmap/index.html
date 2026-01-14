@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lambdaworks - recap and updated roadmap - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">lambdaworks - recap and updated roadmap</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-09-24">September 24, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>It has been over a year and a half since we launched <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/lambdaworks">lambdaworks</a>, our cryptography library for zero-knowledge (ZK) proofs. We built it focusing on performance, ease of use, support for hardware acceleration, and teaching others how to develop and understand ZK.</p>
+<p>Several advances in ZK in the last year have offered incredible performance gains over previous schemes. For example, circle STARKs has allowed to prove over <a rel="noopener external" target="_blank" href="https://x.com/StarkWareLtd/status/1807776563188162562">620k Poseidon2 hashes per second on consumer-end hardware</a>. Binius allows us to leverage the power of binary fields. Their performance can be greatly increased by using specialized hardware. We have seen new lookup arguments that depend only on the number of lookups used. We also have more efficient hash functions. Last year, we also saw the development and release of general proving zk virtual machines (zkvm). These allow us to write ordinary code (for example, in Rust), execute it on top of the virtual machine, and generate a proof of the execution. This simplifies the development of verifiable applications, abstracting developers from the low-level details of ZK. With the introduction of <a rel="noopener external" target="_blank" href="https://docs.alignedlayer.com/">Aligned</a>, we expect proof verification costs to go consistently down, enabling new verifiable applications built on top of Ethereum. We can predict that ZK will become more and more important in the coming years, and it is necessary, therefore, to have many of the essential tools in our library.</p>
+<p>Before jumping into the future, let us recap some of the features and numbers of lambdaworks:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * 493 pull requests merged.</span></span>
+<span class="giallo-l"><span>    * 73 contributors.</span></span>
+<span class="giallo-l"><span>    * 14 releases.</span></span>
+<span class="giallo-l"><span>    * Over 185k downloads.</span></span>
+<span class="giallo-l"><span>    * 4 proof systems (STARKs, Cairo, Groth16, Plonk) and two additional example implementations (Pinocchio and BabySNARK).</span></span>
+<span class="giallo-l"><span>    * 2 editions of the Sparkling Water Bootcamp in Cryptography, with 30 bootcampers from different countries.</span></span>
+<span class="giallo-l"><span>    * [Backend for finite fields](https://github.com/lambdaclass/lambdaworks/tree/main/math/src/field) using Montgomery arithmetic, plus specialized backends for fields with simpler reduction formulae.</span></span>
+<span class="giallo-l"><span>    * [Backend for elliptic curve operations](https://github.com/lambdaclass/lambdaworks/tree/main/math/src/elliptic_curve), with different coordinate systems.</span></span>
+<span class="giallo-l"><span>    * [Backend for Univariate polynomials](https://github.com/lambdaclass/lambdaworks/tree/main/math/src/polynomial) and Fast Fourier Transform (FFT).</span></span>
+<span class="giallo-l"><span>    * Several cryptographic tools, such as hash functions (Poseidon and Pedersen), Merkle trees, KZG commitments, and Fiat-Shamir transformation.</span></span>
+<span class="giallo-l"><span>    * Examples and exercises.</span></span></code></pre>
+<p>Considering all the recent advances and trends, as well as the experience we got from users and friends, we will incorporate new features and improve existing ones according to the following roadmap.</p>
+<h2 id="roadmap">Roadmap</h2>
+<p>The following is a list of features and updates we want to incorporate into lambdaworks. We may change some or include new ones according to the latest developments in ZK technology:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Improve field backends using assembly.</span></span>
+<span class="giallo-l"><span>    * Improve field extension backends.</span></span>
+<span class="giallo-l"><span>    * Provide new backend implementation for Mersenne primes.</span></span>
+<span class="giallo-l"><span>    * Incorporate binary fields.</span></span>
+<span class="giallo-l"><span>    * Improve and add features on multilinear and multivariate polynomials.</span></span>
+<span class="giallo-l"><span>    * Improve the performance of BLS12-381 and BLS12-377 pairings.</span></span>
+<span class="giallo-l"><span>    * Add new hash functions: Rescue, [XHash8 and XHash12](https://eprint.iacr.org/2023/1045.pdf), Poseidon 2.</span></span>
+<span class="giallo-l"><span>    * Add [logUp with GKR](https://eprint.iacr.org/2023/1284).</span></span>
+<span class="giallo-l"><span>    * Add [Binius](https://eprint.iacr.org/2023/1784).</span></span>
+<span class="giallo-l"><span>    * Add [Circle STARKs](https://eprint.iacr.org/2024/278).</span></span>
+<span class="giallo-l"><span>    * Provide tools for efficient proof recursion.</span></span>
+<span class="giallo-l"><span>    * Provide more documentation, examples, use cases, etc.</span></span>
+<span class="giallo-l"><span>    * Add more theoretical background to the library.</span></span>
+<span class="giallo-l"><span>    * Finish integration with [Icicle](https://github.com/ingonyama-zk/icicle).</span></span>
+<span class="giallo-l"><span>    * Add bindings for Python and other programming languages.</span></span></code></pre><h2 id="summary">Summary</h2>
+<p>Over the last year and a half, we have seen many new developments in ZK, improving the performance of proof systems while greatly simplifying the development of verifiable applications. The introduction of ZK verification layers will lead to lower verification costs and new applications.</p>
+<p>lambdaworks has incorporated many proof systems and different cryptographic primitives to help developers build applications and understand how things work under the hood. We present the new roadmap for the library, hoping to incorporate new proof systems, such as Circle STARKS and Binius while maintaining simplicity and providing clear and straightforward documentation. That way, we hope to bring ZK to developers worldwide, helping them adopt and make this transformative technology available to everybody.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

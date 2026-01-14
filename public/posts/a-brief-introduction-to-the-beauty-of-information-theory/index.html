@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A brief introduction to the beauty of Information Theory - LambdaClass Blog</title>
+    <meta name="description" content="Or how to be a hardcore Guess Who gamer">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">A brief introduction to the beauty of Information Theory</h1>
+        
+        <div class="page-meta">
+            <time datetime="2020-05-06">May 06, 2020</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h4 id="or-how-to-be-a-hardcore-guess-who-gamer">Or how to be a hardcore Guess Who gamer</h4>
+<p><em>Authors: Juan Pablo Amoroso, Javier Rodríguez Chatruc, Camilo Plata, and Federico Carrone.</em></p>
+<blockquote>
+<p>The fundamental problem of communication is that of reproducing at one point either exactly or approximately a message selected at another point.<br />
+— Claude Shannon, 1948</p>
+</blockquote>
+<p>Imagine you were tasked with designing a comunications system between a space station and a ground control headquarters back in Earth. The system would transmit and receive messages encoded in binary, that is, as a sequence of 1s and 0s. As the message travels, there may be interferences from other radio signals, so that what is picked up in ground control is not exactly the same as the original message. Under these circumstances, is it possible to devise a scheme that allows reliable comunication?</p>
+<p>A simple workaround would be to add redundancy: send each bit a number of times, let’s say 5:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>11111</span></span>
+<span class="giallo-l"><span>00000</span></span>
+<span class="giallo-l"><span>…</span></span></code></pre>
+<p>If ground control receives the message <em>11101</em> , they could be fairly certain that what was truly sent was <em>11111</em>. Although this simple system would work (up to a point), we can see that it is very wasteful: we have to send 4 extra bits for every bit in the original message. The <em>transmission rate</em> is therefore only 20%. Can we do any better?</p>
+<p>There seems to be a dilemma here: if we want accuracy, we must lower the rate of transmission.</p>
+<p>This is the problem Claude Shannon tackled in his 1948 paper <em>A Mathematical Theory of Communication</em>. In it, he proved that there is a limit for the rate of information that can be reliably transmitted over a noisy channel (the <em>Shannon limit</em>). However, below this limit we can transmit information with an increasingly small error. This important result tells us that there <em>exists</em> a code that allows arbitrary accuracy over a given comunication channel, but it does not tell us how to build it.</p>
+<p>More precisely, let’s say a channel has a probability <em>p</em> of transmitting a bit correctly, and a corresponding probability of 1 —  <em>p</em> of sending the wrong bit, Shannon proved that the optimum rate of transmission is:</p>
+<p><img src="/images/max/2000/1-kCNAUFlhWJv1kUzKatqINA.png" alt="" /><img src="/images/max/2000/1-TgCse1znfuWYULYwXeo4Aw.png" alt="" /></p>
+<p>The plot is symmetrical around <em>p = 0.5</em> , with maxima at <em>p = 0</em> and <em>p = 1</em>. The case of <em>p = 0</em> is interesting, the channel has perfect noise: it flips all the bits in the original message. But if we know that, then the message is trivially deciphered, we just flip them back.</p>
+<p>The formula is commonly stated in terms of <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Entropy_%28information_theory%29">information entropy</a>, a measure Shannon devised that can be interpreted as the level of ‘uncertainty’ or ‘surprise’ associated with the channel.</p>
+<p><img src="/images/max/2000/1-fCyO-nZidJEiOqwqDGWJ3g.png" alt="" /><img src="/images/max/2000/1-s0z3MUCTtJvh_AsvxGg72g.png" alt="" /></p>
+<p>We can see that the entropy has a maximum at 1 when <em>p</em> = ½, and minima at 0 for <em>p =</em> 0 and <em>p =</em> 1.</p>
+<p>More generally, given a random message <em>M</em> that can take <em>n</em> different values with probability <em>pᵢ</em> for <em>i =</em> 1,…,<em>n</em> , we define the entropy of the message as:</p>
+<p><img src="/images/max/2000/1-ezweLprVK1INseQwDCN2yg.png" alt="" /></p>
+<h4 id="guess-who-example">Guess Who example</h4>
+<p>Let’s take a different approach. Suppose you are playing <em>Guess Who</em> , the game where you ask yes/no questions about the appearance of your opponent’s character in order to single him or her out among a set of characters. You ask yourself: what order should I ask the questions in to maximise the probability of winning? Intutively, you try to ask first about features most of the characters have.</p>
+<p><img src="/images/max/2000/1-TkW9quvg52IBgM06fM-7IA.jpeg" alt="" />Hardcore Guess Who gamers apply Information Theory for optimal results</p>
+<p>Moreover, an optimal question is one that divides the population evenly, that is, one that regardless of the answer (<em>yes</em> or <em>no</em>) discards half the characters. In any other case, you are not gaining the optimal amount of information with each question.</p>
+<p>But what if you can’t divide the characters evenly by their characteristics? To answer the question, first we recall the concept of entropy defined above. We can think of a question as a variable <em>X</em> that splits the population into groups <em>xᵢ</em> with probabilities <em>pᵢ</em>. For example, think of a question about the eye color of the character (the questions in the game are technically only <em>yes</em> or <em>no</em> but this can be generalized). With this in mind, the entropy of a question becomes:</p>
+<p><img src="/images/max/2000/1-KZq1CO03SyEnsH0qLamzRQ.png" alt="" /></p>
+<p>The intuition here is that with each possible answer, we gain an amount of information  <em>— log</em> <em>p</em>(<em>x</em> ᵢ), meaning that if we receive an answer with a very low probability (i.e. we ask if the character has a feature that is shared by very few people, and the answer is yes), the amount of information we gained is higher than an answer with more probability.</p>
+<p>On the other hand, entropy is related to uncertainty. For example, if we flip a coin, the uncertainty in the outcome is higher with a <em>p</em> = 0.5 than with any other value of <em>p</em>. And in our case, more uncertainty is better. Why? If we choose a question with an uneven distribution in the population, lets say 0.7 and 0.3, the odds are that our character is among the 70%, discarding with the <em>no</em> answer only the remaining 30%, but with a more even division (and therefore more uncertain), we always tend to discard 50% of the population, leading to an advantage in the long run. This means that the best questions to ask are those that maximize the entropy, i.e, the ones with the higher uncertainty.</p>
+<h4 id="decision-trees">Decision Trees</h4>
+<p>One common use of entropy is in decision trees, where one uses a set of features (features that split the data into disjoint sets) to construct a flowchart for a classification problem. Here, a common question is: which order should we “apply” the features in to get the best splits? A possible solution is to recursively always use the feature that maximizes the <em>information gain</em>. If we’re working with a dataset <em>S</em> and our feature is called <em>X</em> , the information gained on <em>S</em> by <em>X</em> , <em>I</em>(<em>S</em> ,<em>X</em>), is calculated as:</p>
+<p><img src="/images/max/2000/1-tIzlfBpMihRvpfZICpWZJA.png" alt="" /></p>
+<p>where <em>H</em>(<em>S</em> |<em>X</em>) is the conditional entropy of <em>S</em> given <em>X</em>. Intuitively, this is just the reduction in the entropy of the dataset <em>S</em> if we know <em>X</em>. Thus, it makes sense to choose the features <em>X</em> that maximize this value, as they will be the ones that reduce uncertainty the most, effectively obtaining the best splits.</p>
+<p>Algorithms that consider the information gain at each node to choose the next feature are called <em>greedy</em> algorithms. Such algorithms do not take into account the overall information gain and may lead in some cases to suboptimal queries, but they are well-behaved and have a straightforward approach.</p>
+<p>As an example, consider the picture below, where a decision tree method was used on the famous Iris flower dataset and two features were selected, the petal width, first with 0.8 cm as a threshold and then 1.75 cm. Setting aside how these specific features are selected, why use the ≤ 0.8 first? With the information gain calculation we described, we can provide an answer. We will call the feature that separates petal width on 0.8 cm <em>X</em> and the other one <em>Y</em>.</p>
+<p><img src="/images/max/2000/1-dEesB-YyIVG81qhIDn_T_w.png" alt="" /></p>
+<p>Applying <em>X</em> first splits the 150 data points (usually one would split between training and test sets, here for simplicity we use the entire set) into two sets: one containing the entire <em>setosa</em> class (50 points, corresponding to ≤ 0.8 cm) and nothing else, and the other containing the rest. In that case the calculations yield:</p>
+<p><img src="/images/max/2000/1-2dDOZS_8PGYonq3RZYoyAg.png" alt="" /></p>
+<p>On the other hand, applying <em>Y</em> first gives us one set with 50 <em>setosa</em> , 49 <em>versicolor</em> and 5 <em>virginica</em> (≤ 1.75 cm) and another with no <em>setosa</em> , 1 <em>versicolor</em> and 45 <em>virginica</em>. This leaves us with:</p>
+<p><img src="/images/max/2000/1-VCQsujq_mEufMZi1X4DGdw.png" alt="" /></p>
+<p>Thus the information gain from <em>X</em> (petal width being under or over 0.8 cm) is greater than the one from <em>Y</em> , and we should use it first. This makes sense intuitively, as <em>X</em> completely separates the <em>setosa</em> class from the other two, whereas using <em>Y</em> first gives a more entangled split.</p>
+<h4 id="conclusion">Conclusion</h4>
+<p>It is hard to overstate the importance of Shannon’s work: the Theory of Information has found <a rel="noopener external" target="_blank" href="https://www.britannica.com/science/information-theory/Applications-of-information-theory">many applications</a> in fields as diverse as statistical inference and machine learning, natural language processing, genetics, data compression, coding theory, and cryptography. With over 120,000 citations, few papers can boast a similar impact. In the words of information theorist Anthony Ephremides:</p>
+<blockquote>
+<p>It was like an earthquake and the aftershocks haven’t finished yet!</p>
+</blockquote>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

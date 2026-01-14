@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The fields powering Binius - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">The fields powering Binius</h1>
+        
+        <div class="page-meta">
+            <time datetime="2025-06-12">June 12, 2025</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>The development of general-purpose zkVMs has made writing verifiable applications easier, by allowing developers to write high-level code and then compiling it to RISC-V or another instruction set architecture (ISA) and running it on top of the virtual machine. The virtual machine then generates a succinct proof of execution using a proof system, such as STARKs or Groth16. Recent advances in proof systems have allowed to reduce proving times, and we are heading towards real-time proving of Ethereum blocks. <a rel="noopener external" target="_blank" href="https://www.binius.xyz/">Binius</a> is a proof system that was developed focusing on how to create a technology that is hardware-friendly. Knowing how hardware works, a tailored proof system with really fast mathematics on it can yield significant improvements. <a rel="noopener external" target="_blank" href="https://github.com/PetraProver/PetraVM">Petra</a> is the first virtual machine to leverage Binius. What makes Binius special and how does it work?</p>
+<p>In this article we will review the basic mathematics behind the Binius protocol, which exploits the boolean hypercube $\mathcal{B_\ell} = \{0 , 1 \}^\ell$. We’ll concentrate in an elementary description of binary towers and the representation of field elements, as well as addition and multiplication of field elements exploiting their natural relation with circuit level operations. Throughout this article, we will cover some of the ground material from which binary towers emerge and came to life as a technologically interesting object, namely:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Diamond and Posen&#39;s work from 2023, [&quot;Succint Arguments over Towers of Binary Fields&quot;](https://eprint.iacr.org/2023/1784)</span></span>
+<span class="giallo-l"><span>    * David Cantor&#39;s seminal 1989 paper [&quot;On Arithmetical Algorithms over Finite Fields&quot;](https://www.sciencedirect.com/science/article/pii/0097316589900204)</span></span>
+<span class="giallo-l"><span>    * Wiedemann&#39;s 1987 article [&quot;An Iterated Quadratic Extension of GF(2)&quot;](https://www.fq.math.ca/Scanned/26-4/wiedemann.pdf)</span></span></code></pre>
+<p>For more background material, see our <a href="/snarks-on-binary-fields-binius/">previous post on Binius part 1</a> and <a href="/binius-part-2/">Binius part 2</a></p>
+<h2 id="field-extensions-and-representation-of-field-elements">Field extensions and representation of field elements</h2>
+<p>In the following discussion, we will fix $\mathbb{F_2} = {0,1}$ as the field with two elements. Finite field extensions of degree $d$ of this field can be characterized as the quotient ring</p>
+<p>$$\mathbb{F}_{q} \equiv \mathbb{F}[X]/\langle f(X)\rangle$$</p>
+<p>where $f$ is any irreducible polynomial $f \in \mathbb{F_2} [X]$ of degree $d$: this field has exactly $q = 2^d$ elements and consists of all the remainders of polynomial division by $f$. In other words, it consists of polynomials of degree at most $d - 1$ with coefficients in $\mathbb{F_2}$. Also, this extension can be viewed as a vector space of dimension $d$ over the base field $\mathbb{F_2}$ which is a very nice feature. The collection</p>
+<p>$$B_q = \{1 , X , X^2 ,\ldots, X^{d - 1} \}$$</p>
+<p>commonly called “the monomial basis” and upon fixing this basis, an isomorphism identifying such a polynomial with its $\mathbb{F_2}$ coordinates is established. Addition and multiplication of field elements when viewed as polynomials, are performed modulo $f$.</p>
+<h3 id="example">Example</h3>
+<p>Consider the polynomial $$f(X) = X^2 + X + 1$$ as an element in $\mathbb{F_2} [X]$. The $f$ is irreducible; if it had a non-trivial factor $g$ then $\deg(g) = 1$ and since $g \in \mathbb{F_2} [X]$ that would force that a root of $g$ be a root of $f$. Since $f$ has no roots in the base field, then we conclude that $f$ is irreducible and</p>
+<p>$$\mathbb{F}[X]/\langle X^2+X+1\rangle $$</p>
+<p>is indeed a degree 2 extension of $\mathbb{F_2}$; this means that it can be considered as a dimension 2 vector space over the base field. The canonical basis for this vector space is then</p>
+<p>$$B_2 = \{1 , X \}$$</p>
+<p>and all its elements can be listed as linear combinations of elements of $B_2$:</p>
+<p>$$\mathbb{F_4} = \{0 , 1 , X , 1 + X \}$$</p>
+<p>The coordinate Representation of $\mathbb{F_4}$ over $\mathbb{F_2}$ can be viewed in the following table</p>
+<table><thead><tr><th>Polynomial Representation</th><th>Coordinate Representation</th></tr></thead><tbody>
+<tr><td>$0$</td><td>$(0, 0)$</td></tr>
+<tr><td>$1$</td><td>$(1, 0)$</td></tr>
+<tr><td>$X$</td><td>$(0, 1)$</td></tr>
+<tr><td>$1 + X$</td><td>$(1, 1)$</td></tr>
+</tbody></table>
+<p>The field operations in the extensions are ring operations in $\mathbb{F_2} [X]$ taken to the quotient field by considering the non-trivial relation $X^2 + X + 1 = 0 \iff X^2 = 1 + X$. <strong>This is sometimes interpreted in a straightforward manner: now $X$ becomes a root of $f$ in the field extension $\mathbb{F_4}$</strong>.</p>
+<hr />
+<p>We observe that the irreducibility of $f$ in the last example was simple since the degree of $f$ was low enough: if $\deg(f)\leq 3$ then $f$ is irreducible over $\mathbb{F}[X] \iff \quad f$ has no roots in $\mathbb{F}$ (this is a theorem in the theory of fields).</p>
+<p><strong>Definition (Quadratic extensions):</strong> Field extensions defined by quotienting by irreducible polynomials of degree 2 are called <em>quadratic</em>.</p>
+<p><strong>Definition (Towers of fields):</strong> Whenever there are fields $K,E,F$ such that</p>
+<p>$$K,\subset, E\quad\text{ and }\quad E,\subset, F$$</p>
+<p>we say that <em>$E$ is an extension of $K$</em> (usually noted $E,\rvert K$) and that <em>$F$ is an extension of $E$</em>. Putting these extensions together result in a <em>tower of extensions</em> , and we denote it by $F\rvert\quad E\quad \rvert\quad K$.</p>
+<p>It turns out that concatenating field extensions at first sight might seem alien and overly complicated but ultimately, will yield great results.</p>
+<h3 id="extended-example-two-constructions-of-mathbb-f-16">Extended example: two constructions of $\mathbb{F_{16}}$</h3>
+<p>Let’s work two different realizations of the field of 16 elements and see how fields are constructed.</p>
+<p><strong>First construction:</strong> $\mathbb{F_{16}}$ as quotient by a degree 4 polynomial:</p>
+<p>To construct the field $\mathbb{F_{16}}$ we need to find an irreducible polynomial of degree 4 over the field of two elements, $\mathbb{F_2} = \{0, 1 \}$. One such irreducible polynomial is:<br />
+$$p(X) = X^4 + X + 1$$</p>
+<p>To verify that this polynomial is irreducible over $\mathbb{F_2}$, we need to check that it has no roots in $\mathbb{F_2}$ <strong>and</strong> that it cannot be factored into the product of two irreducible polynomials of degree 2 over $\mathbb{F_2}$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. **No roots in $\mathbb{F_2}$:**  </span></span></code></pre>
+<p>- $p(0) = 0^4 + 0 + 1 = 1 \neq 0$<br />
+- $p(1) = 1^4 + 1 + 1 = 1 + 1 + 1 = 1 \pmod{2} \neq 0$<br />
+Since $p(X)$ has no roots in $\mathbb{F_2}$, it has no linear factors $(X - a)$ where $a \in \mathbb{F_2}$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    2. **No factorization into two irreducible polynomials of degree 2:**  </span></span></code></pre>
+<p>The only irreducible polynomial of degree 2 over $\mathbb{F_2}$ is $X^2 + X + 1$. If $X^4 + X + 1$ were reducible into two degree 2 polynomials, it would have to be $(X^2 + X + 1)(X^2 + aX + b)$, where $a, b \in \mathbb{F_2}$.<br />
+Expanding this product:<br />
+$$(X^2 + X + 1) (X^2 + aX + b) = X^4 + (a + 1)X^3 + (b + a + 1)X^2 + (b + a) X + b$$<br />
+Comparing the coefficients with $X^4 + 0X^3 + 0X^2 + 1X + 1$:<br />
+- Coefficient of $X^3$: $a + 1 = 0 \implies a = 1$<br />
+- Coefficient of $X^2$: $b + a + 1 = 0 \implies b + 1 + 1 = b = 0$<br />
+- Coefficient of $X$: $b + a = 1 \implies 0 + 1 = 1$ (This is consistent)<br />
+- Constant term: $b = 1$<br />
+We have a contradiction since we found $b = 0$ and $b = 1$. Therefore, $X^4 + X + 1$ cannot be factored into two irreducible polynomials of degree 2 over $\mathbb{F_2}$.</p>
+<p>Since $p(X) = X^4 + X + 1$ is irreducible of degree 4 over $\mathbb{F_2}$, the quotient ring<br />
+$$\mathbb{F_2} [X] / \langle X^4 + X + 1 \rangle$$<br />
+is a field with $2^4 = 16$ elements.</p>
+<p>Elements of this field can be represented as polynomials in $X$ of degree at most 3 with coefficients in $\mathbb{F_2}$; moreover, addition of these elements is done by adding the polynomials coefficient-wise modulo 2 while multiplication is done by multiplying the polynomials <strong>and then</strong> reducing the result modulo $X^4 + X + 1$. This reduction is achieved by repeatedly using the relation $X^4 \equiv -X - 1 \equiv X + 1 \pmod{X^4 + X + 1}$.</p>
+<p>For instance, to multiply $\alpha = 1 + X + X^3$ and $\beta = X^2 + X^3$,</p>
+<p>$$\alpha\cdot\beta = ( 1 + X + X^3 )\cdot (X^2 + X^3) = X^2 + X^3 + X^3 + X^4 + X^5 + X^6$$</p>
+<p>By making use of addition modulo 2 we may eliminate the third powers of $X$ and by the defining relation we may replace all powers of $X$ above 4:</p>
+<p>$$\alpha\cdot\beta = X^2 + ( 1 + X ) + X (1 + X) + X^2 ( 1 + X ) = X^2 + 1 + X + X + X^2 + X^2 + X^3$$</p>
+<p>and again by addition modulo 2, we obtain $\alpha \cdot \beta = 1 + X^2 + X^3$.</p>
+<p>We will see that even if it is straightforward to understand the mechanics of this pattern for multiplication, it is highly non-efficient. We would like to have a different way of representing elements in a field extension such that multiplication could be done fast and efficiently.</p>
+<p><strong>Second construction</strong> : $\mathbb{F_{16}}$ as a sequence of quadratic extensions</p>
+<p>In this approach, we will construct the field of 16 elements by realizing a tower of fields which has $\mathbb{F_{16}}$ at the top; we will exploit quadratic extensions and the fact that when polynomials are of low degree (at most 3) their irreducibility can be deduced by looking for roots.</p>
+<p><strong>Step 1: $\mathbb{F_4}$ as an extension of $\mathbb{F_2}$:</strong></p>
+<p>As before, we use the irreducible polynomial $p(t) = t^2 + t + 1$ over $\mathbb{F_2}$. Since extending $\mathbb{F_2}$ is adjoining a root $X_0$ of $f$, we will simply say that</p>
+<p>$$\mathbb{F_4} = \mathbb{F_2} (X_0 )$$</p>
+<p>and the four elements of this field are simply ${ 0, 1, X_0, 1 + X_0 }$, with $X_0^2 = X_0 + 1$.</p>
+<p><strong>Step 2: $\mathbb{F_{ 16 }}$ as an extension of $\mathbb{F_4}$:</strong></p>
+<p>Since $\mathbb{F_4}$ has 4 elements, we need an irreducible polynomial of degree $2$ over $\mathbb{F_4}$ to construct $\mathbb{F_{16}}$ and grant $[\mathbb{F_{16}} : \mathbb{F_4} ] = 2$ (see here for <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Degree_of_a_field_extension">degree of an extension</a>); consider the polynomial $$q(t) = t^2 + t + X_0$$ over $\mathbb{F_4}$. To check for irreducibility, we need to see if it has roots in $\mathbb{F_4} = {0, 1, X_0, 1 + X_0}$. So, let’s begin checking one by one:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $q(0) = 0^2 + 0 + X_0 = X_0 \neq 0$</span></span>
+<span class="giallo-l"><span>    * $q(1) = 1^2 + 1 + X_0 = 1 + 1 + X_0 = 0 + X_0 = X_0 \neq 0$</span></span>
+<span class="giallo-l"><span>    * $q(X_0) = X_0^2 + X_0 + X_0 = (X_0 + 1) + X_0 + X_0 = X_0 + 1 + 0 = X_0 + 1 \neq 0$</span></span>
+<span class="giallo-l"><span>    * \begin{align*}  </span></span></code></pre>
+<p>q(1 + X_0) &amp;= (1 + X_0)^2 + (1 + X_0) + X_0<br />
+= (1 + X_0^2) + 1 + X_0 + X_0 \newline &amp;= 1 + (X_0 + 1) + 1 + 0 = X_0 + 1 + 1 = X_0 \neq 0<br />
+\end{align*}</p>
+<p>Since $q(t)$ has degree 2 and no roots in $\mathbb{F_4}$, it is irreducible over $\mathbb{F_4}$ and the extension obtained by adjoining a root $X_1$ of $q$ yields</p>
+<p>$$\mathbb{F_{16}} = \mathbb{F_4} (Y) = \mathbb{F_2} (X_0 ) (X_1 ) = \mathbb{F_2} (X_0 , X_1 )$$</p>
+<p>subject to the relations:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $X_0^2 = X_0 + 1$ (this comes from the first extension)</span></span>
+<span class="giallo-l"><span>    * $X_1^2 = X_1 + X_0$ (this comes from the second extension)</span></span></code></pre>
+<p>Each step is indeed defined by quotienting by an irreducible polynomial of degree 2, i.e. each step is a <em>quadratic extension</em>. More importantly, each element in $\mathbb{F_{16}}$ is a linear combination with coefficients in $\mathbb{F_2}$ of the basis elements</p>
+<p>$$\{ 1 , X_0 ,X_1 ,X_0 \cdot X_1 \}$$</p>
+<h3 id="a-word-about-coordinates">A word about coordinates:</h3>
+<p>Let’s work out the coordinate representation of $\mathbb{F_{ 16 }}$ over $\mathbb{F_4}$ and over the base field $\mathbb{F_2}$. The elements of $\mathbb{F_{ 16 }}$ can be written in the form $$a + bX_1$$ where $a, b \in \mathbb{F_4}$. Since each of $a$ and $b$ has 4 choices, there are $4 \times 4 = 16$ elements in $\mathbb{F_{16}}$; also recall that a basis for $\mathbb{F_4}$ over $\mathbb{F_2}$ is $\{1, X_0 \}$ and that $\mathbb{F_{16}}$ over $\mathbb{F_4}$ is $\{1, X_1\}$.</p>
+<p>It is a well known theorem of the theory of fields a basis for the upper field in a tower consists of the multiplication of the basis elements in the lower extensions. But there’s a caveat: we will consider ordered basis. This means that in order to show a basis one must not only exhibit a linearly independent subset that spans the vector space, but also we need to make explicit <em>the order</em> in which those elements lie in the basis. This order is needed in order to make available the use of coordinates. Considering the ordered basis above, let’s take a look at the elements in $\mathbb{F_{16}}$:</p>
+<table><thead><tr><th>Element in $\mathbb{F_{16}}$</th><th>Coordinates over $\mathbb{F_4}$</th><th>Coordinates over $\mathbb{F_2}$</th></tr></thead><tbody>
+<tr><td>$0$</td><td>$(0, 0)$</td><td>$(0, 0, 0, 0)$</td></tr>
+<tr><td>$1$</td><td>$(1, 0)$</td><td>$(1, 0, 0, 0)$</td></tr>
+<tr><td>$X_0$</td><td>$(X_0, 0)$</td><td>$(0, 1, 0, 0)$</td></tr>
+<tr><td>$1 + X_0$</td><td>$(1 + X_0, 0)$</td><td>$(1, 1, 0, 0)$</td></tr>
+<tr><td>$X_1$</td><td>$(0, 1)$</td><td>$(0, 0, 1, 0)$</td></tr>
+<tr><td>$1 + X_1$</td><td>$(1, 1)$</td><td>$(1, 0, 1, 0)$</td></tr>
+<tr><td>$X_0 + X_1$</td><td>$(X_0, 1)$</td><td>$(0, 1, 1, 0)$</td></tr>
+<tr><td>$(1 + X_0) + X_1$</td><td>$(1 + X_0, 1)$</td><td>$(1, 1, 1, 0)$</td></tr>
+<tr><td>$X_0X_1$</td><td>$(0, X_0)$</td><td>$(0, 0, 0, 1)$</td></tr>
+<tr><td>$1 + X_0X_1$</td><td>$(1, X_0)$</td><td>$(1, 0, 0, 1)$</td></tr>
+<tr><td>$X_0 + X_0X_1$</td><td>$(X_0, X_0)$</td><td>$(0, 1, 0, 1)$</td></tr>
+<tr><td>$(1 + X_0) + X_0 X_1$</td><td>$(1 + X_0, X_0)$</td><td>$(1, 1, 0, 1)$</td></tr>
+<tr><td>$(1 + X_0 ) X_1$</td><td>$(0, 1 + X_0)$</td><td>$(0, 0, 1, 1)$</td></tr>
+<tr><td>$1 + (1 + X_0 ) X_1$</td><td>$(1, 1 + X_0)$</td><td>$(1, 0, 1, 1)$</td></tr>
+<tr><td>$X_0 + (1 + X_0 ) X_1$</td><td>$(X_0, 1 + X_0)$</td><td>$(0, 1, 1, 1)$</td></tr>
+<tr><td>$(1 + X_0) + (1 + X_0 ) X_1$</td><td>$(1 + X_0, 1 + X_0)$</td><td>$(1, 1, 1, 1)$</td></tr>
+</tbody></table>
+<p>The way monomial basis are chosen also show how coordinates in succesive basis relate to one another: for instance, suppose we take an element $$\omega=a + bX_1 \in \mathbb{F_{16}} \quad \text{ with } a, b \in \mathbb{F_4}$$ and we represent $\omega$ by its coordinates $(a, b)$. If we now express $a$ and $b$ in terms of the basis $\{1, X_0 \}$ over $\mathbb{F_2}$ then we’ll be able to find the coordinates of $\omega$ over $\mathbb{F_2}$ by simply concatenating coordinates of $a$ and $b$!</p>
+<p>To illustrate what the table is saying, take the element $\omega = X_0 + X_1$. Over $\mathbb{F_4}$, it is $X_0 \cdot 1 + 1 \cdot X_1$, so the coordinates are $$[\omega]^{ \mathbb{F_4} } = ( X_0 , 1)$$.<br />
+Now, $[ X_0 ]^{ \mathbb{F_2} } = (0 , 1)$ and $[1]^{\mathbb{F_2}} = (1,0)$, so</p>
+<p>$$[X_0 + X_1]^{ \mathbb{F_2} } = (0, 1, 1, 0)$$</p>
+<p>We repeat what we mentioned earlier: whenever a choice of basis is made, there’s also a choice of order of the basis elements; mathematically speaking, basis consisting of the same elements but in a different order are different basis. In this exposition, the order is selected folklorically, reading the basis from left to right, aggregating elements as we read matching the succesive extensions. This is not the only way this could be done; as a matter of fact, the reverse ordering is popular among computer scientists.</p>
+<h2 id="wiedemann-towers-and-the-work-of-diamond-and-posen">Wiedemann towers and the work of Diamond and Posen</h2>
+<p>What we have just seen in the example of $\mathbb{F_{16}}$ is an instance of a <em>Wiedemann tower</em> : a sequence of field extensions such that each extension is a quadratic extension of the previous one, represented in such a way that a basis of the extension can be obtained by adjoining roots of a certain sequence of irreducible polynomials at the time. In the case just seen, the basis was simply</p>
+<p>$$\mathcal{B} = \{1, X_0 ,X_1 ,X_0 X_1 \}$$</p>
+<p>and the field elements are simply $\mathbb{F_2}$ linear combinations of these symbols: we will commonly view them as polynomials in 2 variables over $\mathbb{F_2}$ in which all the variables appear raised to the first power, at most. These polynomials are usually called “multilinear” in the cryptography context. These type of field extensions and polynomials are central to the work of Ben Diamond and Jim Posen in their proposition for a setting in which zero knowledge protocols can be implemented in characteristic 2 for more efficient performance relying on circuitry-level arithmetical operations: <strong>BINIUS</strong>. The binary tower defined in their work is defined just like an iterative quadratic sequence of extensions, inspired in the work of Wiedemann. To match their notation set $\mathcal{T_0} = \mathbb{F_2}$ and then recursively define</p>
+<p>$$\mathcal{T_{ k + 1}} = \mathcal{T_{k}} [X_{ k + 1}]/ \langle f_{ k + 1} \rangle$$</p>
+<p>where $f_{ k + 1 } ( X_{ k + 1 }) = X_{ k + 1 }^2 + X_{k} X_{ k + 1 } + 1$; Wiedemann proved that this polynomial is indeed irreducible over $\mathcal{T_k}$ and so it defines $\mathcal{T_{ k + 1}}$ as a quadratic extension of $\mathcal{T_{k}}$. Briefly write down a few extensions</p>
+<p>$$\mathbb{F_2} = \mathcal{T_0},\quad \mathbb{F_4} = \mathcal{T_1} , \quad \mathbb{F_{16}} = \mathcal{T_2},\ldots $$</p>
+<p>We will usually refer to $\mathcal{T_k}$ as the $k-$th level or extension of $\mathcal{T_0}$; and such a field has exactly $2^{ 2^k }$ elements. In such level, elements are described as polynomials in the set of $k$ variables $\{X_0 , X_1 , \ldots, X_{ k - 1} \}$ such that every $X$ is raised to a power at most 1, this is, they are linear combinations over $\mathbb{F_2}$ of multilinear monomials. For simplicity, there is also an extremely convenient way to point to specific monomials and it relates to the binary expansion of the non-negative integers.</p>
+<p>To make this clear, suppose we need to find the $n-$th basis element, and we’ll call it $y_n$. To do that, we simply expand $n$ in base 2:</p>
+<p>$$n = \sum \limits_{ i = 0 } n_i 2^i , \quad \text{ where } n_i \in {0,1}$$</p>
+<p>and then set</p>
+<p>$$y_n = \prod_{i: n_i = 1} X_i$$</p>
+<p>For instance, to obtain the tenth basic element in the Wiedemann tower, first expand in base 2:</p>
+<p>$$10 = 0\cdot 2^0 + 1 \cdot 2^1 + 0 \cdot 2^2 + 1\cdot 2^3 , \quad\text{ or more briefly } [10]^2 = [1010]$$</p>
+<p>(and you need to remember that it is customary in computer science to start the expansion with the most significant digit and that counts of elements usually start at zero), and then build</p>
+<p>$$y_{10} = X_1 X_3$$</p>
+<p>This specific ordering of the basis, which we admitted naturally from the conversation is indeed a <em>lexicographic order</em> , and such fact which will allow various things:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * First of all, it will allow us to eyeball if an elements belongs to a specific subfield of $\mathcal{T_k}$; whenever the coordinate vector associated to a level $k$ element has its last half of coordinates equal to zero, then we know it belongs to $\mathcal{T_{ k - 1}}$</span></span>
+<span class="giallo-l"><span>    * This previous fact shows that the tower construction nicely embeds $\mathcal{T_{ k - 1}}$ into $\mathcal{T_k}$ by zero padding in the last half of the coordinate vector. Computationally it has &quot;zero cost&quot; to view elements from a subfield as an element of an extension of that field.</span></span></code></pre>
+<p>This properties make the Wiedemann towers so suitable for coding and chip-level implementations: there is no mathematical guarantee on arbitrary extensions that we can identify to which subfield an element belongs to. However, in this case and due to the highly structured nature of these fields, that problem can be sometimes quickly solved. Or phrased better: we can easily characterize subfields of the extension.</p>
+<h2 id="field-operations-and-the-issue-of-multiplication">Field operations and the issue of multiplication</h2>
+<p>An interesting aspect of these type of towers is the way coordinates behave under the usual field operations.</p>
+<h3 id="addition">Addition</h3>
+<p>The relationship between addition in $\mathbb{F_2}$ (which is the operation performed on the coordinates) and the XOR operation is direct and fundamental. Addition of two elements in a finite extension $\mathcal{T_k}$ is performed by adding their corresponding coordinates modulo 2. Since addition modulo 2 is equivalent to the XOR operation, addition is a very fast and efficient bitwise operation in most processor architectures.</p>
+<h3 id="multiplication">Multiplication</h3>
+<p>Now here is where things get slippery. Multiplication of field elements can be carried out in different ways according to how those elements are represented. Let’s begin with</p>
+<h4 id="multiplication-the-naive-way-polynomials-with-reduction">Multiplication the naive way: polynomials with reduction</h4>
+<p>One of the more straightforward way of multiplying elements in a field extension is by first representing elements as polynomials, then multiplying those polynomials and finally reducing the product modulo the irreducible that defines the extension of $\mathbb{F_2}$.</p>
+<p>To illustrate, consider $u,v \in \mathcal{T_2}$. Let’s go slowly.</p>
+<p><strong>Multiplication as Polynomials in $X_1$ with Coefficients in $\mathcal{T_1}$:</strong><br />
+\begin{align*}<br />
+u \cdot v &amp;= ((1 + X_0) + X_1)(X_0 + X_0X_1) \newline<br />
+&amp;= (1 + X_0)X_0 + (1 + X_0)X_0X_1 + X_1X_0 + X_1(X_0X_1) \newline<br />
+&amp;= (X_0 + X_0^2) + (X_0 + X_0^2 ) X_1 + X_0 X_1 + X_0 X_1^2<br />
+\end{align*}</p>
+<p>Now, we substitute $X_0^2 = X_0 + 1$ and $X_1^2 = X_1 X_0 + 1$:<br />
+\begin{align*}<br />
+&amp;= (X_0 + X_0 + 1) + (X_0 + X_0 + 1)X_1 + X_0 X_1 + X_0(X_1 X_0 + 1) \newline<br />
+&amp;= (2X_0 + 1) + (2X_0 + 1)X_1 + X_0 X_1 + X_1 X_0^2 + X_0)<br />
+\end{align*}<br />
+Since we are in a field with characteristic 2, $2X_0 = 0$. So,<br />
+\begin{align*}<br />
+&amp;= 1 + X_1 + X_0X_1 + X_1(X_0 + 1) + X_0 \newline<br />
+&amp;= 1 + X_1 + X_0X_1 + X_0X_1 + X_1 + X_0 \newline<br />
+&amp;= 1 + X_0<br />
+\end{align*}<br />
+So, $((1 + X_0 ) + X_1 )(X_0 + X_0 X_1 ) = 1 + X_0$ in $\mathcal{T_2}$.</p>
+<p>As the reader may have guessed - this is a lot of work. We’d like to have a more efficient algorithm for multiplication of field elements that draws from the highly structured tower of extensions.</p>
+<p>One way of having a systematic approach to field element multiplication is by using a Karatsuba-like technique.</p>
+<h4 id="karatsuba-like-multiplication-in-the-wiedemann-tower">Karatsuba-like Multiplication in the Wiedemann Tower</h4>
+<p>The primary aim of the Karatsuba algorithm, when applied to multiplication of elements in a finite field extension (like the levels of the Wiedemann tower), is to <strong>reduce the number of field multiplications</strong> in the larger field by increasing the number of <em>field additions</em> and <em>sub-field multiplications</em> by exploiting the fact that additions (done through XOR) is computationally cheap.</p>
+<p>Specifically, for multiplying two degree-1 polynomials over a subfield, a naive approach would require four multiplications in the subfield. Karatsuba’s method achieves this with only <strong>three multiplications</strong> and a few additions in the subfield. This seemingly small reduction becomes significant when applied recursively across many levels of a tower extension, leading to a sub-quadratic asymptotic complexity.</p>
+<p>Let’s start describing the Karatsuba formula for multiplication of two elements in $\mathcal{T_k}$ (which are polynomials of degree at most 1 in $X_{ k - 1}$ with coefficients in $\mathcal{T_{ k - 1}}$) by stating what the multiplication looks like and then by sharpening our eye:</p>
+<p>Suppose that we need to multiply together $$u = \alpha_0 + \alpha_1 X_{ k - 1 }\quad \text{and } \quad v = \beta_0 + \beta_1 X_{ k - 1}$$ with $\alpha_i, \beta_i \in \mathcal{T_{ k - 1}}$ for $i = 0,1$. Then multiplication obeys the distributive law and so the product we’re looking for is then</p>
+<p>$$u\cdot v = \alpha_1 \beta_1 X_{ k - 1}^2 + (\alpha_0 \beta_1 + \alpha_1 \beta_0) X_{ k - 1} + \alpha_0 \beta_0 $$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Step 1: Compute the three intermediate products in the subfield $\mathcal{T_{ k - 1 }}$.**</span></span></code></pre>
+<p>This is where the Karatsuba trick reduces multiplications. Instead of computing the four products involving $\alpha_i\beta_j$, we resort to compute three multiplications instead:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $P_A = \alpha_0 \beta_0$</span></span>
+<span class="giallo-l"><span>    * $P_B = \alpha_1 \beta_1$</span></span>
+<span class="giallo-l"><span>    * $P_C = (\alpha_0 + \alpha_1)(\beta_0 + \beta_1)$</span></span></code></pre>
+<p>and note that in characteristic two these three products suffice to produce the coefficents in $u\cdot v$ since</p>
+<p>$$P_A + P_B + P_C = \alpha_0 \beta_1 + \alpha_1 \beta_0 = M$$</p>
+<p>We commonly call $M$ the “middle term”. These three multiplications and two additions are performed in $\mathcal{T_{ k - 1}}$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Step 2: Reduce the product using the defining irreducible polynomial.**</span></span></code></pre>
+<p>Up to this point, the product is given by:</p>
+<p>$$P_B X_{ k - 1 }^2 + MX_{ k - 1} + P_A$$</p>
+<p>Now the relation $X_{ k - 1 }^2 = X_{ k - 2} X_{ k - 1} + 1$ will yield the final expression for the desired product:</p>
+<p>$$u\cdot v= (P_A + P_B) + (M + P_B X_{ k - 2}) X_{ k - 1}$$</p>
+<p>This is the final reduction to the canonical polynomial representation of the element. There is something relevant to point out exactly here. How is this computation performed?</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * As mentioned before, the coefficients $P_A + P_B$ and $M + P_B X_{k - 2}$ computed in the subfield $\mathcal{T_{ k - 1}}$.</span></span>
+<span class="giallo-l"><span>    * To compute the greater linear combination, we must compute the product</span></span></code></pre>
+<p>$$(M + P_B X_{ k - 2}) X_{ k - 1}$$</p>
+<p>first. The catch is that when considering $\mathcal{T_k}$ as a vector space over $\mathcal{T_0}$, multiplication by $X_{ k - 1}$ is then an automorphism, so the product mentioned above can be obtained by matrix multiplication once we look at the elements in the convenient level of the Wiedemann tower (and here is where the way the subfields are linked together pays dividends). Explicitly, <strong>we first interpret $M + P_B X_{ k - 2}$ as an element of the upper field $\mathcal{T_k}$. In coordinates this fact is expressed by padding the coordinates $[\cdot]^{ k - 1}$ with zeros to obtain its coordinates $[\cdot]^k$:</strong></p>
+<p>$$[M + P_B X_{ k - 2}]^k = [ [M + P_B X_{ k - 2}]^{ k - 1}:, 0,0,\cdots 0]$$</p>
+<p>If we consider $M + P_B X_{ k - 2} \in \mathcal{T_k}$ then the product against $X_{ k - 1}$ con be performed in coordinates by matrix multiplication:</p>
+<p>$$[(M + P_B X_{ k - 2}) X_{ k - 1 }]^{k} = [M + P_B X_{ k - 2}]^{k} A_{ k - 1}$$</p>
+<p>where $A_k$ is the matrix that has <strong>as rows</strong> the coordinates over $\mathcal{T_k}$ of the products of the basis elements of $\mathcal{T_k}$ by $X_{ k - 1}$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * The final addition is performed in the top field $\mathcal{T_k}$; in coordinates this is simply done by XOR.</span></span></code></pre><h2 id="a-quick-summary-so-far">A quick summary, so far:</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Concatenation for Hierarchy:** The key insight of the multilinear basis (as implicitly adopted by Diamond and Posen) is that an element&#39;s representation in $\mathcal{T_k}$ is simply the concatenation of its coefficients from $\mathcal{T_{ k - 1}}$. This means you can &quot;unpack&quot; an element into its sub-elements simply by splitting its bit string. This is a &quot;free&quot; operation, involving no computation beyond index manipulation.</span></span>
+<span class="giallo-l"><span>    * **Recursive Application:** The Karatsuba algorithm maps perfectly to this recursive structure. This is exactly how the algorithm is designed to work efficiently.</span></span>
+<span class="giallo-l"><span>    * **Bitwise XOR for Additions:** All additions are simply bitwise XORs ($\oplus$) on the coordinate vectors. This is exceptionally fast on modern processors, which can perform XOR on entire machine words in a single cycle.</span></span>
+<span class="giallo-l"><span>    * **Defined Reductions:** The irreducible polynomials ($X_0^2 = X_0 + 1$, $X_1^2 = X_0 X_1 + 1$, $X_2^2 = X_1 X_2 + 1$) are simple trinomials or binomials in $\mathbb{F_2}$. The reduction step (e.g., $X_1^2 \to X_0 X_1 + 1$) translates into a linear transformation on the coefficient vector that can be done with a few XORs and re-indexing.</span></span>
+<span class="giallo-l"><span>    * **Small Coefficients:** Because the field is $\mathbb{F_2}$, all coefficients ($a_0, a_1, \ldots$) are single bits (0 or 1). This simplifies the base multiplications within the $M_1$ function, making it extremely efficient.</span></span></code></pre><h2 id="an-extended-example-by-hand">An extended example, by hand</h2>
+<p>Let’s work out the product of two elements in $\mathcal{T_3}$, namely</p>
+<p>$$u = X_0 + X_1 X_2 \quad\text{and }\quad v = 1 + X_1 + X_0 X_2$$</p>
+<p>using the aforementioned algorithm. Before going any further, and just because we want to avoid the pain of going way too deep in the recursion, we can be practical and cook up the matrix for the “multiplication by $X_0$” map. This matrix is then</p>
+<p>$$<br />
+\boxed{<br />
+\begin{matrix}<br />
+0 &amp; 1 \newline<br />
+1 &amp; 1<br />
+\end{matrix}<br />
+}<br />
+$$</p>
+<p>and helps building a complete multiplication table; to multiply $\gamma$ by $X_0$ we compute</p>
+<p>$$<br />
+[\gamma]^{1} \cdot \boxed{<br />
+\begin{matrix}<br />
+0 &amp; 1 \newline<br />
+1 &amp; 1<br />
+\end{matrix}<br />
+} = [\gamma\cdot X_0 ]^1<br />
+$$</p>
+<p>For a full multiplication table covering all possible field element multiplications in $\mathcal{T_1}$, we resort to linearity and the gadget above.</p>
+<p>Let’s get started. Remember that $\mathcal{T_3}$ is a field with $2^{ 2^3 } = 2^8 = 256$ elements, and as a vector space over $\mathbb{F_2} = \mathcal{T_0}$ is has dimension 8; its multilinear basis is then</p>
+<p>$$\{1, X_0 ,X_1 ,X_0 X_1 ,X_2 ,X_0 X_2 ,X_1 X_2 ,X_0 X_1 X_2 \}$$</p>
+<p>We will carry out the product of $u$ and $v$ in coordinates. First of all,</p>
+<p>$$[u]^3 = (0,1,0,0,0,0,1,0) \quad\text{and }\quad [v]^3 =(1,0,1,0,0,1,0,0)$$</p>
+<p>are the coordinates of $u$ and $v$ in the multilinear basis for $\mathcal{T_3}$. Before carrying out Karatsuba’s algorithm, we will display both set of coordinates in matrix form and hint a partition corresponding to the canonical description of both elements as elements of the last extension in the tower. This is</p>
+<p>$$\begin{pmatrix}u\newline \hline v\end{pmatrix}^3 = \begin{pmatrix}<br />
+0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \newline<br />
+\hline<br />
+1 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0<br />
+\end{pmatrix}=<br />
+\left(<br />
+\begin{array}{cccc:cccc} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \newline<br />
+\hline % Solid horizontal line<br />
+1 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0<br />
+\end{array}<br />
+\right)<br />
+= \left(<br />
+\begin{array}{c:c} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+\alpha_0 &amp; \alpha_1 \newline<br />
+\hline % Solid horizontal line<br />
+\beta_0 &amp; \beta_1<br />
+\end{array}<br />
+\right)$$</p>
+<p>where we’re exploiting the fact that we can write $u$ and $v$ over the previous extension $\mathcal{T_2}$:</p>
+<p>$$u = \alpha_0 + \alpha_1 X_2 \quad\text{and }\quad v = \beta_0 + \beta_1 X_2$$</p>
+<p>for certain $\alpha_i , \beta_j \in \mathcal{T_2}$. Recall that this field has dimension 4 and that the previous matrix partition already gives us the coordinates over $\mathcal{T_0}$ of the coordinates over $\mathcal{T_2}$! This is the utterly COOL feature of multilinear basis for binary towers! We’re now ready to proceed with Karatsuba’s algorithm.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **First step:** We proceed to compute the products</span></span>
+<span class="giallo-l"><span>    1. $P_A = \alpha_0 \beta_0$</span></span>
+<span class="giallo-l"><span>    2. $P_B = \alpha_1 \beta_1$</span></span>
+<span class="giallo-l"><span>    3. $P_C = (\alpha_0 + \alpha_1) (\beta_0 + \beta_1)$</span></span>
+<span class="giallo-l"><span>    4. $P_B X_1$</span></span></code></pre>
+<p>where <strong>all of these elements belong to and action is done in the subfield $\mathcal{T_2}$.</strong> In order to do this, we need to go one layer deep for each of the products needed. Let’s proceed with caution.</p>
+<p>i. To calculate $P_A$ we interpret the <strong>coordinates over $\mathcal{T_2}$ in coordinates over $\mathcal{T_0}$</strong> and just as in the previous layer and write</p>
+<p>$$\begin{pmatrix}\alpha_0\newline \hline \beta_0\end{pmatrix}^2=\begin{pmatrix}<br />
+0 &amp; 1 &amp; 0 &amp; 0\newline<br />
+\hline % This command draws a solid horizontal line<br />
+1 &amp; 0 &amp; 1 &amp; 0<br />
+\end{pmatrix}=<br />
+\left(<br />
+\begin{array}{cc:cc} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+0 &amp; 1 &amp; 0 &amp; 0 \newline<br />
+\hline % Solid horizontal line<br />
+1 &amp; 0 &amp; 1 &amp; 0<br />
+\end{array}<br />
+\right)<br />
+= \left(<br />
+\begin{array}{c:c} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+\alpha_{00} &amp; \alpha_{01} \newline<br />
+\hline % Solid horizontal line<br />
+\beta_{00} &amp; \beta_{01}<br />
+\end{array}<br />
+\right)$$</p>
+<p>Applying Karatsuba’s algorithm in this scenario requires reaching for the multiplication table we mentioned earlier,</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $P^\prime_A = \alpha_{00}\cdot\beta_{00}$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{0, 1}\times \boxed{1, 0}=\boxed{0,1}$$</span></span>
+<span class="giallo-l"><span>    * $P^\prime_B = \alpha_{01}\cdot\beta_{01}$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{0, 0}\times \boxed{1, 0}=\boxed{0,0}$$</span></span>
+<span class="giallo-l"><span>    * $P^\prime_C = (\alpha_{00}+\alpha_{01})\cdot(\beta_{00}+\beta_{01})$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{0, 1}\times \boxed{0, 0}=\boxed{0,0}$$ (once done the necessary addition in each factor)</span></span>
+<span class="giallo-l"><span>    * And finally the product of the uncanny $P^\prime_B X_{0}$ term:  </span></span></code></pre>
+<p>$$\boxed{0,0}\times\boxed{<br />
+\begin{matrix}<br />
+0 &amp; 1 \newline<br />
+1 &amp; 1<br />
+\end{matrix}<br />
+}=\boxed{0,0}$$</p>
+<p>It is now time to construct the product $\alpha_0 \beta_0$ as an element in $\mathcal{T_2}$; and now is where the special choice of basis comes into play (again): <strong>The way elements of $\mathcal{T_1}$ sit into $\mathcal{T_2}$ is fundamental and computationally crucial: to view them in the extension above we simply pad with zeros at the end of their $\mathcal{T_1}$ coordinates to get a 4 bit string.</strong></p>
+<p>According to the algorithm presented, the coordinate expression for</p>
+<p>$$\alpha_0 \beta_0 = (P^\prime_A + P^\prime_B) + (M + P^\prime_B X_0) X_1$$</p>
+<p>can be reconstructed step by step. <strong>First add</strong> in $\mathcal{T_1}$, <strong>then pad</strong> :</p>
+<p>$$[P^\prime_A + P^\prime_B ]^1 = \boxed{0,1} + \boxed{0,0} = \boxed{0,1} \implies [P\prime_A+P\prime_B]^2 = \boxed{0,1,0,0}$$</p>
+<p>Then, the slippery part: viewed as elements in $\mathcal{T_1}$,</p>
+<p>$$[P^\prime_B X_0 ]^1 = \boxed{0,0} \implies [M + P^\prime_B X_0 ]^1 = \boxed{0,1} + \boxed{0,0} =\boxed{0,1}$$</p>
+<p><strong>Before multiplying it with $X_1$, we embed this element in $\mathcal{T_2}$ by padding with zeros at the end.</strong> Multiplication by $X_1$ is done by matrix multiplication</p>
+<p>$$[(M + P^\prime_B X_0 )\cdot X_1 ]^2 = \boxed{0,1,0,0}\times \boxed{<br />
+\begin{matrix}<br />
+0 &amp; 0 &amp; 1 &amp;0\newline<br />
+0 &amp; 0 &amp; 0 &amp; 1\newline<br />
+1 &amp; 0 &amp; 0 &amp; 1\newline<br />
+0 &amp; 1 &amp; 1 &amp; 1<br />
+\end{matrix}<br />
+} =\boxed{0,0,0,1}$$</p>
+<p>Finally, performing the sum we obtain</p>
+<p>$$\boxed{0,1,0,0} + \boxed{0,0,0,1} = \boxed{0,1,,0,1}$$</p>
+<p>which means that $P_A = \alpha_0 \beta_0 = X_0 + X_0 X_1 \in \mathcal{T_2}$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Once that we explained in detail the first case, we proceed to calculate $P_B:$</span></span></code></pre>
+<p>$$\begin{pmatrix}\alpha_1\newline \hline \beta_1\end{pmatrix}^2=\begin{pmatrix}<br />
+0 &amp; 0 &amp; 1 &amp; 0\newline<br />
+\hline % This command draws a solid horizontal line<br />
+0 &amp; 1 &amp; 0 &amp; 0<br />
+\end{pmatrix}=<br />
+\left(<br />
+\begin{array}{cc:cc} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+0 &amp; 0 &amp; 1 &amp; 0 \newline<br />
+\hline % Solid horizontal line<br />
+0 &amp; 1 &amp; 0 &amp; 0<br />
+\end{array}<br />
+\right)<br />
+= \left(<br />
+\begin{array}{c:c} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+\alpha_{10} &amp; \alpha_{11} \newline<br />
+\hline % Solid horizontal line<br />
+\beta_{10} &amp; \beta_{11}<br />
+\end{array}<br />
+\right)$$</p>
+<p>We’ll compute $\alpha_1 \beta_1$ going one level down in the recursion, viewing its coordinates in $\mathcal{T_2}$ in its coordinates in $\mathcal{T_0}$, just as before:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. $P^\prime_A = \alpha_{10}\cdot\beta_{10}$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{0, 0}\times \boxed{1, 0} = \boxed{0,0}$$</span></span>
+<span class="giallo-l"><span>    2. $P^\prime_B = \alpha_{11}\cdot\beta_{11}$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{1, 0}\times \boxed{0, 0} = \boxed{0,0}$$</span></span>
+<span class="giallo-l"><span>    3. $P^\prime_C = (\alpha_{10} + \alpha_{11})\cdot(\beta_{10} + \beta_{11})$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{1, 0}\times \boxed{0, 1} = \boxed{0,1}$$ (once done the necessary addition in each factor)</span></span>
+<span class="giallo-l"><span>    4. And finally we have the $P^\prime_B X_{0}$ term (we omit writing down the matrix product since this is fairly trivial and intuitive from reading the coordinates):  </span></span></code></pre>
+<p>$$\boxed{0,0}\times\boxed{0,1} = \boxed{0,0}$$</p>
+<p>With all these, we’re ready to reconstruct $\alpha_1 \beta_1$ as an element in $\mathcal{T_2}$. The coordinate expression for</p>
+<p>$$\alpha_1 \beta_1 = (P^\prime_A + P^\prime_B ) + (M + P^\prime_B X_0) X_1$$</p>
+<p>can be reconstructed from the 2-bit strings as follows: <strong>first, add then pad.</strong> We get</p>
+<p>$$[P^\prime_A + P^\prime_B ]^1 = \boxed{0,0} + \boxed{0,0} = \boxed{0,0}\implies [P^\prime_A + P^\prime_B ]^2 = \boxed{0,0,0,0}$$</p>
+<p>remembering the padding to view them in $\mathcal{T_2}$ coordinates. Then, the slippery part: viewed as elements in $\mathcal{T_1}$,</p>
+<p>$$[P^\prime_B X_0 ]^1=\boxed{0,0}\implies [M + P^\prime_B X_0]^1 = \boxed{0,1} + \boxed{0,0} = \boxed{0,1}$$</p>
+<p><strong>Before multiplying it with $X_1$, we embed this element in $\mathcal{T_2}$ by padding with zeros at the end.</strong> Then, matrix multiplication:</p>
+<p>$$[(M + P^\prime_B X_0 ) X_1]^2 = \boxed{0,1,0,0}\times \boxed{<br />
+\begin{matrix}<br />
+0 &amp; 0 &amp; 1 &amp;0\newline<br />
+0 &amp; 0 &amp; 0 &amp; 1\newline<br />
+1 &amp; 0 &amp; 0 &amp; 1\newline<br />
+0 &amp; 1 &amp; 1 &amp; 1<br />
+\end{matrix}<br />
+}=\boxed{0,0,0,1}$$</p>
+<p>We then perform the sum to obtain</p>
+<p>$$\boxed{0,0,0,0} + \boxed{0,0,0,1} = \boxed{0,0,,0,1}$$</p>
+<p>which means that $P_B = \alpha_1 \beta_1 = X_0 X_1 \in \mathcal{T_2}$</p>
+<p>Now we want to compute $P_C = (\alpha_) + \alpha_1)(\beta_0 + \beta_1)$. By taking a look at the expression in coordinates of $u$ and $v$, the sum of its first and second halves is done quickly and now we have</p>
+<p>$$\begin{pmatrix}\alpha_0 + \alpha_1\newline \hline \beta_0 + \beta_1\end{pmatrix}^2=\begin{pmatrix}<br />
+0 &amp; 1 &amp; 1 &amp; 0\newline<br />
+\hline % This command draws a solid horizontal line<br />
+1 &amp; 1 &amp; 1 &amp; 0<br />
+\end{pmatrix}=<br />
+\left(<br />
+\begin{array}{cc:cc} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+0 &amp; 1 &amp; 1 &amp; 0 \newline<br />
+\hline % Solid horizontal line<br />
+1 &amp; 1 &amp; 1 &amp; 0<br />
+\end{array}<br />
+\right)<br />
+= \left(<br />
+\begin{array}{c:c} % ‘c’ for centered column, ‘:’ for a dotted vertical line<br />
+a &amp; b \newline<br />
+\hline % Solid horizontal line<br />
+c &amp; d<br />
+\end{array}<br />
+\right)$$</p>
+<p>We’ll compute $P_C$ going one level down in the recursion, viewing its coordinates in $\mathcal{T_2}$ in its coordinates in $\mathcal{T_0}$, just as before:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. $P^\prime_A = a\cdot c$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{0, 1}\times \boxed{1, 1} = \boxed{1,0}$$</span></span>
+<span class="giallo-l"><span>    2. $P^\prime_B = b\cdot d$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{1, 0}\times \boxed{1, 0} = \boxed{1,0}$$</span></span>
+<span class="giallo-l"><span>    3. $P^\prime_C = (a + b)\cdot(c + d)$, which in $\mathcal{T_1}$ coordinates is the product $$\boxed{1, 1}\times \boxed{0, 1}=\boxed{1,0}$$ (once done the necessary addition in each factor)</span></span>
+<span class="giallo-l"><span>    4. And finally we have the $P^\prime_B X_{0}$ term:  </span></span></code></pre>
+<p>$$\boxed{1,0}\times\boxed{0,1} = \boxed{0,1}$$</p>
+<p>With all these, we’re ready to reconstruct $P_C$ as an element in $\mathcal{T_2}$. The coordinate expression for</p>
+<p>$$P_C = (P^\prime_A + P^\prime_B) + (M + P^\prime_B X_0 )X_1$$</p>
+<p>can be reconstructed from the 2-bit strings as follows: <strong>first add, then pad</strong>. Since we already did this a couple of times, we allow some speeding:</p>
+<p>$$[P^\prime_A + P^\prime_B ]^2 = \boxed{1,0,0,0} + \boxed{1,0,0,0} = \boxed{0,0,0,0}$$</p>
+<p>Then, the slippery part: viewed as elements in $\mathcal{T_1}$,</p>
+<p>$$P^\prime_B X_0 = \boxed{0,1}\implies M + P^\prime_B X_0 = \boxed{1,0} + \boxed{0,1} = \boxed{1,1}$$</p>
+<p><strong>Before multiplying it with $X_1$, we embed this element in $\mathcal{T_2}$ by padding with zeros at the end.</strong> We now perform the product in the upper extension by simply shifting its coefficients in two positions to the left while padding with zeros the first two slots:</p>
+<p>$$[M + P^\prime_B X_0 ]^2=\boxed{1,1,0,0},\quad\text{then }\quad [(M + P^\prime_B X_0 )X_1 ]^2 = \boxed{0,0,1,1}$$</p>
+<p>We obtain $[P_C ]^2=\boxed{0,0,1,1}$, this is, $P_C = X_1 + X_0 X_1 \in\mathcal{T_2}$</p>
+<p>The last branch of this first layer amounts to computing $P_BX_1$; this product happens in the $\mathcal{T_2}$ subfield. In coordinates we have</p>
+<p>$$[P_B X_1 ]^2 = \boxed{0,1,1,1}$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Second step:** Reconstruct by performing additions</span></span></code></pre>
+<p>We’re now ready to build $u\cdot v$ with Karatsuba’s recipe:</p>
+<p>$$u\cdot v = (P_A + P_B ) +(M + P_B X_1 ) X_2$$</p>
+<p>Let’s proceed in coordinates. Before anything else, lest begin by displaying all the elements we need to combine so we don’t mess up.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. $P_A = X_0 + X_0 X_1 \in\mathcal{T_2} \iff [P_A ]^2 = \boxed{0,1,0,1}$</span></span>
+<span class="giallo-l"><span>    2. $P_B = X_0 X_1 \in\mathcal{T_2} \iff [P_B ]^2 = \boxed{0,0,0,1}$</span></span>
+<span class="giallo-l"><span>    3. $P_C = X_1 + X_0 X_1 \in\mathcal{T_2} \iff [P_C ]^2 = \boxed{0,0,1,1}$</span></span>
+<span class="giallo-l"><span>    4. $M = P_A + P_B + P_C = X_0 + X_1 + X_0 X_1 \in\mathcal{T_2} \iff [M]^2 = \boxed{0,1,1,1}$</span></span>
+<span class="giallo-l"><span>    5. $P_B X_1 = X_0 + X_1 + X_0 X_1 \in\mathcal{T_2} \iff [P_B X_1 ]^2 = \boxed{0,1,1,1}$</span></span></code></pre>
+<p>To do this, we add these elements in $\mathcal{T_2}$ and then embed them in $\mathcal{T_3}$ by simply padding with zeros their last 4 positions to obtain 8 bit strings. This gives</p>
+<p>$$[P_A + P_B]^3 = \boxed{0,1,0,0,0,0,0,0}$$</p>
+<p>is the first thing we need. Now compute $M + P_B X_1$ in $\mathcal{T}^3$;</p>
+<p>$$[M + P_B X_1 ]^2 = \boxed{0,0,0,0}\implies [M + P_B X_1 ]^3 = \boxed{0,0,0,0,0,0,0,0}$$</p>
+<p>so trivially</p>
+<p>$$[(M + P_B X_1 )X_2 ]^3 = \boxed{0,0,0,0,0,0,0,0}$$</p>
+<p>The desired product is then</p>
+<p>$$[u\cdot v]^3 = \boxed{0,1,0,0,0,0,0,0} + \boxed{0,0,0,0,0,0,0,0} = \boxed{0,1,0,0,0,,0,0}$$</p>
+<p>this is $u\cdot v = X_0$ which can be verified directly by hand.</p>
+<p>Obviously, this last example performed in full can quickly turn dull, but it only hightens the convenient recursive nature of multiplication in binary towers and that circuitry-level operations appear as a key element for fast and efficient implementations.</p>
+<h2 id="summary">Summary</h2>
+<p>In this post, we covered the basics of the tower construction powering Binius and some of its interesting properties. In an upcoming article, we raise the bar and aim for a more involved problem: polynomial evaluation in binary towers.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

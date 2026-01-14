@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GKR protocol: a step-by-step example - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">GKR protocol: a step-by-step example</h1>
+        
+        <div class="page-meta">
+            <time datetime="2025-03-05">March 05, 2025</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>An interactive proof is a protocol between two parties, a prover $\mathcal{P}$ and a verifier $\mathcal{V}$, where the prover attempts to convince the verifier of the validity of a statement. By leveraging randomness and interaction, the verifier can check the statement more efficiently than by doing everything himself. There is always a trivial way in which we can verify a computation: re-execution. This is how blockchains achieve verifiability: each node re-executes transactions and then reaches consensus. However, this is inefficient since every node must repeat the same computations, leading to bottlenecks. Succinct proofs allow us to check computations much faster, avoiding re-execution and solving blockchain scalability issues. For an introduction to interactive proof systems, see <a rel="noopener external" target="_blank" href="https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.pdf">Thaler</a>. One such protocol is the sum-check protocol, proposed by Lund, Fortnow, Karloff, and Nisan in 1992, which is one of the building blocks used by several proof systems.</p>
+<p>The <a rel="noopener external" target="_blank" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/12/2008-DelegatingComputation.pdf">GKR protocol</a> (Goldwasser–Kalai–Rothblum) extends the idea of the <a href="/have-you-checked-your-sums/">sum-check protocol</a> for efficient verification of arithmetic circuits. The protocol allows a verifier to check that a computation—expressed as a logarithmic‐depth circuit with low-degree gates—has been executed correctly. This is achieved with only $O(\log⁡(n))$ rounds of interaction and a total of $O(\text{poly} \log(n))$ operations.</p>
+<p>The key idea of the GKR protocol is that instead of evaluating the entire circuit, it uses the <a rel="noopener external" target="_blank" href="https://people.cs.georgetown.edu/jthaler/sumcheck.pdf">sum-check</a> protocol recursively to verify the partial sums that represent the computed value efficiently. This method enables a resource-limited verifier to check computations far larger than what they could perform on their own by leveraging the underlying algebraic structure of the problem. The advantage of the GKR protocol is that one avoids having to commit to intermediate results in the circuit, which is usually the expensive part of many proof systems.</p>
+<p>This post will explain how the protocol works with an example. For additional explanations on the protocol, we recommend watching doubly efficient interactive proofs <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=db1xAyO4YgM&amp;list=PLUl4u3cNGP61EZllk7zwgvPbI4kbnKhWz&amp;index=3">part 1</a> and <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=Ob1fFHAXlJQ&amp;list=PLUl4u3cNGP61EZllk7zwgvPbI4kbnKhWz&amp;index=4">part 2</a> or reading <a rel="noopener external" target="_blank" href="https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.pdf">Thaler’s book</a> or this <a rel="noopener external" target="_blank" href="https://65610.csail.mit.edu/2024/lec/l12-gkr.pdf">short note</a>. The GKR protocol is used to improve the <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2023/1284">LogUp lookup argument</a>. You can take a look at the implementation in <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stwo/tree/dev/crates/prover/src/core/lookups">Stwo</a>.</p>
+<h2 id="protocol">Protocol</h2>
+<p>The goal of this post is to explain the protocol in detail. To do so, we will use a simple example and follow, step by step, everything that both the prover($\mathcal{P}$) and the verifier ($\mathcal{V}$) do.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>Note: We will consider the interactive version of the protocol. </span></span>
+<span class="giallo-l"><span>You can turn it into a non-interactive protocol with the Fiat-Shamir</span></span>
+<span class="giallo-l"><span>transformation. </span></span></code></pre>
+<p>Let’s begin by describing the computation we wish to prove. We must express the computation as a log-space uniform arithmetic circuit $\mathcal{C}$ of fan-in 2 over a finite field $\mathbb{F}_p$. This means that:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * The circuit has only two types of gates: addition and multiplication.</span></span>
+<span class="giallo-l"><span>    * It is layered so that each gate is connected to only two gates in the previous layer (possibly the same gate).</span></span>
+<span class="giallo-l"><span>    * In each layer $i$, the number of gates is $S_i = 2^{k_i}$ where $k_i \in \mathbb{N}$</span></span>
+<span class="giallo-l"><span>    * All values are elements of $\mathbb{F_{p}}$</span></span></code></pre>
+<blockquote>
+<p>Let’s build a circuit that meets these conditions:<br />
+<img src="/images/external/ByBJecQFkl.png" alt="circuit_gkr" /><br />
+Figure 1: Diagram of the arithmetic circuit used in the GKR protocol example.</p>
+<p>This circuit models a program that has 2 inputs and two outputs, and we work over the field $\mathbb{F_{23}}$.</p>
+</blockquote>
+<h4 id="the-final-goal-of-the-protocol-is-for-the-prover-to-provide-the-outputs-of-the-program-to-the-verifier-and-convince-the-verifier-that-these-outputs-were-computed-correctly-from-the-public-inputs"><strong>The final goal of the protocol is for the prover to provide the outputs of the program to the verifier and convince the verifier that these outputs were computed correctly from the public inputs.</strong></h4>
+<p>Recall that both the circuit and the inputs are public.</p>
+<h2 id="part-one-sharing-the-results">Part One: Sharing the Results</h2>
+<p>We can divide this into several steps:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Output Claim:</span></span></code></pre>
+<p>The prover $\mathcal{P}$ sends the verifier $\mathcal{V}$ the values claimed to be the circuit outputs. <em>These values are sent in the form of a function</em> $D: {0,1}^{ k_0 } \to \mathbb{F_{p}}$.</p>
+<blockquote>
+<p>For our example: $k_0 = 1$, so $\mathcal{P}$ sends the linear polynomial $D$ satisfying:</p>
+<p>$$D(0) = 18$$ $$D(1) = 7$$</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    2. Random Challenge:</span></span></code></pre>
+<p>A key resource we’ll use frequently in the protocol is having the verifier select a random point and send it to the prover. The prover must then incorporate this point into their calculations. This prevents the prover from precomputing results and trying to deceive the verifier.</p>
+<p>$\mathcal{V}$ picks a random $r_0 \in \mathbb{F}^{ k_0 }$ and send it to $\mathcal{P}$.</p>
+<blockquote>
+<p>Let’s pick $r_0 = 2$</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    3. Computing the Multilinear Extension:</span></span></code></pre>
+<p>Both $\mathcal{V}$ and $\mathcal{P}$ compute $\tilde D(r_0)$, where $\tilde D({x})$ is the multilinear extension of $D$. This is the unique multilinear polynomial over $\mathbb{F_{p}}$ satisfying:<br />
+$$\tilde D(x) = f(x) \ \forall x \in {0, 1}^v$$</p>
+<p>This is a $v-$variate polynomial over $\mathbb{F_{p}}$ where $\tilde D({x})$ agrees with $D({x})$ at all boolean-valued (or bitstrings of a given length) inputs. It acts as a distance-amplifying encoding of $D({x})$ because, if another function $D’({x})$ disagrees at even a single input, the extension $\tilde D({x})$ will differ with $\tilde D’({x})$ at almost every point outside the original domain. This is a consequence of the <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma">Schwartz-Zippel lemma</a>, which states that the probability of choosing a zero of a polynomial at random is $v / \lvert \mathbb{F_p} \rvert$ (which is negligible for a sufficiently large field).</p>
+<p>Using Lagrange interpolation, we have:<br />
+$$\tilde f (x_1, \ldots, x_v) = \sum_{w \in {0, 1}^v} f(w) \cdot \chi_w(x_1, \ldots, x_v)$$</p>
+<p>where $\chi_w$ are the (multilinear) Lagrange basis polynomials: $$\chi_w(x_1, \ldots, x_v) = \prod_{i = 1}^{v} (x_i \cdot w_i + (1-x_i)(1-w_i))$$</p>
+<blockquote>
+<p>In our case (with $k_0=1$):</p>
+<p>$$\begin{align} \tilde D(x) &amp;= D(0) : (x \cdot 0 + (1-x)(1-0)) + D(1) : (x \cdot 1 (1 - x)(1 - 1)) \newline<br />
+&amp;= D(0)\cdot(1-x) + D(1) \cdot x= 18(1-x)+7x\end{align}$$</p>
+<p>Thus:</p>
+<p>$$\tilde D(r_0) = \tilde D(2) = -4 \equiv 19 \text{ mod } (23)$$</p>
+<p>We denote this value by:</p>
+<p>$$\tilde D(r_0) = 19 = m_0.$$</p>
+</blockquote>
+<p>Now, we can see that verifying the program’s outputs comes down to checking that:<br />
+$$m_0 = \tilde W_0(r_0)$$</p>
+<hr />
+<p>Before continuing, let’s introduce an additional notation. For each layer $i$ of the circuit, we will denote</p>
+<p>$$W_i: \{0,1\}^{ k_i } \to \mathbb{F_{p}}$$</p>
+<p>to be the function that maps a node’s position to its actual value, let $\tilde W_i(x)$ be its multilinear extension.</p>
+<blockquote>
+<p><img src="/images/external/B1M6_kEtkx.png" alt="Screenshot 2025-02-07 at 5.09.49 PM" /></p>
+</blockquote>
+<p>With this notation, the verifier’s task can be seen as checking that</p>
+<p>$$D(x) = W_0(x)$$</p>
+<p>since $D(x)$ represents the claimed outputs and $W_0(x)$ represents the correct values. Because multilinear extensions are unique, this is equivalent to verifying that:</p>
+<p>$$\tilde D(x) = \tilde W_0(x)$$</p>
+<p>Finally, by the Schwartz-Zippel lemma, it suffices to check that</p>
+<p>$$\tilde D(r_0) = \tilde W_0(r_0)$$</p>
+<p><strong>But wait! The verifier cannot directly access $W(x)$. That is precisely the point of the protocol!</strong></p>
+<h2 id="part-two-modeling-the-circuit">Part Two: Modeling the circuit</h2>
+<p>In this phase, the goal is to verify that the sum of many terms (corresponding to a node’s computed value) equals $m_0$.</p>
+<p>To do this efficiently, we use the sum-check protocol.</p>
+<h4 id="introducing-the-wiring-functions">Introducing the Wiring Functions</h4>
+<p>We define two functions that capture the circuit’s wiring:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Addition Function**.</span></span></code></pre>
+<p>This function marks all the addition nodes in layer $i$. It takes as input:</p>
+<p>$$x \in \{0,1\}^{k_i + 2k_{i + 1}}$$</p>
+<p>which encodes the position $a$ of an addition node in the current layer, along with the positions $b$ and $c$ of the two nodes in the next layer to which it is connected.</p>
+<p>The function $\text{Add}_i$ is defined to be 1 when $x = (a,b,c)$ corresponds to a valid addition node with the proper inputs and zero otherwise.</p>
+<p>Just like with $\tilde D(x)$, we will need to create the multilinear extension: $\widetilde{\text{Add}}_i(x)$.</p>
+<blockquote>
+<p>In our circuit:<br />
+<img src="/images/external/SyIm5y4F1x.png" alt="Screenshot 2025-02-07 at 5.15.38 PM" /><br />
+The output addition node is at position: $$a = (1)$$<br />
+And is connected to nodes: $$b: (1,0) \ \ c: (1,1)$$<br />
+Since this is the only addition node, we define the function:<br />
+$$\text{Add_1}(x) \begin{cases}<br />
+1 &amp; \text{if } x = (1,1,0,1,1)\newline<br />
+0 &amp; \text{if not}.<br />
+\end{cases}$$<br />
+We then extend this function to a multilinear polynomial, denoted $\widetilde{\text{Add}}_i(x)$:</p>
+<p>$$\widetilde{\text{Add}}_1 (x_1, x_2, x_3, x_4, x_5) = x_1 \cdot x_2 \cdot (1 - x_3) \cdot x_4 \cdot x_5 $$</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Multiplication Function**.</span></span></code></pre>
+<p>Similarly, we define the function $\text{Mult}_0(x)$ for the multiplication nodes and its multilinear extension.</p>
+<blockquote>
+<p>For the Multiplication node in our first layer:<br />
+$$\text{Mult_1}(x) \begin{cases}<br />
+1 &amp; \text{if } x = (0,0,0,0,1)\newline<br />
+0 &amp; \text{if not}.<br />
+\end{cases}$$<br />
+Its multilinear extension is given by<br />
+$$\widetilde{\text{Mult_1}}(x_1, x_2, x_3, x_4, x_5) = (1 - x_1) \cdot (1-x_2) \cdot (1 - x_3) \cdot (1 - x_4) \cdot x_5 $$</p>
+</blockquote>
+<p>Finally, we need to connect these two new functions. For that, we can define a function that “computes” the value of a node in layer $i$ given the values in the next layer:</p>
+<p>$$\tilde f^{(i)}(a,b,c) := \widetilde{\text{Add_i}}(a,b,c)\cdot(\tilde W_{i + 1}(b) + \tilde W_{i + 1}(c)) + \widetilde{\text{Mult_i}} \cdot \tilde W_{i + 1}(b) \cdot \tilde W_{i + 1}(c)$$</p>
+<p>When this function is evaluated on the values $(a,b,c)$ corresponding to a node in layer $i$, it yields the value of that node.</p>
+<blockquote>
+<p>In our first layer:<br />
+$$\tilde f^{(0)}(0,0,0,0,1) = 18$$ $$\tilde f^{(0)}(1,1,0,1,1) = 7$$</p>
+</blockquote>
+<p>This function is handy, but we can go one step forward and fix $a = r$ and sum over all possible binary assignments for $b$ and $c$, we obtain:</p>
+<p>$$\sum_{(b,c) \in \{0,1\}^{ 2k_i }} \tilde f^{(i)}(r,b,c) = \tilde W(r)$$</p>
+<p>This new function is now a univariate polynomial!</p>
+<p>Let us denote the function with $a$ fixed at $r$ as $\tilde f_r(b,c)^{(i)}$.</p>
+<hr />
+<p>Let’s go back a bit and not lose sight of the objective we had. We had reached the point where what we wanted to check was:<br />
+$$\tilde D(r_0) = \tilde W(r_0)$$</p>
+<p>or equivalently,</p>
+<p>$$\tilde W(r_0) = m_0$$</p>
+<p>So, with the new function $\tilde f$ we can think this as:</p>
+<p>$$\sum_{(b,c) \in {0,1}^{2k_i}} \tilde f_{r_0}^{(0)}(b,c) = m_0$$</p>
+<p>To verify this equality, which implies a lot of additions(operations), we will employ the Sum-Check protocol.</p>
+<h2 id="part-three-sum-check">Part Three: Sum-check</h2>
+<p>Let’s describe, step by step, all the operations performed by the prover and the verifier during this phase to better understand the protocol.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. The prover $\mathcal{P}$ builds a new function $g_1(z)$:  </span></span></code></pre>
+<p>$$g_1(z): \mathbb{F_{p}} \to \mathbb{F_{p}}$$<br />
+$$g_1(z) := \sum_{ (x_2, x_3, … , x_{ 2k_1 }) \in \{0,1\}^{2k_1 - 1} } \tilde f_{r_0}^{(0)} (z, x_2, …, x_{2k_1 - 1})$$</p>
+<p>In other words, we leave the first coordinate of $x$ in $\tilde f_{r_0}^{(0)} (x)$ as the free variable $z$ and sum over all possible assignments of the remaining coordinates.</p>
+<p>Observe that this function satisfies:</p>
+<p>$$g_1(0) + g_1(1) = m_0$$</p>
+<p>Because $g_1(0)$ sums over all combinations with the first coordinate set to 0, and $g_1(0)$ does so for the first coordinate equal to 1.</p>
+<blockquote>
+<p>In our case, since $k_1 = 2$ (i.e. there are $2^2$ nodes in layer 2), we have:<br />
+$$g_1 (z) = \sum_{ (x_2, x_3, x_4) \in \{0, 1\}^3 } \tilde f_{r_0}^{(0)} (z, x_2, x_3, x_4).$$<br />
+$$\begin{align}<br />
+f_{ r_0 }^{(0)} (b, c) = &amp; \ 2b_1 (1 - b_2) c_1 c_2 \Big[<br />
+(3(1 - b_1)(1 - b_2) + 6(1 - b_1)b_2 + 4b_1(1 - b_2) + 3b_1b_2) \notag \newline<br />
+&amp; \quad + (3(1 - c_1)(1 - c_2) + 6(1 - c_1)c_2 + 4c_1 (1 - c_2) + 3c_1 c_2 ) \Big] \notag \newline<br />
+&amp; - (1 - b_1)(1 - b_2)(1 - c_1)c_2 \notag \newline<br />
+&amp; \Big[ (3(1 - b_1)(1 - b_2) + 6(1 - b_1)b_2 + 4b_1(1 - b_2) + 3b_1b_2 ) \notag \newline<br />
+&amp; \quad \times (3(1 - c_1)(1 - c_2) + 6(1 - c_1)c_2 + 4c_1(1 - c_2) + 3c_1c_2) \Big]<br />
+\end{align}<br />
+$$<br />
+Now we have to keep $b_1$ fixed and $b_1,c_1, c_2$ change</p>
+</blockquote>
+<table><thead><tr><th>$b_2$</th><th>$c_1$</th><th>$c_2$</th></tr></thead><tbody>
+<tr><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>0</td><td>1</td><td>1</td></tr>
+<tr><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>1</td><td>1</td><td>1</td></tr>
+</tbody></table>
+<blockquote>
+<p>Due to the multiplicative factors (for example, terms like<br />
+$$2b_1(1 - b_2)c_1c_2$$<br />
+vanish unless $(c_1 = c_2 = 1)$ in the first term, and similarly in the second term), most combinations will contribute zero. In our case, let’s assume that after substitution, the only nonzero contributions come from:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Case 1:** When $(b_2, c_1, c_2) = (0, 1, 1)$</span></span>
+<span class="giallo-l"><span>    * **Case 2:** When $(b_2, c_1, c_2) = (0, 0, 1)$  </span></span></code></pre>
+<p>We now analyze these cases separately.</p>
+</blockquote>
+<blockquote>
+<p>Case 1: $(b_2, c_1, c_2) = (0, 1, 1)$<br />
+$$2b_1 [3(1-b_1)+4b_1+3] \to 2x(x - 6)\to 2x^2 +12x$$<br />
+Case 2: $(b_2, c_1, c_2) = (0, 0, 1)$<br />
+$$-(1-b_1) [3(1 - b_1)+ 4b_1 ]6 \to -6(1 - x)(3 - 3x + 4x) \to (- 6 + 6x)(x + 3)$$<br />
+The sum leads to:<br />
+$$g_1(z) = 8z^2 + 24z - 18 \equiv 8z^2 + z - 18$$</p>
+</blockquote>
+<p>The prover sends this polynomial (its low degree allows sending its coefficients directly) to the verifier.</p>
+<p>The verifier checks two things:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * That $g_1$ is indeed a low-degree polynomial.</span></span>
+<span class="giallo-l"><span>    * That:</span></span></code></pre>
+<p>$$g_1(0) + g_1(1) = m_0.$$</p>
+<blockquote>
+<p>In our example: $$g_1(0) = -18$$ $$g_1(1) = 14$$ $$g_1(0) + g_1(1) = -4 \equiv 19 = m_0.$$</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    2. The verifier $\mathcal{V}$ chooses a random value $s_1 \in \mathbb{F_{p}}$ and sends it to the prover $\mathcal{P}$ . The verifier also computes:</span></span></code></pre>
+<p>$$g_1(s_1) = C_1$$</p>
+<blockquote>
+<p>We can sample $s_1$ = 3: $$g_1(s_1) = g_1(3) = 8 \cdot 3^2 + 24 \cdot 3 - 18 = 126 \equiv 11.$$</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    3. Upon receiving $s_1$, $\mathbb{F_{p}}$ computes $C_1$ and then repeats a similar procedure. The prover defines a new function:</span></span></code></pre>
+<p>$$g_2(z): \mathbb{F_{p}} \to \mathbb{F_{p}}$$<br />
+$$g_2(z) := \sum_{(x_3, … , x_{2k_1}) \in \{0,1\}^{2k_1 - 2}} \tilde f_{r_0}^{(0)} (s_1, z, x_3 …, x_{ 2k_1 - 2})$$</p>
+<p>Here, the prover fixes the first variable to $s_1$ and leaves the second variable free (denoted by $z$), summing over the remaining binary assignments.</p>
+<blockquote>
+<p>We have:<br />
+$$g_2(z) = \sum_{(x_3, x_4) \in {0,1}^{2}} \tilde f_{ r_0 }^{(0)} (s_1, z, x_3, x_4)$$<br />
+$$g_2(z) = 162x^2 - 288x + 126 \equiv x^2 - 12x + 11.$$</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    4. The prover $\mathcal{P}$ sends the coefficients of $g_2(z)$ to the $\mathcal{V}$.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    5. The verifier checks that:</span></span></code></pre>
+<p>$$g_2(0) + g_2(1) = C_1$$</p>
+<p>$$g_2(0) = 0$$</p>
+<blockquote>
+<p>We must check: $$g_2(1) = 11$$ $$g_2(0) + g_2(1) = 11$$</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    6. This procedure is repeated until the verifier receives  </span></span></code></pre>
+<p>$C_{2k+1}$:</p>
+<p>$$C_{ 2k + 1} := \tilde f_{ r_0 }^{(0)} (s_1, s_2, x_3 …, s_{ 2k_{ i + 1}})$$</p>
+<p><strong>This is the final step of the Sum-Check protocol.</strong> At this point, the verifier would normally query an oracle to compute this value directly; however, in our protocol, the verifier can’t evaluate the function directly.</p>
+<p>The verifier can build $\widetilde{\text{Add}}$ and $\widetilde{\text{Mult_i}}$ but not to $\tilde W_{i+1}$, which represent the values of the nodes in the immediately preceding layer.</p>
+<h2 id="what-have-we-achieved">What Have We Achieved?</h2>
+<p>In effect, we have reduced the problem of verifying the circuit’s outputs to verifying the values in one layer lower. This reduction is repeated layer by layer until the final layer is reached, which corresponds to the inputs the verifier already knows. This whole idea behind the protocol.</p>
+<blockquote>
+<p>Let’s do the math for our example:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\mathcal{V}$ samples $s_2 = 2$ and sends it to $\mathcal{P}$.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * $\mathcal{V}$ and $\mathcal{P}$ calculate $C_2 = g_2(s_2)$:$$g_2(s_2) = g_2(2) = 2^2 - 12 \cdot 2 + 11 = -9 \equiv 14.$$</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * $\mathcal{P}$ calulates:$$g_3(z) = \sum_{x_4 \in {0,1}} \tilde {f_{ r_0 }^{(0)} (s_1, s_2, z, x_4)}$$ $$g_3(z) = 90x^2 - 180x + 144 \equiv 21x^2 - 19x + 6$$</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * $\mathcal{V}$ receives $g_3(z)$ and checks:$$g_3(0) = 8 $$ $$ g_3(1) = 6 $$ $$g_3(0) + g_3(1) = 14$$</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * $\mathcal{V}$ samples $s_3 = 4$ and sends it to $\mathcal{P}$.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * $\mathcal{V}$ and $\mathcal{P}$ calculate $C_3 = g_3(s_3)$:  </span></span></code></pre>
+<p>$$g_3(s_3) = 21 \cdot 4^2 - 19 \cdot 4 + 6 = 266 \equiv 13$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\mathcal{P}$ calculates:  </span></span></code></pre>
+<p>$$g_4(z) = \tilde f_{r_0}^{(0)} (s_1, s_2, s_3, z)$$ $$g_4(z) = -288z^2 + 1152x \equiv 11z^2 + 2z$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\mathcal{V}$ receives $g_4(z)$ and checks:  </span></span></code></pre>
+<p>$$g_4(0) = 0$$ $$g_4(1) = 13 $$ $$g_4(0) + g_3(1) = 13$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\mathcal{V}$ samples $s_4 = 7$ and sends it to $\mathcal{P}$.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * $\mathcal{V}$ and $\mathcal{P}$ calculate $C_4 = g_4(s_4)$:  </span></span></code></pre>
+<p>$$g_4(s_4) = 553 \equiv 1$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\mathcal{P}$ calulates  </span></span></code></pre>
+<p>$$\tilde f^{(0)}_{r_0}(s_1,s_2,s_3,s_4) = c_4$$<br />
+$$\begin{equation}<br />
+\begin{aligned}<br />
+\tilde{f}^{(0)}(r_1,s_1,s_2,s_3,s_4) := &amp; \newline \widetilde{\text{Add}}_1(r_1,s_1,s_2,s_3,s_4) \cdot (\tilde{W}_2(s_1,s_2) + \tilde{W}_2(s_3,s_4)) \newline<br />
+&amp; + \widetilde{\text{Mult}}_1(r_1,s_1,s_2,s_3,s_4) \cdot \tilde{W}_2(s_1,s_2) \cdot \tilde{W}_2(s_3,s_4)<br />
+\end{aligned}<br />
+\end{equation}$$</p>
+</blockquote>
+<h2 id="part-four-recursion">Part four: Recursion</h2>
+<p>We reached a stage where the verifier’s goal is to check that</p>
+<p>$$\tilde f_{ r_0 }^{(0)} (s_1, s_2, x_3, …, s_{2k_{i + 1}}) = C_1$$</p>
+<p>However, to do so, the verifier would need to know:</p>
+<p>$$\tilde W_2(s_1, s_2, … , s_{k + 1})$$ $$\tilde W_2(s_{ k + 1}, … , s_{ 2k + 1})$$</p>
+<p>If the verifier were to perform two separate sum-checks for these values, the final workload would be excessive. Instead, the prover makes a single claim at one point. How?</p>
+<p>Both parties compute the unique function</p>
+<p>$$\ell: \mathbb{F} \to \mathbb{F}^{2k}$$</p>
+<p>such that:</p>
+<p>$$\ell(0) = (s_1, s_2, … , s_{k+1})$$ $$\ell(1) = (s_{k + 1}, … , s_{2k + 1})$$</p>
+<p>Then $\mathcal{P}$ sends the function:<br />
+$$q = \tilde W_2 \circ \ell : \mathbb{F} \to \mathbb{F}.$$</p>
+<p>to the verifier. Notice that:</p>
+<p>$$q(0) = \tilde W_2(s_1, s_2, … , s_{k+1})$$ $$q(1) = \tilde W_2(s_{k+1}, … , s_{2k+1})$$</p>
+<p>Thus, by knowing $q(x)$, the verifier can recover the necessary values $q(0)$ and $q(1)$ to complete the final evaluation in the Sum-Check protocol.</p>
+<p>So, with $q(x)$, $\mathcal{V}$ can use $q(0)$ and $q(1)$ to do the last evaluation in the sumcheck protocol.</p>
+<p>But how does the verifier know that $q(x)$ is correct? Again, $\mathcal{V}$ samples a random element $r∗ \in \mathbb{F}$ and computes</p>
+<p>$$r_1 = \ell (r^*)$$</p>
+<p>Then, $\mathcal{P}$ and $\mathcal{V}$ compute:</p>
+<p>$$m_1 = q(r_1)$$</p>
+<p>Now, the prover’s task is to convince the verifier that:</p>
+<p>$$\tilde W_2(r_1) = m_1$$</p>
+<p>This claim is analogous to our initial verification step:</p>
+<p>$$\tilde D(r_0) = m_0$$</p>
+<p>where $\tilde D(x)$D encoded the output values and now $\tilde W_2(x)$ encodes the values of the nodes in the immediately preceding layer.</p>
+<p>Thus, the remaining task is to apply the same Sum-Check protocol to this new layer.</p>
+<blockquote>
+<p>For our circuit:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\mathcal{P}$ and $\mathcal{V}$ calculate:  </span></span></code></pre>
+<p>$$\ell(0) = (s_1, s_2) = (3, 2)$$ $$ \ell(1) = (s_3, s_4) = (4, 7)$$ $$\ell(x) = (s_1(1-x) + s_3x, s_2(1-x) + s_4x) = (3(1-x) + 4x, 2(1-x) + 7x).$$
+* $\mathcal{P}$ sends $q= \tilde W_1 \circ \ell : \mathbb{F} \to \mathbb{F}.$<br />
+$$q(x) = -20x^2 -52x - 12 \equiv 3x^2 + 17x + 11$$
+* $\mathcal{V}$ checks $\tilde f_{r_0}^{(0)} (s_1, s_2, s_3, s_4) = c_4$ using $q(x)$
+* $\mathcal{V}$ sends $\mathcal{P}$ a random $r^* \in \mathbb{F}$<br />
+$$r^* = 6$$
+* $\mathcal{V}$ and $\mathcal{P}$ calculate:<br />
+$$r_1 = \ell (6) = (9, 32) \equiv (9,9)$$ $$m_1 = q(6) = 14.$$
+* Now $\mathcal{P}$ needs to convice $\mathcal{V}$ that:<br />
+$$\sum_{(b, c) : \in {0, 1}^{2 \cdot 1}} f_{r_1}^{(1)} (b, c) = m_1$$
+* $\mathcal{P}$ calculates $g_1(z)$ and sends it to $\mathcal{V}$ :<br />
+$$g_1(z) = \sum_{x_2 \in {0, 1}} f_{r_1}^{(1)} (z, x_2)$$ $$g_1(z) = 2z^2 + 7z + 14$$
+* $\mathcal{V}$ checks $g_1(0) + g_1(1) = m_1$:<br />
+$$ g_1(0) = 14 $$ $$ g_1(1) = 0 $$ $$ g_1(0) + g_1(1) = 14$$
+* $\mathcal{V}$ samplse $s_1 = 12$ and sends it to $\mathcal{P}$.
+* $\mathcal{V}$ and $\mathcal{P}$ calculates $C_1 = g_1(s_1)$:<br />
+$$g_1(12) = 2 \cdot 12^2 + 7 \cdot 12 + 14 = 386 \equiv 18$$
+* $\mathcal{P}$ calculates $g_2(z)$ and send it to $\mathcal{V}$:<br />
+$$g_2(z) = \tilde f_{r_1}^{(1)} (s_1, z)$$ $$g_2(z) = 9z^2 + z +4$$
+* $\mathcal{V}$ checks $g_2(0) + g_2(1) = C_1$:<br />
+$$g_2(0) = 4$$ $$g_2 (1) = 14$$ $$ g_2(0) + g_2(1) = 18$$
+* $\mathcal{V}$ samples $s_2 = 5$ and sends it to $\mathcal{P}$.
+* $\mathcal{V}$ and $\mathcal{P}$ calculate $C_2 = g_2(s_2)$:<br />
+$$C_2 = g_2(5) = 4$$
+* $\mathcal{P}$ and $\mathcal{V}$ calculate:<br />
+$$ \ell(0) = s_1 = 12$$ $$ \ell(1) = s_2 = 5$$ $$\ell(x) = -7x + 12$$
+* $\mathcal{P}$ sends $q= \tilde W_1 \circ \ell : \mathbb{F} \to \mathbb{F}.$<br />
+$$q(x) = 3(1 - (-7x + 12) ) + (-7x +12)$$
+* $\mathcal{V}$ checks $f_{r_1}^{(1)}(s_1,s_2) = c_2$ using $q(x)$
+* $\mathcal{V}$ sends $\mathcal{P}$ a random $r^* \in \mathbb{F}$<br />
+$$r^* = 17$$
+* $\mathcal{V}$ and $\mathcal{P}$ calculate:<br />
+$$r_2 = \ell (17) = 8$$ $$m_2 = q(17) = 10$$
+* Finally, $\mathcal{V}$ calculates $\tilde W_2(x)$ and checks $\tilde W_2(r_2) = m_2$<br />
+$$W_2(0) = 3$$ $$W_2(1) = 1$$ $$\tilde W_2(x) = 3(1 - x) + x$$ $$\tilde W_2(8) = 10$$</p>
+</blockquote>
+<h2 id="last-part-repeat">Last part: repeat</h2>
+<p>Well, everything is almost ready! We just need to repeat this procedure once per layer. Finally, $W_d(x)$ is the function that maps the program’s inputs, which we will use to verify the sum-check of layer $d-1$. If this check is correct, it means that all the previous ones are also correct, so we can confidently say that the computation was executed correctly.</p>
+<h2 id="conclusion">Conclusion:</h2>
+<p>In summary, the GKR protocol elegantly reduces the problem of verifying the output of a complex arithmetic circuit into a series of simpler verifications that recursively move from the output layer to the input layer. Each step relies on algebraic properties—most notably, the uniqueness of multilinear extensions and the Schwartz–Zippel lemma—to ensure that a resource-limited verifier can efficiently confirm the correctness of the computation. This protocol illustrates the power of interactive proofs and lays the foundation for more advanced cryptographic applications such as zero-knowledge proofs.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

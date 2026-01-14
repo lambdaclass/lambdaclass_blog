@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilinear polynomials: survival kit - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Multilinear polynomials: survival kit</h1>
+        
+        <div class="page-meta">
+            <time datetime="2025-08-26">August 26, 2025</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>In this article we briefly introduce a list of basic properties of multilinear polynomials that are convenient to have in mind when tackling a very interesting piece of work by Bagad, Dao, Domb and Thaler: “Speeding up SUM-CHECK proving”. The authors focus on a specific setting for the SUMCHECK protocol, useful in various contexts: they narrow their attention to the case where the polynomial $g$ object of the SUMCHECK claim can be written as a product of $d$ multilinear polynomials</p>
+<p>$$g(X) = \prod\limits_{ k = 1 }^d p_k (X)$$</p>
+<p>and proceed to craft a series of algorithms tayloring their time and memory usage. Before diving into their findings, it is maybe timely that we refresh some facts about these type of polynomials for future use.</p>
+<h2 id="multilinear-polynomials-definition-and-basic-properties">Multilinear polynomials: definition and basic properties</h2>
+<p>For the rest of the article, fix a field $k$. By multilinear polynomial we mean a $\ell\geq 0$ variate polynomial $f\in k\left[X_1,\ldots X_\ell\right]$ such that each of its monomials has the following feature: each variable is raised to a power which is either 0 or 1. These polynomials are of great use and appear throughout field theory literature in different guises and recently re emerged as useful objects in Ben Diamond and Jim Posen’s effort BINIUS.</p>
+<p>We will use $\mathcal{M_k} \left[X_1,\ldots X_\ell\right]$ to denote the collection of all multilinear polynomials of $\ell$ variables with coefficients in $k$. Examples of multilinear polynomials abound:</p>
+<p>$$p(X_1 , X_2) = 2 + X_1 + X_1 X_2,\quad q(X_1,X_2,X_3) = 2x_3 + X_1 X_2 X_3 + X_1 X_2, , \text{etc}$$</p>
+<p>It should be noticed that multilinear polynomials of $\ell$ indeterminates have degree bounded by $\ell$; naturally, $\mathcal{M_k} \left[X_1,\ldots X_\ell\right]$ is a vector subspace of $k\left[X_1, \ldots X_\ell \right]$: it is closed respect to addition and scalar multiplication.</p>
+<h3 id="interpolation">Interpolation</h3>
+<p>One of the great features of multilinear polynomials is that they allow a neat way of replacing arbitrary functions over a very special domain. Cutting to the chase, <em>any</em> function $\varphi$ defined over the hypercube $\{ 0,1 \}^\ell$ can be interpolated with multilinear polynomials. This happens because the hypercube being discrete, it allows the identification of the function $\varphi$ with the list of its images ${\varphi(x): x \in \{0,1 \}^\ell}$ and crucially, for each $x$ in the hypercube we have a multilinear polynomial that takes the value 1 over $x$ and evaluates to zero elsewhere.</p>
+<p>For example, take $b = (1,0,1,1) \in \{0,1 \}^4$. Then</p>
+<p>$$\chi_b (X_1 , X_2 , X_3 , X_4 ) = X_1 (1 - X_2 ) X_3 X_4$$</p>
+<p>is a multilinear polynomial evaluating to 1 over $b$ and to 0 elsewhere. Generally, for $b \in \{0,1 \}^\ell$, the multilinear polynomial having this property can be expressed as</p>
+<p>$$\chi_b (X) = \prod_{ j = 1 }^{\ell} ( b_j X_j + (1 - b_j) (1 - X_j))$$</p>
+<p>The reader may recall Lagrange interpolation in one variable and polynomials satisfying this sort of condition). In cyprographic lingo, these are sometimes called “equality polynomials” and commonly nomenclated as $eq(x,y)$. So how does this interpolation property work? Let’s cook up an example.</p>
+<p>Suppose we are given the function</p>
+<p>$$\varphi (X_1 ,X_2 ) = (1 + X_1) (X_1 + X_2)$$</p>
+<p>As it is, this polynomial has degree 2 in $X_1$ so it is not a multilinear polynomial. However it can be interpolated over the cube $\{0,1 \}^2$, by the use of the equality or Lagrange polynomials: $\chi_b$ with $b$ in the boolean square $\{0,1 \}^2$.</p>
+<p>\begin{align*}<br />
+\varphi(X_1, X_2) =&amp; \sum\limits_{ b \in \{0,1\}^2 } g(b) \chi_b (x) =\newline<br />
+=&amp; \varphi(0,0)(1 - X_1)(1 - X_2) + \varphi(1,0) X_1 (1 - X_2)\newline<br />
++&amp; \varphi(0,1) (1 - X_1) X_2 + \varphi(1,1) X_1 X_2<br />
+\end{align*}</p>
+<p>where this equality is functionally understood: it is the equality of two functions over the boolean hypercube, one of which is a multilinear polynomial. Before getting carried away, lets state a fact</p>
+<p><strong>Fact number 1:</strong> $\mathcal{M_\ell}$ is a vector space of dimension $2^\ell$ with basis the Lagrange polynomials</p>
+<p>$$\mathcal{L_\ell} = \{ \chi_b : b\in \{0,1\}^\ell \}$$</p>
+<p>As it is customarily done, there is an ordering of the dimension $\ell$ hypercube obtained by the binary expansion of the first $2^\ell$ non negative integers: if $0\leq m\leq 2^{\ell} - 1$ then</p>
+<p>$$m = m_0 2^0 + m_1 2^1 + \cdots m_{ \ell - 1 } 2^{ \ell - 1}\quad m_i\in \{0,1 \}$$</p>
+<p>we set the $m$-th basis polynomial to be the equality polynomial for the string $$(m_{ \ell - 1} ,\ldots m_1, m_0)$$ This will be the ordering we adopt for the Lagrange basis and the order we will use to obtain crucial information: the standard binary order. For those unfamiliar:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. The **first variable** , $X_1$, is associated with the **most significant bit (MSB)**.</span></span>
+<span class="giallo-l"><span>    2. The **last variable** , $X_l$, is associated with the **least significant bit (LSB)**.</span></span></code></pre>
+<p>For example, for a 3-variable polynomial, $g(X_1, X_2, X_3)$, the hypercube coordinates are ordered as follows:</p>
+<table><thead><tr><th><strong>Hypercube Point</strong> (Binary Representation)</th><th><strong>Polynomial Coordinates</strong> $(X_1, X_2, X_3)$</th></tr></thead><tbody>
+<tr><td>$000_2 = 0$</td><td>$(0, 0, 0)$</td></tr>
+<tr><td>$001_2 = 1$</td><td>$(0, 0, 1)$</td></tr>
+<tr><td>$010_2 = 2$</td><td>$(0, 1, 0)$</td></tr>
+<tr><td>$\dots$</td><td>$\dots$</td></tr>
+<tr><td>$111_2 = 7$</td><td>$(1, 1, 1)$</td></tr>
+</tbody></table>
+<p>Don’t fret, this is simply a choice to walk the cube and how we will consider the interpolation basis. For sake of clarity:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. One can easily verify that the basis</span></span></code></pre>
+<p>$$\mathcal{L_2} = \{ (1 - X_1) (1 - X_2), (1 - X_1) X_2, X_1 (1 - X_2), X_1 X_2 \}$$</p>
+<p>interpolates the boolean hypercube in the sense that the $k$-th basis vector takes the value 1 over the binary representation of $k$ and takes the value 0 elsewhere.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    2. The basis for $\mathcal{M} \left[X_1 ,X_2 ,X_3 \right]$ is obtained by simply orderly taking from left to right each vector in $\mathcal{L_2}$ and multiplying it by ($1 - X_3$) first, and then secondly, by $X_3$. Then $\mathcal{L_3}$ consists of the collection</span></span>
+<span class="giallo-l"><span>    * $(1 - X_1) ( 1 - X_2 )( 1 - X_3)$</span></span>
+<span class="giallo-l"><span>    * $(1 - X_1) (1 - X_2) X_3$</span></span>
+<span class="giallo-l"><span>    * $(1 - X_1) X_2 (1 - X_3)$</span></span>
+<span class="giallo-l"><span>    * $(1 - X_1) X_2 X_3$</span></span>
+<span class="giallo-l"><span>    * $X_1 (1 - X_2) (1 - X_3)$</span></span>
+<span class="giallo-l"><span>    * $X_1 (1 - X_2) X_3$</span></span>
+<span class="giallo-l"><span>    * $X_1 X_2 (1 - X_3)$</span></span>
+<span class="giallo-l"><span>    * $X_1 X_2 X_3$</span></span></code></pre>
+<p>in this specific order.</p>
+<h3 id="coordinates-and-evaluations-the-golden-link">Coordinates and evaluations: the golden link</h3>
+<p>What we just discussed in the previous section already sets multlinear polynomials and their basis in a different ground respect to other sets. In linear algebra for instance, the expression of a vector as a linear combination of a basis set involves building (and solving!) a system of linear equations. As much as we love systems of linear equations, finding the coordinates of the vector REQUIRES SOLVING the system and this obviously costs time and memory. It is for this reason that some basis are preferred over others: finding coordinates of vectors should be as easy as possible.</p>
+<p>Concretely, if we wanted to represent $v = (2,3)$ as a combination of $(1,2)$ and $(5, - 7)$ we would be required to first build a system of equations and secondly, solving it dealing with all the numerical complexities involved (this is a small example but think of vectors with $2^{128}$ elements…).</p>
+<p>It results in a different story altogether if now the vectors we want to use are $(1,0)$ and $(0,1)$: the canonical basis. Now the problem is almost trivially solved by eyeballing or directly, evaluating what the contents of $v$ are:</p>
+<p>$$v = 2\cdot (1,0) + 3\cdot (0,1)$$</p>
+<blockquote>
+<p>This is the precise situation we have with the equality polynomials: now coordinates in this basis are simply the evaluations of the function we want to interpolate. And this is great news because computers love to evaluate.</p>
+</blockquote>
+<p>This conversation yields</p>
+<blockquote>
+<p><strong>Fact number 2:</strong> Coordinates of a function $f$ defined over the boolean hypercube $\{0,1 \}^\ell$ respect to the Lagrange basis $\mathcal{L_\ell}$ are simply its evaluations:</p>
+</blockquote>
+<p>$$coords(f)= \left[f(b) \right]_{ b\in \{0,1 \}^\ell}$$</p>
+<p>For instance, for the multilinear polynomial</p>
+<p>$$g(X_1 , X_2) = 1 + X_1 + X_1 X_2$$</p>
+<p>Then its coordinates in the interpolation basis are simply</p>
+<p>$$g\longleftrightarrow coords(g) = \left[1,1,2,3 \right] = \left[g(0), g(1), g(2), g(3) \right]$$</p>
+<p>where we exploited the ordering of teh cube and took the liberty of “evaluating $g$ at the integers $0\leq n\leq 2^2 - 1$”.</p>
+<h3 id="tensorization-in-this-context">Tensorization in this context</h3>
+<p>One of the operations between polynomials that we learn in highschool is polynomial multiplication: for example, when given polynomials</p>
+<p>$$X + 1\quad\text{and }\quad 2 + Y$$</p>
+<p>we compute their product using the distributive law, juxtaposing indeterminates and using powers to abbreviate equal symbols juxtaposed:</p>
+<p>$$(X + 1)( 2 + Y) = 2 X + XY + 2 + Y$$</p>
+<p>and assuming the order of the symbols in monomial is irrelevant. When thinking of polynomials as vectors, we need a formalism to portray this exact operation. That formalism is called the tensor product and allows vector multiplication just as we know it; the field that studies tensor products is called multilinear algebra and is obviously an older brother of linear algebra. The symbol commonly found for the tensor product of vectors $v\in\mathbb{V}$ and $w\in\mathbb{W}$ is</p>
+<p>$$v\otimes w\in \mathbb{V}\otimes\mathbb{W}$$</p>
+<p>and we notice that $\mathbb{V}\otimes\mathbb{W}$ is a new vector space, constructed with $\mathbb{V}$ and $\mathbb{W}$ obviously called their tensor product. This product has all the properties we want to abstract, the distributive law being crucial for our needs:</p>
+<p>$$v\otimes w + 2v.u \otimes w = (3v + u)\otimes w$$</p>
+<p>All this in our setting is quite natural: if we set $\mathbb{V}$ the vector space of polynomials of degree at most 1 in the indeterminate $X_1$ and $\mathbb{W}$ the vector space of polynomials of degree at most 1 in the indeterminate $X_2$, then</p>
+<p>$$\mathbb{V}\otimes \mathbb{W} = \mathcal{M} \left[X_1 \right]\otimes \mathcal{M} \left[X_2 \right] = \mathcal{M_2} \left[X_1,X_2 \right]$$</p>
+<p>and more importantly, the tensor product of the basis yields a basis for the tensor product. The general theory guarantees that whenever $\mathcal{B}$ and $\mathcal{C}$ are basis for $\mathbb{V}$ and $\mathbb{W}$ respectively, then</p>
+<p>$$\mathcal{B}\otimes\mathcal{C}={v_i\otimes w_j: 1\leq i\leq dim(\mathbb{V}), 1\leq j\leq dim(\mathbb{W})}$$</p>
+<p>is a basis for the new vector space. However a choice of order for those vectors must be made. To our interest, it is convenient to order the tensor products of the basis vectors in a fashion compatible with the binary expansion; in the case of $dim(\mathbb{V})=dim(\mathbb{W})=2$ the basis we’re going to be looking at is simply</p>
+<p>$$\mathcal{B}\otimes\mathcal{C}={v_1\otimes w_1, v_1\otimes w_2, v_2\otimes w_1,v_2\otimes w_2}$$</p>
+<p>which is commonly referred to as the lexicographic order. In this sense, this basis works just fine: say you pick $z \in V \otimes W$ for instance</p>
+<p>$$z = 2(v_1 \otimes w_1) + 5(v_1 \otimes w_2) + 3(v_2 \otimes w_1) - 1(v_2 \otimes w_2)$$</p>
+<p>Its coordinate vector turns out to be $[2, 5, 3, -1]$. Moreover, since tensors are compatible with the distributive law, we are allowed to regroup the terms:</p>
+<p>$$z = (2w_1 + 5w_2) \otimes v_1 + (3w_1 - 1w_2) \otimes v_2$$</p>
+<p>The coefficients of this combination are the following elements of $V$:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Coefficient of $v_1$** : $c_1 = 2w_1 + 5w_2$</span></span>
+<span class="giallo-l"><span>    * **Coefficient of $v_2$** : $c_2 = 3w_1 - 1w_2$</span></span></code></pre>
+<p>These coefficients, expressed in coordinates of the basis chosen for $\mathbb{W}$ are simply $[2, 5]$ and $[3, -1]$. The way the order for the tensor basis is chosen to recreate the fact:</p>
+<p>$$\text{concat}(\text{coords}(c_1), \text{coords}(c_2)) = \text{concat}([2, 5], [3, -1]) = [2, 5, 3, -1]$$</p>
+<p>In the context of multilinear polynomials, this discussion makes clear that these polynomials can be obtained by recursively tensoring vector spaces of polynomials of degree at most 1 in distinct variables: we have an algebraic characterization of the vector space of multilinear polynomials</p>
+<p>$$\mathcal{M_\ell} \left[X_1,\ldots X_\ell \right] = \mathcal{M_\ell} \left[X_1,\ldots X_{ \ell - 1} \right]\bigotimes \mathcal{M}\left[X_\ell \right]$$</p>
+<p>and moreover, exploiting the associativity of the tensor product we arrive at a very natural fact:</p>
+<blockquote>
+<p><strong>Fact number 3:</strong> Let $\{1,2,\ldots, \ell \} = J \bigcup I$ with $J,I$ disjoint. Then multilinear polynomials with indeterminates $X_1,\ldots X_\ell$ can be regarded as multlinear polynomials with indeterminates $X_j\in J$ and coefficients being multilinear polynomials in the indeterminates $X_i\in I$.</p>
+</blockquote>
+<p>To fix the idea, take a look at the polynomial</p>
+<p>$$h = X_1+X_1 X_3 + 2X_2 X_3 X_4 + 2X_4$$</p>
+<p>This naturally is a multilinear polynomial in $X_3$ and $X_4$, since they are raised to power at most 1. Using the Lagrange basis for multilinear polynomials in the variables $X_3$ and $X_4$</p>
+<p>$$\{(1 - X_3) (1 - X_4), (1 - X_3 ) X_4, X_3 (1 - X_4), X_3 X_4 \}$$</p>
+<p>we find the corresponding coefficients by making use of we what we already discussed: the coefficients will be polynomials in the remaining variables, $X_1$ and $X_2$ obtained by evaluating the original polynomial $h$ at the four points of the hypercube for $X_3$ and $X_4$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Coefficient of $(1 - X_3) (1 - X_4)$:** We evaluate $h$ at $(X_3 = 0, X_4 = 0)$.  </span></span></code></pre>
+<p>$$h(X_1, X_2, 0, 0) = X_1 + X_1(0) + 2 X_2 (0)(0) + 2(0) = X_1$$<br />
+This is the coefficient for the first basis polynomial.
+* <strong>Coefficient of $(1 - X_3) X_4$:</strong> We evaluate $h$ at $(X_3 = 0, X_4 = 1)$.<br />
+$$h(X_1, X_2, 0, 1) = X_1 + X_1(0) + 2X_2 (0)(1) + 2(1) = X_1 + 2$$<br />
+This is the coefficient for the second basis polynomial.
+* <strong>Coefficient of $X_3 (1 - X_4)$:</strong> We evaluate $h$ at $(X_3 = 1, X_4 = 0)$.<br />
+$$h(X_1, X_2, 1, 0) = X_1 + X_1(1) + 2X_2 (1)(0) + 2(0) = X_1 + X_1 = 2X_1$$<br />
+This is the coefficient for the third basis polynomial.
+* <strong>Coefficient of $X_3 X_4$:</strong> We evaluate $h$ at $(X_3 = 1, X_4 = 1)$.<br />
+$$h(X_1, X_2, 1, 1) = X_1 + X_1(1) + 2X_2(1)(1) + 2(1) = X_1 + X_1 + 2X_2 + 2 = 2X_1 + 2X_2 + 2$$<br />
+This is the coefficient for the fourth basis polynomial.</p>
+<p>Putting it all together, the coordinates for $h$ viewed as a multilinear polynomial in the variables $X_3$ and $X_r$ is simply</p>
+<p>$$\left[X_1, 2+X_1, 2X_1, 2 + 2X_1 + 2X_2 \right]$$</p>
+<p>As the reader may already be thinking “but we can also compute the coordinates of the coordinates” and yes, there is where we are headed: a recursive algorithm to produce coordinates of multilinear polynomial or in a different light: a protocol to use strings of evaluations.</p>
+<blockquote>
+<p><strong>Fact number 4:</strong> In the same vein, evaluating a multilinear polynomial in a subset of its variables yields a multilinear polynomial in the remaining ones.</p>
+</blockquote>
+<h2 id="the-adventure-of-multilinear-interpolation">The adventure of multilinear interpolation</h2>
+<p>What we just discussed can be seen as a case of <em>multilinear interpolation</em>. By the nature of the interpolation basis for multilinear polynomials in $\ell$ variables, this process can be iterated and coordinates computed efficiently, if tackled in an organized manner.</p>
+<h3 id="algorithm-multilinearcoordinates-interpolationbasis-g-l">Algorithm: MultilinearCoordinates/ InterpolationBasis(g, l)</h3>
+<p>This algorithm takes a multilinear polynomial $g$ in $l$ variables and returns a vector of $2^l$ coordinates that represent $g$ in the multilinear interpolation basis.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. **Base Case:**</span></span>
+<span class="giallo-l"><span>       * **If** $l = 0$:  </span></span></code></pre>
+<p>i. The polynomial $g$ is a constant.<br />
+ii. <strong>Return</strong> the vector with the single coordinate $[g]$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>       * **If** $l = 1$:  </span></span></code></pre>
+<p>i. The polynomial $g$ is multilinear in one variable $X_1$.<br />
+ii. The coordinates are the evaluations of $g(0)$ and $g(1)$.<br />
+iii. <strong>Return</strong> the vector $[g(0), g(1)]$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    2. **Recursive Step:**</span></span>
+<span class="giallo-l"><span>       * **If** $l &gt; 1$:  </span></span></code></pre>
+<p>i. Express $g$ as a polynomial in the variable $X_l$ with coefficients that are multilinear polynomials in the first $l - 1$ variables:<br />
+$$g(\mathbf{X}) = C_0 (X_1, \dots, X_{l - 1})(1 - X_l) + C_1 (X_1, \dots, X_{l - 1}) X_l$$<br />
+ii. Compute the coefficients $C_0$ and $C_1$ by evaluating $g$ at the extreme points of $X_l$:<br />
+$$C_0(\mathbf{X_{&lt;l}}) = g(\mathbf{X_{&lt;l}}, 0)$$<br />
+$$C_1(\mathbf{X_{&lt;l}}) = g(\mathbf{X_{&lt;l}}, 1)$$<br />
+iii. <strong>Recursively call</strong> the algorithm to find the coordinates of these two new polynomials in $l - 1$ variables:<br />
+a. $coords_0 \gets$ <code>MultilinearCoordinatesInterpolationBasis(C_0, l - 1)</code><br />
+b. $coords_1 \gets$ <code>MultilinearCoordinatesInterpolationBasis(C_1, l - 1)</code><br />
+iv. The coordinates of the original polynomial $g$ are the concatenation of the vectors $coords_0$ and $coords_1$.<br />
+v. <strong>Return</strong> $$concat(coords_0, coords_1)$$</p>
+<p>This algorithm exploits the fact that over the corresponding interpolation basis, the coordinates are none but the evaluation of the polynomial in the designated point in the hypercube, just as in the previous section.</p>
+<p>To illustrate let’s pick up our previous example. For our toy polynomial</p>
+<p>$$h = X_1 + X_1 X_3 + 2X_2 X_3 X_4 + 2X_4$$</p>
+<p>we computed its coordinates in the interpolation basis in the variables $X_3, X_4$, obtaining:</p>
+<p>$$\left[ X_1, 2+X_1, 2X_1, 2 + 2X_1 + 2X_2 \right]$$</p>
+<p>Now we go on by obtaining the coordinates of each of these polynomials in the multilinear interpolation basis for the variables $X_1$ and $X_2$:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Coordinates for $X_1$:** We evaluate $X_1$ at each of the points of the boolean square, obtaining  </span></span></code></pre>
+<p>$$X_1\longleftrightarrow \left[0, 1, 0, 1 \right]$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Coordinates for $2 + X_1$:** We evaluate $2 + X_1$ at each of the points of the boolean square, obtaining  </span></span></code></pre>
+<p>$$2 + X_1\longleftrightarrow \left[2, 3, 2, 3 \right]$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Coordinates for $2X_1$:** repeating the idea we get  </span></span></code></pre>
+<p>$$2X_1\longleftrightarrow \left[0, 2, 0, 2 \right]$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Coordinates for $2 + 2X_1 + 2X_2$:** finally, evaluating at the point of the boolean square in binary order  </span></span></code></pre>
+<p>$$2 + 2X_1 + 2X_2 \longleftrightarrow \left[2, 4, 4, 6 \right]$$</p>
+<p>The concatenation of these final coordinates gives us the 16 evaluations of the polynomial $h$ on the hypercube ${0,1}^4$:</p>
+<p>$$\text{coords}(h) = \text{concat}([0,1,0,1], [2,3,2,3], [0,2,0,2], [2,4,4,6] )$$</p>
+<p>this is,</p>
+<p>$$\text{coords}(h) = [0,1,0,1,2,3,2,3,0,2,0,2,2,4,4,6]$$</p>
+<p>As we can easily verify the evaluations of $h$ directly. We’ve shown this procedure forwards, but this makes available for us a quick way of looking at coordinates in a quick way by simply eyeballing sub-vectors in the original string of coordinates. More on this later.</p>
+<h2 id="products-of-multilinear-polynomials">Products of multilinear polynomials</h2>
+<p>As we’ve seen already, the set of multilinear polynomials in $\ell$ variables is indeed a vector space over the base field. However, product of multilinear polynomials fails to be a multilinear polynomial, in general.<br />
+Suppose now that</p>
+<p>$$g = \prod\limits_{ k = 1 }^d p_k$$</p>
+<p>where the factors $p_k$ are all multilinear polynomials in $X_1,\ldots X_\ell$. By picking a variable $X_i$ we can view the product as a general polynomial in $X_i$ and coefficients in the ring of polynomials in the remaining variables.</p>
+<blockquote>
+<p><strong>Fact number 4:</strong> The degree of $g$ as a polynomial in $X_i$ is the sum of the degrees, as polynomials in $X_i$ for each of the factors $p_k$; this can be determined by deciding whether the polynomial $p_k$ has $X_i$ as a variable.</p>
+</blockquote>
+<p>So if we want to decide what is the degree of $g$ in the $X_i$ variable, we need to check whether each multilinear factor includes this variable or not. We can decide this fact with a rudimentary algorithm that uses a simple evaluation-based test: a multilinear polynomial $p(X_1, \dots, X_\ell)$ does <strong>not</strong> include the variable $X_k$ if and only if its value remains constant when you change the value of $X_k$ from 0 to 1, while keeping all other variables fixed. This is, if</p>
+<blockquote>
+<p><strong>Fact number 5:</strong><br />
+$$p(x_1, \dots, x_{k - 1}, 0, x_{k + 1}, \dots, x_\ell) = p(x_1, \dots, x_{k - 1}, 1, x_{k + 1}, \dots, x_\ell)$$<br />
+for all $x_j \in \{0,1 \}$ where $j \neq k$ $\iff$ $p$ does not depend on $X_k$.</p>
+</blockquote>
+<p>To illustrate this fact, suppose we have</p>
+<p>$$p(X_1, X_2, X_3) = X_1 (X_2 + X_3)$$</p>
+<p>and we want to test if this polynomial includes the variable <strong>$X_3$</strong>. The test requires us to check if $$p(X_1, X_2, 0) = p(X_1, X_2, 1)$$ for all possible combinations of $(X_1, X_2) \in \{0,1 \}^2$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. **First we check for $(x_1, x_2) = (0, 0)$:**</span></span>
+<span class="giallo-l"><span>    * $p(0, 0, 0) = 0(0 + 0) = 0$</span></span>
+<span class="giallo-l"><span>    * $p(0, 0, 1) = 0(0 + 1) = 0$</span></span>
+<span class="giallo-l"><span>    * The equality holds and observe that if the algorithm stopped here, it would wrongly conclude that the polynomial does not depend on $X_3$. Checking equality at all points of the hypercube is necessary.</span></span>
+<span class="giallo-l"><span>    2. **Now check for $(x_1, x_2) = (1, 0)$:**</span></span>
+<span class="giallo-l"><span>    * $p(1, 0, 0) = 1(0 + 0) = 0$</span></span>
+<span class="giallo-l"><span>    * $p(1, 0, 1) = 1(0 + 1) = 1$</span></span>
+<span class="giallo-l"><span>    * The equality **fails**.</span></span></code></pre>
+<p>Because the equality fails for at least one case, an algorithm comparing evaluations correctly concludes that the variable $X_3$ <strong>is</strong> included in the polynomial.</p>
+<p>Since we’ve spent some time discussing the connection between evaluations on the hypercube and coordinates over the multilinear interpolation basis - how can we make use of what we already know?</p>
+<blockquote>
+<p>Concretely, can we come up with an algorithm to decide whether a certain multilinear polynomial includes a specific variable or not, in a way that the algorithm exploits the recursive nature of the coordinates in the multilinear interpolation basis and the ordering of the hypercube?</p>
+</blockquote>
+<p>Since evaluations are no other than coordinates in the multilinear interpolation basis, performing the test we mentioned before amounts to inspecting different entries in the coordinate vector.</p>
+<p>And how is this possible? Well, the first step is realizing that there is a relation between the position on the coordinate vector and the value of a variable $X_i$. For instance, take the polynomial $$g(X_1, X_2, X_3) = X_1 + X_3$$ which clearly does not depend on $X_2$. Its coordinate vector is:</p>
+<p>$$\text{coords}(g) = [0, 1, 0, 1, 1, 2, 1, 2]$$</p>
+<p>The first half of the vector corresponds to evaluations over points in the hypercube with $X_1=0$ and the second half corresponds to evaluations over points with $X_1=1$. In this way we split the coordinates in two chunks of half the size and proceed to compare those strings:</p>
+<p>$$\text{coords} g_{ X_1 = 0} = [0, 1, 0, 1],\quad \text{coords} g_{ X_1 = 1 } = [1, 2, 1, 2]$$</p>
+<blockquote>
+<p><em>As a brief comment: it is worth mentioning that these new strings of evaluations correspond to the coordinates of the multilinear polynomials that act as coefficients of $g$ as discussed in the earlier sections: they are the coordinates of $C_0^1 (X_2 , X_3)$ and $C_1^1 (X_2 , X_3)$ in the equality</em> $$g(X_1, X_2 , X_3 ) = C_0^1 (X_2 , X_3) ( 1 - X_1 ) + C_1^1 (X_2 , X_3) X_1$$</p>
+</blockquote>
+<p>But let’s stick to the coordinates. We now scan these pieces: since they differ in the fist position we correctly conclude that $g$ depends on $X_1$.</p>
+<p>Next we have the task to decide whether $X_2$ is present in $g$: w can now identify these two sub-vectors as coefficients in the multilinear interpolation basis for the variables $X_2$ and $X_3$ and call this test again on both pieces. We split both in two halves, corresponging to the evaluations $X_2 = 0$ and $X_2 = 1$:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * the coordinates of $C^1_0 (X_2,X_3)$ are $\text{coords}(c^1_0 ) = [0, 1, 0, 1]$ and split into $[0, 1]$ and $[0, 1]$</span></span>
+<span class="giallo-l"><span>    * the coordinates of $C^1_1 (X_2 , X_3)$ are $\text{coords}(c^1_1 ) = [1, 2, 1, 2]$ and split into $[1, 2]$ and $[1, 2]$  </span></span></code></pre>
+<p>in both cases, the sub-vectors coincide and this means that in effect, $X_2$ is not present in $g$.</p>
+<p>Finally to decide for $X_3$ we perform the same test on each of the 4 pieces obtained in the last step. It is easy to see that splitting $[0, 1]$ yields the scalar vectors</p>
+<p>$$[0]\quad\text{and}\quad [1] $$</p>
+<p>which are obviously different and so $g$ effectively contains the variable $X_3$.</p>
+<p>In this example, we organized the routine in a “divide and conquer” fashion which is already appealing by inspecting equality starting in the most significant bit (MSB), working by halving string size towards the less significant bit (LSB) $X_3$. However, this is not the only way the inspection can be done, and as a matter of fact, for memory access reasons it is more convenient to assess variables <em>in reverse order of significance</em>. On the one hand this kills the divide and conquer approach but yields better performance results: modern computers access memory in contiguous blocks (cache) and the “divide and conquer” approach we discussed compares positions that are far apart in the original vector: $g(0)$ is compared to $g(5)$, $g(1)$ is compared to $g(6)$, and so on, and this is costly in terms of performance. How do cook up a way of using contiguity?</p>
+<p>A good way of making use of contiguity is by the use of <em>strides</em>. The coordinate vector is ordered lexicographically, which means the indices of the elements correspond to the binary representation of integers, from 0 to $2^l - 1$. In this convention, each polynomial variable, $X_k$, is associated with a specific bit in the binary representation of the coordinates.</p>
+<p>The <em>stride</em> for variable $X_k$ is simply the <strong>positional weight</strong> of its bit in the binary representation: in other words, how much does the $k-th$ bit contribute to the position in the hypercube. For a polynomial<br />
+$$g(X_1, X_2, X_3)$$<br />
+with an 8-element coordinate vector, the <em>stride</em> aligns with the inspection of each variable:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **For $X_3$ (LSB):** To change the value of $X_3$ from 0 to 1, we only need to change the least significant bit. The weight of this bit is $2^0 = 1$. Therefore, the _stride_ for $X_3$ is **1**. The test compares pairs of adjacent coordinates, such as $v_0$ with $v_1$ (corresponding to $000$ and $001$).</span></span>
+<span class="giallo-l"><span>    * **For $X_2$:** To change the value of $X_2$ from 0 to 1, we need to change the middle bit. The weight of this bit is $2^1 = 2$. Therefore, the _stride_ for $X_2$ is **2**. The test compares pairs of coordinates that are 2 positions apart, such as $v_0$ with $v_2$ (corresponding to $000$ and $010$).</span></span>
+<span class="giallo-l"><span>    * **For $X_1$ (MSB):** To change the value of $X_1$ from 0 to 1, we need to change the most significant bit. The weight of this bit is $2^2 = 4$. Therefore, the _stride_ for $X_1$ is **4**. The test compares pairs of coordinates that are 4 positions apart, such as $v_0$ with $v_4$ (corresponding to $000$ and $100$).</span></span></code></pre>
+<blockquote>
+<p>The <em>stride</em> works as an algorithmic shortcut to find the pairs of coordinates that only differ in the variable you are testing, by leveraging the structure of the binary encoding.</p>
+</blockquote>
+<p>By the use of the stride for each variable, now we have a way of scanning the coordinate vector in an efficient way. The pseudocode of such an algorithm is not complicated:</p>
+<p><strong>Inputs:</strong></p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * _coords_ : A vector of $2^l$ coordinates (evaluations) of the polynomial $g$ on the hypercube ${0,1}^l$.</span></span>
+<span class="giallo-l"><span>    * _l_ : The total number of variables in the polynomial ($X_1$ to $X_l$).</span></span></code></pre>
+<p><strong>Intermediate Parameters:</strong></p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * _stride_ : The step or distance between the coordinates being compared. Its value is $2^{l-k}$ for variable $X_k$.</span></span>
+<span class="giallo-l"><span>    * _block length_ : The size of each iteration block. Its value is $2^{k - 1}$.</span></span></code></pre>
+<blockquote>
+<p>The algorithm <em>DecideDependence_LSBFirst(coords, l)</em> is executed as follows:</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. For each variable $X_k$ (iterating from $k = l$ down to $1$):</span></span>
+<span class="giallo-l"><span>    2. Calculate _stride_ $= 2^{l - k}$.</span></span>
+<span class="giallo-l"><span>    3. Set a flag _depends_ to _FALSE_.</span></span>
+<span class="giallo-l"><span>    4. Iterate from $j = 0$ to $j = 2^{l} - 1$, with a step of $2 \cdot \text{stride}$.</span></span>
+<span class="giallo-l"><span>    5. In each iteration, compare the coordinates _coords[j]_ and _coords[j + stride]_.</span></span>
+<span class="giallo-l"><span>    6. If it is found that _coords[j]_ $\neq$ _coords[j + stride]_ , set _depends_ to _TRUE_ and exit the inner loop.</span></span>
+<span class="giallo-l"><span>    7. Report the result of _depends_ for variable $X_k$.</span></span></code></pre>
+<p>As an example with absolutely no surprises, here’s the application to the polynomial $$g(X - 1, X_2, X_3) = X_1 + X_3$$</p>
+<p>We will use the same 8-element coordinate vector for $g$:<br />
+$$\text{coords}(g) = [0, 1, 0, 1, 1, 2, 1, 2]$$</p>
+<h3 id="1-decision-for-x-3-k-3">1. Decision for $X_3$ ($k = 3$)</h3>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. _stride_ = $2^{ 3 - 3} = 1$.</span></span>
+<span class="giallo-l"><span>    2. The algorithm compares the pairs _(coords[j], coords[j+1])_ for $j = 0, \dots, 6$ with a step of 2.</span></span>
+<span class="giallo-l"><span>    3. For $j = 0$: _coords[0] (0)_ vs. _coords[1] (1)_. Since $0 \neq 1$, the test fails.</span></span>
+<span class="giallo-l"><span>    4. **Conclusion:** $g$ **depends** on $X_3$.</span></span></code></pre><h3 id="2-decision-for-x-2-k-2">2. Decision for $X_2$ ($k = 2$)</h3>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. _stride_ = $2^{ 3 - 2} = 2$.</span></span>
+<span class="giallo-l"><span>    2. The algorithm compares the pairs _(coords[j], coords[j+2])_ for $j = 0, \dots, 6$ with a step of 4.</span></span>
+<span class="giallo-l"><span>    3. For $j = 0$: _coords[0]} (0)_ vs. _coords[2] (0)_. They are equal.</span></span>
+<span class="giallo-l"><span>    4. For $j = 1$: _coords[1]} (1)_ vs. _coords[3] (1)_. They are equal.</span></span>
+<span class="giallo-l"><span>    5. For $j = 4$: _coords[4]} (1)_ vs. _coords[6] (1)_. They are equal.</span></span>
+<span class="giallo-l"><span>    6. For $j = 5$: _coords[5]} (2)_ vs. _coords[7] (2)_. They are equal.</span></span>
+<span class="giallo-l"><span>    7. **Conclusion:** $g$ **does not depend** on $X_2$.</span></span></code></pre><h3 id="3-decision-for-x-1-k-1">3. Decision for $X_1$ ($k = 1$)</h3>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. _stride_ = $2^{ 3 - 1} = 4$.</span></span>
+<span class="giallo-l"><span>    2. The algorithm compares the pairs _(coords[j], coords[j+4])_ for $j = 0, \dots, 3$.</span></span>
+<span class="giallo-l"><span>    3. For $j = 0$: _coords[0] (0)_ vs. _coords[4] (1)_.</span></span>
+<span class="giallo-l"><span>    4. Since $0 \neq 1$, the test fails.</span></span>
+<span class="giallo-l"><span>    5. **Conclusion:** $g$ **depends** on $X_1$.</span></span></code></pre>
+<p>This is obviously the same result as above, but the way in which the comparisons are executed makes this algorithm preferrable.</p>
+<h2 id="what-comes-next">What comes next</h2>
+<p>Next will employ these ideas to understand the algorithmic proposed by Bagad, Dao, Domb and Thaler in their recent article “Speeding-up SUMCHECK proving” where they explore different implementations of the SUMCHECK protocol for polynomials of the shape just described: products of multilinear polynomials. They investigate and exploiting the different multiplication and addition costs involved in the interaction between base field elements and random field elements at each step of the protocol and this obviously involves clever manipulation and understading of multilinear polynomials and their properties.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

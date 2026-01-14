@@ -84,7 +84,7 @@ After twenty years of expanding hardware targets and changing problem spaces, LL
 
 Out of this came [MLIR](https://mlir.llvm.org/) (Multi-Level Intermediate Representation), a project started by Chris Lattner et al. to build a common infrastructure to support all these different subsystems and to learn from the mistakes made and lessons learned in the development of LLVM.
 
-I highly encourage you to read the introductory [paper](https://arxiv.org/pdf/2002.11054.pdf) from whence these graphics came, as it is very readable, or to listen to the [talk]() Lattner and Shpeisman gave presenting it.
+I highly encourage you to read the introductory [paper](https://arxiv.org/pdf/2002.11054.pdf) from whence these graphics came, as it is very readable, or to listen to the [talk](https://www.youtube.com/watch?v=qzljG6DKgic) Lattner and Shpeisman gave presenting it.
 
 > MLIR aims to address software fragmentation, improve compilation for heterogeneous hardware, significantly reduce the cost of building domain-specific compilers, and aid in connecting existing compilers.
 

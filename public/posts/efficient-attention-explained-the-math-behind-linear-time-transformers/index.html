@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efficient attention explained: the math behind linear-time transformers - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Efficient attention explained: the math behind linear-time transformers</h1>
+        
+        <div class="page-meta">
+            <time datetime="2025-10-13">October 13, 2025</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>One of the key components of the Transformer architecture is the Attention layer, which is in charge of making every word (or more generally, every <em>token</em>) learn the context given by every other in a sequence, and was introduced in the seminal paper <a rel="noopener external" target="_blank" href="https://arxiv.org/abs/1706.03762">Attention is all you need</a>. In this post, we will explore this equation and a specific approach that manages to improve its complexity to be linear with a few mathematical tricks, following the work of <a rel="noopener external" target="_blank" href="https://arxiv.org/pdf/1812.01243">Shein et al. (2021)</a>.</p>
+<h2 id="how-the-original-implementation-of-attention-works">How the original implementation of Attention works</h2>
+<p>There’s a lot of information about the original Attention (also known as dot product Attention) implementation out there so we’ll do just a quick recap of it. It all comes down to a bunch of matrix multiplications with a normalization function. The exact mathematical formulation is</p>
+<p>$$<br />
+Attention(Q,K,V) = softmax(\frac{{QK^T}}{\sqrt{d_k}})V<br />
+$$</p>
+<p>where,</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $Q \in \mathbb{R}^{N\times d_q}$, are the projections of the input sequence over the query space</span></span>
+<span class="giallo-l"><span>    * $K \in \mathbb{R}^{N\times d_k}$ are the projections of the input sequence over the key space</span></span>
+<span class="giallo-l"><span>    * $V \in \mathbb{R}^{N\times d_v}$ are the projections of the input sequence over the value space</span></span>
+<span class="giallo-l"><span>    * $N$ is the sequence (or _context_) length, i.e., the maximum size of the input</span></span>
+<span class="giallo-l"><span>    * $d_{q}, d_{k}$ and $d_{v}$ are the dimensions of each of the projection spaces</span></span></code></pre>
+<p>Both the $Q$ and $K$ matrices must have the same embedding dimension, so we can assume $d_k = d_q$ and without loss of generality we can consider $d_{q} = d_{k} = d_{v} = d$ for simplicity.</p>
+<p>The softmax function works by mapping each element of an arbitrary, real numbers array into the range $(0, 1)$ - this is how it looks for a given input element:</p>
+<p><img src="/images/external/softmax.png?raw=true" alt="Im 1" /></p>
+<p>The $\sqrt{d_k}$ scaling factor is present to prevent the softmax function from saturating – as $d_k$ becomes larger, the dot products in $QK^T$ grows larger in magnitude, pushing the softmax function into regions where it is essentially flat and thus has extremely small gradients. While using backpropagation for training, this may turn into stability issues, slow training or even leaving some parameters entirely frozen for the whole training process.</p>
+<p>We use the softmax function to go from attention scores (the results of the matrix multiplication of $QK^T$) to attention weights that will be multiplied by the $V$ matrix. The attention weights can be interpreted as how much each token affects the other ones in the sequence. If the attention weight between a pair of tokens is high, then we say that one <em>attends</em> to the other.<br />
+As an example, from basic english grammar, we know that in the sentence</p>
+<blockquote>
+<p><em>Do androids dream of electric sheep?</em></p>
+</blockquote>
+<p>the word <em><strong>sheep</strong></em> attends more to <em><strong>electric</strong></em> than to the word <em><strong>do</strong>.</em></p>
+<h2 id="deep-dive-into-attention-complexity">Deep dive into Attention complexity</h2>
+<p>One of the major drawbacks of the Attention mechanism is the way in which computational resources scale with respect to the sequence length $N$. In the definition of the Attention function we can see the similarity calculation between the vectors in $Q$ and $K$, given by $QK^T$. From basic matrix multiplication we know that,</p>
+<p>$$<br />
+(\mathbb{R}^{N\times d} \times \mathbb{R}^{d\times N}) \rightarrow \mathbb{R}^{N\times N}<br />
+$$</p>
+<p>which means that we end up having to store a $N \times N$ matrix and hence have $O(N^2)$ memory complexity. On the other hand, this matrix multiplication needs a total of $O(d_{k}N^2)$ operations, so we can clearly see that resource demands scale quite quickly as the sequence length gets larger.</p>
+<p>In essence, the original attention architecture is really limited by the sequence length we can use, making it infeasible for situations where bigger contexts are needed. There has been a lot of effort on trying to optimize the original Attention mechanism and we will focus on one that really stands out due to the simplicity of its approach, taking into account some of their trade-offs.</p>
+<h2 id="efficient-attention">Efficient Attention</h2>
+<p>Since the scaling issues come from having to compute and store the $N \times N$ matrix as an intermediate value in the computation, if we could somehow apply softmax piecemeal we could have simpler intermediate values. If we apply softmax to the rows of $Q$, and to the columns of $K$ separately and <em>then</em> do the product, we can avoid storing the entire matrix. Since we are no longer performing a dot product in this approximation, we also do not need the scaling factor $\sqrt{d_k}$.</p>
+<p>Thus, efficient Attention, as proposed by <a rel="noopener external" target="_blank" href="https://arxiv.org/pdf/1812.01243">Shen et al. (2021)</a>, is given by:</p>
+<p>$$<br />
+E(Q,K,V) = softmax_{row}(Q)softmax_{col}(K)^T V<br />
+$$</p>
+<p>where now we make the distinction between $softmax_{row}$ and $softmax_{col}$, where we apply the softmax function in the rows and the columns of the matrices, respectively. In general, when there is no specification, the $softmax_{row}$ version is assumed.</p>
+<p>The trick boils down to getting rid of applying the softmax function over the result of $QK^T$ – kind of like distributing the softmax function into $Q$ and $K$, with the caveat that this is not really a mathematical property of the softmax function but an approximation. This way, we can arrange the order of the matrix multiplications in this expression to our advantage, making the resulting computation much more efficient.</p>
+<p>If we first compute $softmax_{col}(K)^TV$, we have to store an $d \times d$ matrix, which means a $O(d^2)$ memory complexity, and requiring $O(Nd^2) \approx O(N)$ calculations with $d≪N$. This attention implementation is sometimes referred as <em>Linear Attention</em> due to the dependency with $N$<em>.</em></p>
+<p>The efficiency gains make themselves obvious considering that $d &lt; N$ in any practical case, and the difference grows as we make context lengths bigger and bigger.</p>
+<p>To reiterate, the mathematical expression for this new Attention mechanism works as an <em>approximation</em> since the two softmax operations applied over $Q$ and $K$ are not equivalent to the single softmax over $QK^T$. The core property that both variants share, and what makes the approximation reasonable is the fact that the sum over the rows of $softmax_{row}(QK^T)$ and $softmax_{row}(Q)softmax_{col}(K)^T$ both equal 1.</p>
+<p>The approximation is good enough for some applications where the context length $N$ can be large. An example of this is the Computer Vision field, where input tokens may represent pixels of an image. Other examples include audio and genomics, where input lengths can reach millions.</p>
+<h2 id="interpretability-of-efficient-attention">Interpretability of Efficient Attention</h2>
+<p>When trying to make sense of what this change means in the LLM context, we can think of the standard attention mechanism as the process of all elements in our query matrix asking all elements in the key matrix what they should pay attention to. It’s an iterative process to get the correlation between one word (the query element) and the rest of the words in the same sentence (the key elements). We’re essentially doing:</p>
+<p>$$<br />
+s_{ij} = Q_iK_j^T<br />
+$$</p>
+<p>for all <em>j</em> in the input sequence. Each of these $s_i$ (the full set of scores for position <em>i</em>) is called an <em>attention map</em> , so we create $N$ of such attention maps (one for each of our $N$ input positions).</p>
+<p>The Efficient Attention mechanism creates attention maps that do not follow positional information about our queries and instead reference a more general aspect of the whole input. Instead of each query having its own attention map checking correlation with every other element, we create <strong>global attention maps</strong> with information that captures general semantic themes.</p>
+<p>These maps are derived from the keys $K$, but they no longer depend on a specific positions. They are denoted $k_j^T$ and when multiplied by the elements in our value matrix we get $d_{k}$ vectors denoted as $g_i$. Each query then uses coefficients to mix these global themes rather than attending to individual positions.</p>
+<p>Let’s see a practical toy example with some random numbers to see the difference clearly:</p>
+<p>Suppose we have the sentence <strong>“With great power comes great responsibility”</strong> with <strong>N = 6</strong> tokens and <strong>$d_{k} = 4$</strong> (so we’ll generate 4 global attention maps).</p>
+<p>In <strong>Dot Product Attention</strong> , each of the 6 tokens creates its own attention map over all 6 positions:</p>
+<p><strong>Token 3 (“power”)</strong> creates an attention map $s_3$:</p>
+<p>$$<br />
+s_3 = [0.08, 0.45, 0.15, 0.20, 0.05, 0.07]<br />
+$$</p>
+<p>This tells “power” to attend strongly to position 2 (“great”) and moderately to position 4 (“comes”). We got the output:</p>
+<p>$$<br />
+output_3=0.08⋅V_1+0.45⋅V_2+0.15⋅V_3+0.20⋅V_4+0.05⋅V_5+0.07⋅V_6<br />
+$$</p>
+<p><strong>Token 4 (“comes”)</strong> creates its own separate attention map $s_4$:</p>
+<p>$$<br />
+s_4 = [0.05, 0.12, 0.38, 0.10, 0.08, 0.27]<br />
+$$</p>
+<p>This tells “comes” to attend strongly to positions 3 (“power”) and 6 (“responsibility”). We get the output:</p>
+<p>$$<br />
+output_4=0.05⋅V_1+0.12⋅V_2+0.38⋅V_3+0.10⋅V_4+0.08⋅V_5+0.27⋅V_6<br />
+$$</p>
+<p>Similarly, all 6 tokens each create their own attention map. <strong>Total: 6 attention maps, each of size 6.</strong></p>
+<p>In <strong>Efficient Attention</strong> , instead of position-specific attention maps, we can create, for example, <strong>4 global semantic attention maps</strong> that capture themes across the entire sentence. In a language context, an example of these global maps for this input sentence could be something like:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Modifier theme: The model encodes the fact that _great_ qualifies both _power_ and _responsibility_. </span></span>
+<span class="giallo-l"><span>       * _“great” → “power”_</span></span>
+<span class="giallo-l"><span>       * _“great” → “responsibility”_</span></span>
+<span class="giallo-l"><span>    2. Cause-consequence theme: This encodes the overall causal/propositional structure </span></span>
+<span class="giallo-l"><span>       * “power” → “responsibility”</span></span>
+<span class="giallo-l"><span>       * “with … power” → “comes … responsibility”</span></span>
+<span class="giallo-l"><span>    3. Predicate theme: Maps tokens to the main predicate. This reduces the need for the model to discover the verb as the organizing node — the map enforces it. </span></span>
+<span class="giallo-l"><span>       * All words point toward the main verb _“comes”_</span></span>
+<span class="giallo-l"><span>    4. Parallelism - Analogy theme: Highlights symmetry between paired concepts </span></span>
+<span class="giallo-l"><span>       * _“power” ↔ “responsibility”_</span></span>
+<span class="giallo-l"><span>       * Both are treated as abstract nouns of similar importance</span></span></code></pre>
+<p><strong>$k_1^T$ (Modifier theme)</strong> : $[0.10, 0.85, 0.15, 0.10, 0.85, 0.20]$ → creates $g_1$</p>
+<p><strong>$k_2^T$ (Cause-consequence theme)</strong> : $[0.05, 0.10, 0.90, 0.05, 0.10, 0.88]$ → creates $g_2$</p>
+<p><strong>$k_3^T$ (Predicate theme)</strong> : $[0.20, 0.05, 0.10, 0.95, 0.05, 0.10]$ → creates $g_3$</p>
+<p><strong>$k_4^T$ (Parallelism-Analogy theme)</strong> : $[0.90, 0.15, 0.20, 0.15, 0.10, 0.10]$ → creates $g_4$</p>
+<p>Each $g_i$ is a weighted sum of all value vectors $V_{j}$ using the corresponding global map weights.</p>
+<p>Each token mixes these 4 global themes:</p>
+<p><strong>Token 3 (“power”)</strong> with $q_3=[0.30,0.20,0.10,0.40]$</p>
+<p>$$<br />
+output_3=0.30⋅g_1+0.20⋅g_2+0.10⋅g_3+0.40⋅g_4<br />
+$$</p>
+<p><strong>Token 4 (“comes”)</strong> with $q_4=[0.10,0.25,0.40,0.25]$</p>
+<p>$$<br />
+output_4=0.10⋅g_1+0.25⋅g_2+0.40⋅g_3+0.25⋅g_4<br />
+$$</p>
+<p>Here, there are only four global maps shared by all tokens, and each token selects which themes it should attend to, rather than attending to each of the other words in the sentence. The number and composition of themes and how they are picked are just part of this example.</p>
+<h2 id="lost-in-the-big-picture">Lost in the Big Picture</h2>
+<p>While Efficient Attention offers significant computational advantages, it comes with an important trade-off: it loses the ability to sharply focus on specific positions and instead focuses on coarse global features. Let’s demonstrate this limitation with a practical example.</p>
+<p>In this example, we’ll compare the attention scores produced by $softmax(\frac{{QK^T}}{\sqrt{d_k}})$ vs $softmax({{Q}}) ⋅ softmax({{K}})^T$. Although Efficient Attention actually computes $softmax({{K}})^T ⋅ V$ first to achieve its efficiency gains, the final attention distribution remains the same. Examining the scores directly helps us visualize and understand what’s happening to the attention pattern.</p>
+<p>Recall from linear algebra that the dot product of two vectors relates to their similarity:</p>
+<p>$$<br />
+a⋅b=∣a∣.∣b∣cos⁡(θ_{ab})<br />
+$$</p>
+<p>When vectors are closely aligned, their dot product is large.</p>
+<p>In the example below, we have one query vector and four key vectors. Notice that the third key is identical to our query, so we should expect it to receive most of the attention:</p>
+<p>$q = [2, 1, 3]$</p>
+<p>$k_1 = [1, 0, 1]$, $k_2 = [0, 1, 0]$, $k_3 = [2, 1, 3]$, $k_{4} = [1, 1, 0]$</p>
+<p>For the standard Dot-product Attention case,</p>
+<p>$$<br />
+AttnWeight_1= softmax(\frac{q.k_1}{\sqrt{3}}) = 0.005<br />
+$$</p>
+<p>$$<br />
+AttnWeight_2 = softmax(\frac{q.k_2}{\sqrt{3}}) = 0.001<br />
+$$</p>
+<p>$$<br />
+AttnWeight_3 = softmax(\frac{q.k_3}{\sqrt{3}}) = 0.992<br />
+$$</p>
+<p>$$<br />
+AttnWeight_4 = softmax(\frac{q.k_4}{\sqrt{3}}) = 0.002<br />
+$$</p>
+<p>As we expected, position 3 got almost all the attention.</p>
+<p>We now repeat the same calculations for the Efficient Attention case. For simplicity in the calculations here, we will use the matrix formulation where $K$ is the matrix created by setting the vectors $k_i$ as rows.</p>
+<p>$$<br />
+softmax(q).softmax_{col}(K)^T = [0.1309, 0.0713, 0.6962, 0.1017]<br />
+$$</p>
+<p>The trade-off is clear: by applying softmax before computing similarities, Efficient Attention smooths out the attention distribution. Instead of sharply focusing on the most relevant position (3), it distributes attention more uniformly across all positions. This flattening effect is why the mechanism is sometimes described as capturing broad semantic themes rather than precise positional relationships.<br />
+This limitation explains why state-of-the-art language models still prefer standard attention despite its quadratic cost; the ability to attend precisely to specific tokens is crucial for many language understanding tasks. However, although Efficient Attention is not commonly used in LLMs, it remains highly valuable for AI models in other domains. In applications such as computer vision, where inputs represent pixels in images, the model can still perform well with this type of attention mechanism, making the substantial efficiency gains well worth the trade-off.</p>
+<h2 id="code-implementation-and-benchmarks">Code implementation and benchmarks</h2>
+<p>To have a rough idea of the improvements over computational resources with efficient attention, we will run comparisons for some values of $N$and how each of the Attention implementations scales as it increases.</p>
+<p>We’ll see how easy it is to implement these functions using PyTorch and also to use them as a layer in a LLM.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>import torch</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>def dot_product_attention(Q, K, V):</span></span>
+<span class="giallo-l"><span>    attn_scores = torch.matmul(Q, K.T)                 # N x N</span></span>
+<span class="giallo-l"><span>    attn_weights = torch.softmax(attn_scores, dim=-1)  # N x N</span></span>
+<span class="giallo-l"><span>    return torch.matmul(attn_weights, V)               # N x d</span></span>
+<span class="giallo-l"><span>   </span></span>
+<span class="giallo-l"><span>def efficient_attention(Q, K, V):</span></span>
+<span class="giallo-l"><span>    Q_smr = torch.softmax(Q, dim=-1)                   # N x d</span></span>
+<span class="giallo-l"><span>    K_smc = torch.softmax(K, dim=-2)                   # N x d</span></span>
+<span class="giallo-l"><span>    KV = torch.matmul(K_smc.T, V)                      # d x d</span></span>
+<span class="giallo-l"><span>    return torch.matmul(Q_smr, KV) </span></span></code></pre>
+<p>Below you can see a comparison of the execution times for different values of the sequence length $N$, for both Attention implementations.</p>
+<p>For reference, these benchmarks were run on a machine with the following specs:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **GPU:** NVIDIA RTX A4000 (16 GB)</span></span>
+<span class="giallo-l"><span>    * **OS:** Ubuntu 22.04 LTS (Kernel 5.15.0-157)</span></span>
+<span class="giallo-l"><span>    * **CPU:** 8 × Intel(R) Xeon(R) Gold 5315Y @ 3.20 GHz</span></span></code></pre>
+<p><img src="/images/external/execution_time.png?raw=true" alt="Im 2" /></p>
+<p>Similarly, below is the comparison for the memory resources</p>
+<p><img src="/images/external/memory_usage.png?raw=true" alt="Im 3" /></p>
+<p>As one can see, at the beginning, the memory and performance are similar for both (although better for the linear attention implementation), but for larger sequence lengths, both the time and memory requirements of the original implementation grow exponentially (plots are in log-log scale, so a greater slope means greater exponent), whilst the Efficient Attention implementation doesn’t.</p>
+<p>You can see the <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/linear_attention_blog/blob/main/notebook/benchmark.ipynb">code used for the benchmarks</a>.</p>
+<p>The same repository also includes a <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/linear_attention_blog/blob/main/transformer.py">full Transformer implementation</a> following the GPT architecture, with a configuration option to switch between <strong>Efficient Attention</strong> and the <strong>original Dot Product Attention</strong> , providing a broader view of how everything fits together.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Efficient Attention has been shown to be much more memory and performance efficient than the usual Dot Product Attention, allowing for much larger contexts to be processed due to its linear dependency with it. So why aren’t they more widely adopted? State-of-the-art models will rather pay the high costs of training to have that small edge over the competition.</p>
+<p>Nevertheless, efficient attention implementations remain important in domains such as video generation or genomics, where context sizes can inherently become very large.</p>
+<p>In this blog post, we’ve presented the original and simplest implementation of linearized attention; however, this is an ever-evolving field, and new and improved implementations have emerged, such as CosFormer, LinFormer, and Mamba. Some modern architectures also take a hybrid approach, mixing standard and efficient attention heads to balance accuracy and stability.</p>
+<hr />
+<h2 id="references">References</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * [Efficient Attention paper](https://arxiv.org/pdf/1812.01243)</span></span>
+<span class="giallo-l"><span>    * &lt;https://github.com/lucidrains/linear-attention-transformer&gt;</span></span>
+<span class="giallo-l"><span>    * &lt;https://www.youtube.com/watch?v=LgsiwDRnXls&gt;</span></span>
+<span class="giallo-l"><span>    * &lt;https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html&gt;</span></span></code></pre>
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

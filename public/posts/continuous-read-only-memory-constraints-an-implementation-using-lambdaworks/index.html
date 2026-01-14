@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Read-Only Memory Constraints: An implementation using Lambdaworks - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Continuous Read-Only Memory Constraints: An implementation using Lambdaworks</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-12-02">December 02, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>When we first explored the world of STARKs, one of the most confusing concepts we encountered was constraints. We kept asking ourselves: How is it possible to summarize highly complex relationships between trace values using just a few polynomials? It wasn’t until we started implementing some examples that we truly understood the clever, almost magical techniques employed in this domain.</p>
+<p>In this post, we aim to share part of that journey, explaining the insights we’ve gained in a hands-on, practical manner. We firmly believe that the best way to learn is through doing, and we’ll guide you through a concrete example: implementing the constraints for Cairo’s non-deterministic continuous read-only memory using the Lambdaworks library. These constraints are detailed in Section 9.7 of the <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2021/1063">Cairo whitepaper</a>.</p>
+<p>We won’t explain the basic concepts from the protocol, as we assume that if you’re reading this, you already have some understanding of the STARK protocol, the idea of an execution trace, and the purpose of defining constraints. For a deeper understanding or to reinforce some concepts, check out <a href="/diving-deep-fri/">diving DEEP-FRI</a>, <a href="/how-to-code-fri-from-scratch/">FRI from scratch</a> and <a href="/overview-of-the-stone-prover/">Stone prover</a></p>
+<h2 id="what-is-a-continuous-read-only-memory">What is a Continuous Read-Only Memory?</h2>
+<p>So, what do we mean by “continuous, non-deterministic, read-only memory”?</p>
+<p>The definition from the paper is as follows:</p>
+<blockquote>
+<p><strong>9.7.1 Definition</strong><br />
+<strong>Definition 4.</strong> A memory access is a pair $(a, v)\in \mathbb{F}^2$ where $a$ represents an address and $v$ represents the value of the memory at a. A list of memory accesses $(a_i, v_i)$ for $i \in [0, n)$ ($1 \leq n \leq P$) is said to form a <em>read-only memory</em> if for all $i, j \in [0, n)$, if $a_i = a_j,$ then $v_i = v_j$ . It is said to be <em>continuous</em> if the set ${a_i: i \in [0, n)}$ equals $[m_0, m_1)$ for some $m_0, m_1 \in \mathbb{F}$ that satisfy $m_1 = m_0 + t$ for a natural number $t &lt; P$ . In particular, for a given continuous read-only memory list of accesses, we can define a function $f: [m_0, m_1) \to \mathbb{F}$ such that $f(a_i) = v_i$ for all $i \in [0, n)$. Any function $m: \mathbb{F} → \mathbb{F}$ extending $f$ is said to be a memory function for the list of memory accesses.</p>
+</blockquote>
+<p>Let’s simplify this long and complex definition. Imagine a trace with two columns and $n$ rows. The rows represent each step of execution. The first column indicates the memory address accessed during that step, and the second column indicates the value retrieved from that address.</p>
+<p>For a memory to be <strong>read-only</strong> , the same addresses must always have the same value. If two rows in the trace reference the same address, the value in those rows must be the same.</p>
+<p>For example, consider the following trace:</p>
+<table><thead><tr><th>Address</th><th>Value</th></tr></thead><tbody>
+<tr><td>1</td><td>56</td></tr>
+<tr><td>3</td><td>34</td></tr>
+<tr><td>5</td><td>97</td></tr>
+<tr><td>4</td><td>25</td></tr>
+<tr><td>5</td><td>41</td></tr>
+<tr><td>3</td><td>34</td></tr>
+</tbody></table>
+<p>This trace is invalid because address 5 has two different values: 97 in the first occurrence and 41 in the second. This is not allowed in read-only memory.</p>
+<p>For a memory to be <strong>continuous</strong> , every memory address from the starting point (e.g., address 1) to the last address must appear at least once.</p>
+<p>The trace is also invalid in the example above because there is no entry for address 2.</p>
+<p>Then, to validate a trace, we need to ensure:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Read-only property** : The same address always maps to the same value.</span></span>
+<span class="giallo-l"><span>    * **Continuity property** : Every memory address in the range appears at least once.</span></span></code></pre>
+<p>It’s worth noting that addresses can appear multiple times in any order.</p>
+<p>The hard part is figuring out how to transform these two conditions into equations, which can then be expressed as polynomials.</p>
+<p>Like any engineering problem, there are trade-offs: keeping the trace simple can make the constraints more complex, and using more straightforward constraints can require adding more information to the trace.</p>
+<p>If we examine the conditions mentioned earlier, it becomes clear that validating them would be easier if the rows were sorted by address. For example, it’s challenging for a human to determine if a sequence like $(7, 5, 12, 4, 5, 11, 9, 10, 4, 4, 11, 7, 8)$ is continuous, but much more straightforward if we sort it: $(4, 4, 5, 5, 7, 7, 8, 9, 10, 11, 11, 12)$.</p>
+<p>For this reason, Cairo’s VM adds two additional columns to the trace: the sorted versions of the address and value columns.</p>
+<p>For example:</p>
+<table><thead><tr><th>address $(a)$</th><th>value $(v)$</th><th>sorted_address $(a’)$</th><th>sorted_value $(v’)$</th></tr></thead><tbody>
+<tr><td>1</td><td>56</td><td>1</td><td>56</td></tr>
+<tr><td>5</td><td>14</td><td>1</td><td>56</td></tr>
+<tr><td>3</td><td>25</td><td>2</td><td>34</td></tr>
+<tr><td>3</td><td>25</td><td>3</td><td>25</td></tr>
+<tr><td>4</td><td>44</td><td>3</td><td>25</td></tr>
+<tr><td>1</td><td>56</td><td>4</td><td>44</td></tr>
+<tr><td>2</td><td>34</td><td>5</td><td>14</td></tr>
+</tbody></table>
+<p>Although this duplicates the trace columns, it significantly simplifies verifying the continuity and read-only properties, as we’ll see next.</p>
+<p>However, adding these two columns introduces a new challenge: We need a way to verify that the new columns are permutations of the original ones. We’ll handle this with <strong>Permutation Constraints</strong> (spoiler alert: this requires the prover to add another column to the trace).</p>
+<p>Thus, by adding these new columns, validating the memory properties boils down to proving these simpler way constraints:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Continuity Constraint**</span></span>
+<span class="giallo-l"><span>    * **Single Value Constraint**</span></span>
+<span class="giallo-l"><span>    * **Permutation Constraints**</span></span></code></pre><h2 id="constraints">Constraints</h2>
+<h3 id="continuity-constraint">Continuity Constraint</h3>
+<p>Our first constraint will ensure that memory addresses form a continuous range without gaps. For instance, if address 5 appears, addresses 4 and 6 must also appear to maintain continuity.</p>
+<p>A valid example of continuous memory:</p>
+<table><thead><tr><th>sorted_addresses $(a’)$</th><th>sorted_values $(v’)$</th></tr></thead><tbody>
+<tr><td>…</td><td>…</td></tr>
+<tr><td>100</td><td>42</td></tr>
+<tr><td>101</td><td>17</td></tr>
+<tr><td>102</td><td>35</td></tr>
+<tr><td>103</td><td>22</td></tr>
+<tr><td>104</td><td>88</td></tr>
+<tr><td>…</td><td>…</td></tr>
+</tbody></table>
+<p>An invalid example:</p>
+<table><thead><tr><th>sorted_addresses $(a’)$</th><th>sorted_values $(v’)$</th></tr></thead><tbody>
+<tr><td>…</td><td>…</td></tr>
+<tr><td>100</td><td>42</td></tr>
+<tr><td>101</td><td>17</td></tr>
+<tr><td>103</td><td>22</td></tr>
+<tr><td>104</td><td>88</td></tr>
+<tr><td>…</td><td>…</td></tr>
+</tbody></table>
+<p>Here, address 102 is missing, breaking continuity.</p>
+<p>To check continuity, we examine the sorted address column, ensuring that the difference between consecutive addresses is always 0 (if they are the same) or 1 (if they are consecutive). The following Cairo constraint captures this:</p>
+<p>$$(a_{i+1}^\prime - a_i^\prime )(a_{i+1}^\prime - a_i^\prime - 1) = 0 \text{ for all } i \in [0,n - 1]$$</p>
+<p>Where $a_i^\prime$ represents the address in the $i$-th row of the sorted address column, and $v’_i$ represents the corresponding value.</p>
+<p>In this equation:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * The first factor, $(a&#39;_{i+1} - a&#39;_i)$ equals zero when addresses are the same.</span></span>
+<span class="giallo-l"><span>    * The second factor, $(a&#39;_{i+1} - a&#39;_i - 1)$ equals zero when addresses differ by 1.</span></span></code></pre>
+<p>Since the product must equal zero, the addresses must be identical or differ by exactly 1, ensuring continuity.</p>
+<p>Here’s how this is implemented in Rust:<br />
+add code</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn evaluate(</span></span>
+<span class="giallo-l"><span>    &amp;self,</span></span>
+<span class="giallo-l"><span>    frame: &amp;Frame&lt;F, F&gt;,</span></span>
+<span class="giallo-l"><span>    transition_evaluations: &amp;mut [FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>    _periodic_values: &amp;[FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>    _rap_challenges: &amp;[FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>) {</span></span>
+<span class="giallo-l"><span>    transition_evaluations</span></span>
+<span class="giallo-l"><span>        .get_mut(self.constraint_idx())</span></span>
+<span class="giallo-l"><span>        .map(|transition_eval| {</span></span>
+<span class="giallo-l"><span>            let first_step = frame.get_evaluation_step(0);</span></span>
+<span class="giallo-l"><span>            let second_step = frame.get_evaluation_step(1);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            let a_sorted_0 = first_step.get_main_evaluation_element(0, 2);</span></span>
+<span class="giallo-l"><span>            let a_sorted_1 = second_step.get_main_evaluation_element(0, 2);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            let res = (a_sorted_1 - a_sorted_0)</span></span>
+<span class="giallo-l"><span>                * (a_sorted_1 - a_sorted_0 - FieldElement::&lt;F&gt;::one());</span></span>
+<span class="giallo-l"><span>            *transition_eval = res;</span></span>
+<span class="giallo-l"><span>        });</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>where:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let first_step = frame.get_evaluation_step(0); </span></span></code></pre>
+<p>gives us access to the first row of the trace and</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let a_sorted_0 = first_step.get_main_evaluation_element(0, 2); //a&#39;_0</span></span></code></pre>
+<p>will give access to the second third column which is element 2</p>
+<p>Then the equation looks kike</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let res = (a_sorted_1 - a_sorted_0)</span></span>
+<span class="giallo-l"><span>* (a_sorted_1 - a_sorted_0 - FieldElement::&lt;F&gt;::one());</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>*transition_eval = res;</span></span></code></pre><h3 id="single-value-constraint">Single-Value Constraint</h3>
+<p>This constraint ensures that each memory address has a single, consistent value. Even if the same address is accessed multiple times, the value must always remain the same.<br />
+A valid example:</p>
+<table><thead><tr><th>Address</th><th>Value</th></tr></thead><tbody>
+<tr><td>…</td><td>…</td></tr>
+<tr><td>101</td><td>17</td></tr>
+<tr><td>101</td><td>17</td></tr>
+<tr><td>104</td><td>88</td></tr>
+<tr><td>…</td><td>…</td></tr>
+</tbody></table>
+<p>An invalid example:</p>
+<table><thead><tr><th>Address</th><th>Value</th></tr></thead><tbody>
+<tr><td>…</td><td>…</td></tr>
+<tr><td>101</td><td>17</td></tr>
+<tr><td>101</td><td>42</td></tr>
+<tr><td>102</td><td>88</td></tr>
+<tr><td>…</td><td>…</td></tr>
+</tbody></table>
+<p>Here, address 101 has two different values, violating the constraint.</p>
+<p>With an analogous logic to the one used in the continuity constraint, the Cairo paper defines the single-value constraint as:</p>
+<p>$$(v_{i+1}^\prime - v_i^\prime )(a_{i+1}^\prime - a_i^\prime - 1) = 0 \quad \text{for all } i \in [0, n - 1]$$</p>
+<p>In this equation:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * The first factor, $(v&#39;_{i+1} - v&#39;_i)$ ensures that the values for identical addresses are the same.</span></span>
+<span class="giallo-l"><span>    * The second factor, $(a&#39;_{i+1} - a&#39;_i - 1)$ ensures this check only applies to identical addresses.</span></span></code></pre>
+<p>Here’s the implementation in Rust</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn evaluate(</span></span>
+<span class="giallo-l"><span>    &amp;self,</span></span>
+<span class="giallo-l"><span>    frame: &amp;Frame&lt;F, F&gt;,</span></span>
+<span class="giallo-l"><span>    transition_evaluations: &amp;mut [FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>    _periodic_values: &amp;[FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>    _rap_challenges: &amp;[FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>) {</span></span>
+<span class="giallo-l"><span>    transition_evaluations</span></span>
+<span class="giallo-l"><span>        .get_mut(self.constraint_idx())</span></span>
+<span class="giallo-l"><span>        .map(|transition_eval| {</span></span>
+<span class="giallo-l"><span>            let first_step = frame.get_evaluation_step(0);</span></span>
+<span class="giallo-l"><span>            let second_step = frame.get_evaluation_step(1);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            let a_sorted_0 = first_step.get_main_evaluation_element(0, 2);</span></span>
+<span class="giallo-l"><span>            let a_sorted_1 = second_step.get_main_evaluation_element(0, 2);</span></span>
+<span class="giallo-l"><span>            let v_sorted_0 = first_step.get_main_evaluation_element(0, 3);</span></span>
+<span class="giallo-l"><span>            let v_sorted_1 = second_step.get_main_evaluation_element(0, 3);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            let res = (v_sorted_1 - v_sorted_0)</span></span>
+<span class="giallo-l"><span>                * (a_sorted_1 - a_sorted_0 - FieldElement::&lt;F&gt;::one());</span></span>
+<span class="giallo-l"><span>            *transition_eval = res;</span></span>
+<span class="giallo-l"><span>        });</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>As with the continuity constraint, we extract the relevant rows and elements:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let a_sorted_0 = first_step.get_main_evaluation_element(0, 2); // a&#39;_i</span></span>
+<span class="giallo-l"><span>let a_sorted_1 = second_step.get_main_evaluation_element(0, 2); // a&#39;_{i+1}</span></span>
+<span class="giallo-l"><span>let v_sorted_0 = first_step.get_main_evaluation_element(0, 3); // v&#39;_i</span></span>
+<span class="giallo-l"><span>let v_sorted_1 = second_step.get_main_evaluation_element(0, 3); // v&#39;_{i+1}`</span></span></code></pre>
+<p>The evaluation results ensure that if two addresses are equal, their corresponding values are consistent.</p>
+<h3 id="permutation-constraint">Permutation Constraint</h3>
+<p>Now that we know that $a’$ and $v’$ represent a continuous read-only memory, we must prove that $a’$ and $v’$ are a permutation of the original $a$ and $v$ columns. We’ll achieve this using an interactive protocol:</p>
+<p>First, the verifier sends the prover two random field elements $z, \alpha \in \mathbb{F}$, known as <em>challenges</em>. One detail to remember is that if we work with a small field $\mathbb{F}$, these elements should be sampled from an extension field, so all the following permutation constraints will be over the extension.</p>
+<p><strong>Note:</strong> In practice, the protocol is not interactive; instead, the <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Fiat%E2%80%93Shamir_heuristic">Fiat-Shamir heuristic</a> is used to obtain random values, enabling a non-interactive approach.</p>
+<p>secondly, using these challenges, the prover constructs an auxiliary column $p$, which is added to the main trace table. This column is computed as:</p>
+<p>$$ \begin{align} p_0 &amp;= \frac {z - (a_0 + \alpha v_0)} {z - (a’_0 + \alpha v’_0)},<br />
+\ \newline<br />
+p_1 &amp;= \frac {z - (a_0 + \alpha v_0)} {z - (a’_0 + \alpha v’_0)} \cdot \frac {z - (a_1 + \alpha v_1)} {z - (a’_1 + \alpha v’_1)} = p_0 \cdot \frac {z - (a_1 + \alpha v_1)} {z - (a’_1 + \alpha v’_1)},<br />
+\ \newline<br />
+p_2 &amp;= p_1 \cdot \frac {z - (a_2 + \alpha v_2)} {z - (a’_2 + \alpha v’_2)}. \end{align}$$</p>
+<p>Continuing with this procedure we get:</p>
+<p>$$p_{i+1} = p_i \cdot \frac {z - (a_{i+1} + \alpha v_{i+1})} {z - (a_{i+1}^\prime + \alpha v_{i+1}^\prime )} \text{ with } i \in {0, \ldots, n - 2}$$</p>
+<p>For example, if the main trace table is:</p>
+<table><thead><tr><th>$a$</th><th>$v$</th><th>$a’$</th><th>$v’$</th></tr></thead><tbody>
+<tr><td>2</td><td>10</td><td>0</td><td>7</td></tr>
+<tr><td>0</td><td>7</td><td>0</td><td>7</td></tr>
+<tr><td>0</td><td>7</td><td>1</td><td>20</td></tr>
+<tr><td>1</td><td>20</td><td>2</td><td>10</td></tr>
+</tbody></table>
+<p>then the table with the auxiliary column $p$ will look like this:</p>
+<table><thead><tr><th>$a$</th><th>$v$</th><th>$a’$</th><th>$v’$</th><th>$p$</th></tr></thead><tbody>
+<tr><td>2</td><td>10</td><td>0</td><td>7</td><td>$\frac {z - (2 + \alpha 10)} {z - (0 + \alpha 7)}$</td></tr>
+<tr><td>0</td><td>7</td><td>0</td><td>7</td><td>$\frac {z - (2 + \alpha 10)} {z - (0 + \alpha 7)} \cdot \frac {z - (0 + \alpha 7)} {z - (0 + \alpha 7)}$</td></tr>
+<tr><td>0</td><td>7</td><td>1</td><td>20</td><td>$\frac {z - (2 + \alpha 10)} {z - (0 + \alpha 7)} \cdot \frac {z - (0 + \alpha 7)} {z - (0 + \alpha 7)} \cdot \frac {z - (0 + \alpha 7)} {z - (1 + \alpha 20)}$</td></tr>
+<tr><td>1</td><td>20</td><td>2</td><td>10</td><td>$\frac {z - (2 + \alpha 10)} {z - (0 + \alpha 7)} \cdot \frac {z - (0 + \alpha 7)} {z - (0 + \alpha 7)} \cdot \frac {z - (0 + \alpha 7)} {z - (1 + \alpha 20)} \cdot \frac {z - (1 + \alpha 20)} {z - (2 + \alpha 10)}$</td></tr>
+</tbody></table>
+<p>Looking at the example, let us observe that the last value in column $p$ gives us the product of all the previous ones. Since the values indeed come from a permutation, each factor in the numerator (originated from $a$ and $v$) must appear once in the denominator (originated from $a’$ and $v’$), canceling each other out and resulting in the entire product equaling $1$. For instance, in the table above, the first numerator (orange) cancels out with the last denominator (orange):</p>
+<p>$$\frac { {\style{color: orange} {z - (2 + \alpha 10)}}} {\style{color: cyan} {z - (0 + \alpha 7)}} \cdot \frac { \style{color: magenta} {z - (0 + \alpha 7)}} { \style{color: magenta} {z - (0 + \alpha 7)}} \cdot \frac { \style{color: cyan} {z - (0 + \alpha 7)}} { \style{color: lime} {z - (1 + \alpha 20)}} \cdot \frac { \style{color: lime} {z - (1 + \alpha 20)}} { \style{color: orange} {z - (2 + \alpha 10)}} = 1$$</p>
+<p>Generalizing it to any trace with $n$ rows, we get the following last value, called <em>Grand Product</em> :</p>
+<p>$$p_{n - 1} = \frac {z - (a_0 + \alpha v_0)} {z - (a_0^\prime + \alpha v_0^\prime )} \cdot \frac {z - (a_1 + \alpha v_1)} {z - (a_1^\prime + \alpha v_1^\prime )} \ldots \frac {z - (a_{n - 1} + \alpha v_{n - 1})} {z - (a_{n - 1}^\prime + \alpha v_{ n - 1 }^\prime )}$$</p>
+<p>Then, using the randomness of $z$ and $\alpha$ (and the <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma">Schwartz–Zippel Lemma</a>), we know that to prove that $a’$ and $v’$ are a permutation of $a$ and $v$, it suffices to check that:<br />
+$$ p_{n-1} = 1$$</p>
+<p>In this way, the constraints that guarantee the correct permutation are reduced to two boundary constraints and one transition constraint (you can find them in the <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2021/1063.pdf">Cairo Paper</a>, Section 9.7.2):</p>
+<h4 id="1-initial-value-boundary-constraint">1. Initial Value Boundary Constraint:</h4>
+<p>$$p_0 = \frac {z - (a_0 + \alpha v_0)} {z - (a_0^\prime + \alpha v_0^\prime )}$$ We check that the first value in the auxiliary column is correct.</p>
+<h4 id="2-final-value-boundary-constraint">2. Final Value Boundary Constraint:</h4>
+<p>$$p_{n - 1} = 1$$ We check that the Grand Product equals 1.</p>
+<p>In our code, these two Boundary Constraints are located in the <code>boundary_constraints()</code> function of the <code>AIR</code> implementation for <code>ReadOnlyRAP&lt;F&gt;</code>. You can see them below, after the comment <code>//Auxiliary boundary constraints</code>:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn boundary_constraints(</span></span>
+<span class="giallo-l"><span>    &amp;self,</span></span>
+<span class="giallo-l"><span>    rap_challenges: &amp;[FieldElement&lt;Self::FieldExtension&gt;],</span></span>
+<span class="giallo-l"><span>) -&gt; BoundaryConstraints&lt;Self::FieldExtension&gt; {</span></span>
+<span class="giallo-l"><span>    let a0 = &amp;self.pub_inputs.a0;</span></span>
+<span class="giallo-l"><span>    let v0 = &amp;self.pub_inputs.v0;</span></span>
+<span class="giallo-l"><span>    let a_sorted0 = &amp;self.pub_inputs.a_sorted0;</span></span>
+<span class="giallo-l"><span>    let v_sorted0 = &amp;self.pub_inputs.v_sorted0;</span></span>
+<span class="giallo-l"><span>    let z = &amp;rap_challenges[0];</span></span>
+<span class="giallo-l"><span>    let alpha = &amp;rap_challenges[1];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Main boundary constraints</span></span>
+<span class="giallo-l"><span>    let c1 = BoundaryConstraint::new_main(0, 0, a0.clone());</span></span>
+<span class="giallo-l"><span>    let c2 = BoundaryConstraint::new_main(1, 0, v0.clone());</span></span>
+<span class="giallo-l"><span>    let c3 = BoundaryConstraint::new_main(2, 0, a_sorted0.clone());</span></span>
+<span class="giallo-l"><span>    let c4 = BoundaryConstraint::new_main(3, 0, v_sorted0.clone());</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Auxiliary boundary constraints</span></span>
+<span class="giallo-l"><span>    let num = z - (a0 + alpha * v0);</span></span>
+<span class="giallo-l"><span>    let den = z - (a_sorted0 + alpha * v_sorted0);</span></span>
+<span class="giallo-l"><span>    let p0_value = num / den;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let c_aux1 = BoundaryConstraint::new_aux(0, 0, p0_value);</span></span>
+<span class="giallo-l"><span>    let c_aux2 = BoundaryConstraint::new_aux(</span></span>
+<span class="giallo-l"><span>        0,</span></span>
+<span class="giallo-l"><span>        self.trace_length - 1,</span></span>
+<span class="giallo-l"><span>        FieldElement::&lt;Self::FieldExtension&gt;::one(),</span></span>
+<span class="giallo-l"><span>    );</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    BoundaryConstraints::from_constraints(vec![c1, c2, c3, c4, c_aux1, c_aux2])</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Note that the values of $a$, $a’$, $v$, $v’$ from the first row of the trace must also be known by the verifier to perform the check for the Initial Value constraint. This is a problem we did not have before (the rest of the constraints do not depend on the trace) since the verifier only has access to the commitment of the trace, not its elements. Therefore, this first row must be part of the public input.</p>
+<h4 id="3-permutation-transition-constraint">3. Permutation Transition Constraint:</h4>
+<p>$$(z - (a_{i+1}^\prime + \alpha v_{i + 1}^\prime )) \cdot p_{i+1} - (z - (a_{i+1} + \alpha v_{i+1})) \cdot p_i = 0$$ for all $i \in {0, \ldots, n-2}$.</p>
+<p>In this way, we check that each element of $p$ was constructed correctly, with the last element being the Grand Product. In our code, we call this transition constraint <code>PermutationConstraint</code>. When implementing its corresponding <code>evaluate()</code> function (link), the use of this equation can be seen:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn evaluate(</span></span>
+<span class="giallo-l"><span>    &amp;self,</span></span>
+<span class="giallo-l"><span>    frame: &amp;Frame&lt;F, F&gt;,</span></span>
+<span class="giallo-l"><span>    transition_evaluations: &amp;mut [FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>    _periodic_values: &amp;[FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>    rap_challenges: &amp;[FieldElement&lt;F&gt;],</span></span>
+<span class="giallo-l"><span>) {</span></span>
+<span class="giallo-l"><span>    let first_step = frame.get_evaluation_step(0);</span></span>
+<span class="giallo-l"><span>    let second_step = frame.get_evaluation_step(1);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let p0 = first_step.get_aux_evaluation_element(0, 0);</span></span>
+<span class="giallo-l"><span>    let p1 = second_step.get_aux_evaluation_element(0, 0);</span></span>
+<span class="giallo-l"><span>    let z = &amp;rap_challenges[0];</span></span>
+<span class="giallo-l"><span>    let alpha = &amp;rap_challenges[1];</span></span>
+<span class="giallo-l"><span>    let a1 = second_step.get_main_evaluation_element(0, 0);</span></span>
+<span class="giallo-l"><span>    let v1 = second_step.get_main_evaluation_element(0, 1);</span></span>
+<span class="giallo-l"><span>    let a_sorted_1 = second_step.get_main_evaluation_element(0, 2);</span></span>
+<span class="giallo-l"><span>    let v_sorted_1 = second_step.get_main_evaluation_element(0, 3);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let res = (z - (a_sorted_1 + alpha * v_sorted_1)) * p1</span></span>
+<span class="giallo-l"><span>        - (z - (a1 + alpha * v1)) * p0;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    transition_evaluations[self.constraint_idx()] = res;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="summary">Summary</h2>
+<p>By introducing sorted columns and auxiliary columns, we reduce the problem of validating a continuous read-only memory to proving three simpler constraints:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Continuity that ensures all memory addresses form a complete range.</span></span>
+<span class="giallo-l"><span>    * Single-Value that ensures each address always returns the same value.</span></span>
+<span class="giallo-l"><span>    * Permutation that ensures the sorted columns are permutations of the original columns.</span></span></code></pre>
+<p>These constraints demonstrate the simplicity of STARKs in encoding complex relationships as polynomial equations.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

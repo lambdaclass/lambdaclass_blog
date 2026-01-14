@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ term.name | title }} - {{ config.title }}{% endblock %}
+
+{% block content %}
+<section class="taxonomy-page">
+    <header class="taxonomy-header">
+        <span class="taxonomy-label">Topic</span>
+        <h1>{{ term.name | title }}</h1>
+        <p class="taxonomy-count">{{ term.pages | length }} article{% if term.pages | length != 1 %}s{% endif %}</p>
+    </header>
+
+    <div class="posts-list">
+        {% for page in term.pages %}
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+                    {% if page.reading_time %}
+                    <span class="reading-time">{{ page.reading_time }} min read</span>
+                    {% endif %}
+                </div>
+                <h2 class="post-title">
+                    <a href="{{ page.permalink }}">{{ page.title }}</a>
+                </h2>
+                {% if page.description %}
+                <p class="post-excerpt">{{ page.description | truncate(length=200) }}</p>
+                {% elif page.summary %}
+                <p class="post-excerpt">{{ page.summary | striptags | truncate(length=200) }}</p>
+                {% endif %}
+            </div>
+            {% if page.extra.feature_image %}
+            <a href="{{ page.permalink }}" class="post-list-image">
+                <img src="{{ page.extra.feature_image }}" alt="{{ page.title }}" loading="lazy">
+            </a>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+
+    {% if paginator %}
+    <nav class="pagination">
+        {% if paginator.previous %}
+        <a href="{{ paginator.previous }}" class="pagination-link prev">Previous</a>
+        {% endif %}
+        <span class="pagination-info">Page {{ paginator.current_index }} of {{ paginator.number_pagers }}</span>
+        {% if paginator.next %}
+        <a href="{{ paginator.next }}" class="pagination-link next">Next</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+</section>
+{% endblock %}

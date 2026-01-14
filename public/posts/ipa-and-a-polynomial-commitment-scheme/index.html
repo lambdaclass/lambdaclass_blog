@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inner Product Argument (IPA) and a Polynomial Commitment Scheme - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Inner Product Argument (IPA) and a Polynomial Commitment Scheme</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-08-25">August 25, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p>In this blogpost, we’ll take a closer look at the Inner Product Argument. We’ll start by understanding the basics of this technique and then shift our focus to its variant within the Halo2 proving system. Specifically, we’ll explore how Halo2 ingeniously employs the Inner Product Argument as a polynomial commitment scheme.</p>
+<p>Let’s first fix some notation that will be used throughout the text.</p>
+<h2 id="notation">Notation</h2>
+<p>The symbol $\mathbb{F}$ always denotes a prime field of order $p$. Given two vectors $A=(a_1,\dots,a_n)$ and $B=(b_1,\dots,b_n)$ of elements of $\mathbb{F}$ of the same length, the inner product between $A$ and $B$ is the element $a_1b_1 + \cdots + a_nb_n \in \mathbb{F}$. It is denoted by $\langle A, B\rangle$.</p>
+<p>The symbol $\mathbb{G}$ denotes a commutative group of order $p$. We always use additive notation. If $A=(a_1,\dots,a_n)$ is a vector of elements of $\mathbb{F}$ and $G=(G_1, \dots, G_n)$ is a sequence of elements of $\mathbb{G}$, then $\langle A, G\rangle$ denotes the element $a_1G_1 + \cdots + a_nG_n \in\mathbb{G}$.</p>
+<h1 id="the-inner-product-argument">The inner product argument</h1>
+<p>To understand what this is all about, let’s go straight to its description. This is a sort of commitment scheme and there will be a prover and a verifier. The argument has two parts.</p>
+<p><strong>Commit</strong> : The prover can commit to a pair of vectors $(A, B)$, where $A \in \mathbb{F}^n$ and $B \in \mathbb{F}^n$ by producing an object that we denote by $P$. This process does not unveil $A$ or $B$, but it is binding. Meaning that any other vectors would produce another commitment with high probability. Usually, the prover sends $P$ to the verifier.</p>
+<p><strong>Open</strong> : Assume the verifier already holds a commitment $P$. The open protocol is an interactive protocol in which the prover sends a value $c\in\mathbb{F}$ and convinces the verifier that</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $P$ is a valid commitment of two vectors $A$ and $B$, both of length $n$.</span></span>
+<span class="giallo-l"><span>    * The value $c$ is the inner product of $A$ and $B$.</span></span></code></pre><h3 id="ok-but-why">Ok, but why?</h3>
+<p>This scheme itself might not seem particularly valuable, as $A$ and $B$ can be anything. However, its significance lies in its role as a building block for other proving systems. Within these contexts, additional checks are applied to enforce specific structures upon $A$, $B$, and $c$, all dependent on public parameters. Instead of sending $P$, the prover sends other commitments that make possible the structure checks on $A$ and $B$. From those commitments, the verifier can efficiently reconstruct $P$. This approach imbues the vectors with certain contextual meanings regarding the statement being proven. The requirement that their inner product equals a predetermined value functions as evidence of the prover’s knowledge regarding this fact.</p>
+<p>The version we’ll describe next was introduced in the <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2017/1066">Bulletproofs paper</a>. To gain further insight into its application within a zero-knowledge proof of arithmetic circuits, refer to Section 5 of that paper.</p>
+<h3 id="setup">Setup</h3>
+<p>Both the Commit and Open protocols depend on a few precomputed values. The needed ingredients are:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * A commutative group $\mathbb{G}$ with $p$ elements. We&#39;ll use additive notation.</span></span>
+<span class="giallo-l"><span>    * Two sequences of elements $G=(G_1,\dots, G_n)$ and $H=(H_1,\dots, H_n)$ of elements of $\mathbb{G}$. We may refer to these as _bases_.</span></span></code></pre>
+<p>Here $n$ is the length of the vectors to be committed. We will always assume it is a power of two. If this is not the case, vectors can be padded with zeroes until the next power of two.</p>
+<h3 id="commit">Commit</h3>
+<p>Given vectors $A = (a_1,\dots, a_n)$ and $B=(b_1,\dots, b_n)$, the commitment of the pair $(A, B)$ is:</p>
+<p>$$P := \sum_{i=1}^n a_i G_i + \sum_{i=1}^n b_i H_i.$$</p>
+<h3 id="open">Open</h3>
+<p>The Open protocol has $\log_2(n)$ rounds. Let’s start with the easiest example.</p>
+<h4 id="case-n-2">Case $n=2$.</h4>
+<p>In this case $A = (a_1, a_2)$ and $B = (b_1, b_2)$.</p>
+<p>The protocol starts with the verifier choosing a random element $U$ in $\mathbb{G}$ and sending it to the prover.</p>
+<p>The prover computes the following elements and sends them to the verifier</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $L := a_1G_2 + b_2H_1 + a_1b_2U$ and</span></span>
+<span class="giallo-l"><span>    * $R := a_2G_1 + b_1H_2 + a_2b_1U$.</span></span></code></pre>
+<p>The verifier chooses a random non-zero value $x\in\mathbb{F}$ and sends it to the prover, who uses it to compute the following elements:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $a&#39; := a_1 x + a_2 x^{-1}$</span></span>
+<span class="giallo-l"><span>    * $b&#39; := b_1 x^{-1} + b_2 x$</span></span></code></pre>
+<p>The prover sends $a’$ and $b’$ to the verifier. Finally, the verifier checks that:</p>
+<p>$$<br />
+\begin{equation}<br />
+x^2 L + P + c U + x^{-2} R = x^{-1} a’ G_1 + xa’ G_2 + x b’ H_1 + x^{-1} b’ H_2 + a’b’U<br />
+\end{equation}<br />
+$$</p>
+<p>The verifier accepts if and only if the above equality holds.</p>
+<h4 id="completeness-idea">Completeness idea</h4>
+<p>To see why this equality holds, one can expand both sides and check that they have the same terms. Let’s examine for example the first term on the right-hand side:</p>
+<p>$$<br />
+\begin{aligned}<br />
+x^{-1} a’ G_1 &amp;= x^{-1} (a_1 x + a_2 x^{-1}) G_1 \\<br />
+&amp;= (a_1 + a_2 x^{-2}) G_1 \\<br />
+&amp;= \color{blue}{a_1 G_1} + \color{red}{x^{-2} a_2 G_1}<br />
+\end{aligned}<br />
+$$</p>
+<p>Notice how this matches part of $P = \color{blue}{a_1G_1} + a_2G_2 + b_1H_1 + b_2H_2$. The other term appears in $x^{-2}R = \color{red}{x^{-2}a_2G_1} + x^{-2} b_1 H_2 + x^{-2}a_2b_1U$. The rest of the terms behave similarly.</p>
+<h4 id="soundness-idea">Soundness idea</h4>
+<p>In the Bulletproofs paper, the authors prove that, under the discrete log assumption, if the prover could successfully respond with $a’,b’$ for at least $4$ different values of $x$, then two vectors $A$ and $B$ can be extracted from them such that $\langle A, B\rangle = c$ and $P$ is the commitment of the pair $(A, B)$.<br />
+So if such $A$ and $B$ don’t exist, there are at most $3$ values of $x$ for which the prover knows $a’$ and $b’$ that make the verifier’s check pass. But the chances that the verifier happens to choose a random $x$ that’s one of those $3$ options, is negligible.</p>
+<h4 id="general-case-for-n-2-k">General case for $n = 2^k$</h4>
+<p>It is an iterative application of a process in that in each step the prover takes two vectors $A$ and $B$ of size $2^k$ and produces two more vectors $A’$ and $B’$ each of size $2^{k-1}$. In the subsequent step $A’$ and $B’$ take the role of $A$ and $B$ and repeat until $k=0$. In each intermediate step, the bases $G$ and $H$ are updated to halve their length too.<br />
+In the first iteration, $A$ and $B$ are the original vectors and the final step is exactly the base case already described for $n=2$. At the end, $A’$ and $B’$ would be of length $1$, so they are just elements of $\mathbb{F}$. They are the elements we denoted by $a’$ and $b’$ above.</p>
+<p>Concretely, the first step is as follows.</p>
+<p>Let $n = 2^k$ and suppose $k&gt;1$. Otherwise, we follow the case $n=2$ described above.<br />
+Write $A = (a_1,\dots, a_{2^k})$ and define the lower and higher parts of $A$ as $A_{lo} := (a_1,\dots,a_{2^{k-1}})$ and $A_{hi} := (a_{2^{k-1}+1}, \dots, a_{2^k})$. The same for $B$, $B_{lo}$ and $B_{hi}$, $G_{lo}$, $G_{hi}$, $H_{lo}$, $H_{hi}$.</p>
+<p>The protocol starts also with the verifier choosing a random element $U$ in $\mathbb{G}$ and sending it to the prover. This only happens at the very first round. The same element $U$ is then used throughout all rounds.</p>
+<p>The prover computes the following vectors and sends them to the verifier</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $L := \langle A_{lo}, G_{hi} \rangle + \langle B_{hi}, H_{lo} \rangle + \langle A_{lo}, B_{hi}\rangle U$, and</span></span>
+<span class="giallo-l"><span>    * $R := \langle A_{hi}, G_{lo} \rangle + \langle B_{lo}, H_{hi} \rangle + \langle A_{hi}, B_{lo}\rangle U$.</span></span></code></pre>
+<p>The verifier chooses a random non-zero value $x\in\mathbb{F}$ and sends it to the prover.</p>
+<p>At this point, the next step starts. The prover computes</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $A&#39; := x A_{lo} + x^{-1} A_{hi}$,</span></span>
+<span class="giallo-l"><span>    * $B&#39; := x^{-1} B_{lo} + x B_{hi}$.</span></span></code></pre>
+<p>These will take the roles of $A$ and $B$. The bases are updated similarly to $A$ and $B$. Meaning, in the next step, instead of $G$ and $H$, the following bases are used:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $G&#39; := x^{-1} G_{lo} + x G_{hi}$.</span></span>
+<span class="giallo-l"><span>    * $H&#39; := x H_{lo} + x^{-1} H_{hi}$.</span></span></code></pre>
+<p>Finally, the verifier accepts if and only if the check at the last step ($n$=2) succeeds.</p>
+<h1 id="polynomial-commitment-scheme">Polynomial commitment scheme</h1>
+<p>There is a polynomial commitment scheme inspired by the IPA protocol. This is used in the <a rel="noopener external" target="_blank" href="https://zcash.github.io/halo2/index.html">Halo2</a> proving system.</p>
+<p>A polynomial commitment scheme has two parts:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Commit** : given a polynomial $p$, the prover produces an object that&#39;s unique to $p$. We denote it here by $[p]$ and is called the _commitment_ of $p$. The prover usually sends $[p]$ to the verifier. The object $[p]$ is a sort of hash of $p$.</span></span>
+<span class="giallo-l"><span>    * **Open** : This is an interactive protocol between the prover and the verifier. The verifier only holds the commitment $[p]$ of some polynomial and sends a value $z$ to the prover at which he wants to know the value $p(z)$. The prover responds with a value $c$ and then they engage in the _Open_ protocol. As a result of it, the verifier gets convinced that the polynomial that corresponds to the commitment $[p]$ evaluates to $c$ at $z$.</span></span></code></pre>
+<p>The idea to build a polynomial commitment scheme out of IPA is primarily based on two observations.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * A polynomial $p = \sum_{i=0}^{n-1} a_i X^i$ is uniquely determined by the vector of its coefficients $A = (a_0, \dots, a_{n-1})$.</span></span>
+<span class="giallo-l"><span>    * The evaluation of $p$ at an element $z$ is precisely the inner product between the vector $A$ of coefficients of $p$ and the vector $B$ of power of $z$. More precisely, if $p = \sum_{i=0}^{n-1} a_i X^i$, then</span></span></code></pre>
+<p>$$ p(z) = \langle A, B\rangle,$$<br />
+where $A = (a_0, \dots, a_n)$ and $B = (1, z, z^2, \dots, z^n)$.</p>
+<p>As we’ll see shortly, the commitment of the polynomial $p$ is very similar to the commitment $P$ of $(A, B)$ in IPA. The open protocol is very similar too. And it proves that a value $c$ is actually $c = \langle A, B\rangle$, which is $p(z)$ by the way $B$ is defined.<br />
+A major difference with IPA is that, in this case, the vector $B$ is always known to the verifier. So the terms that correspond to $B$ in the commitment are unnecessary. This makes the sequence $H_1,\dots, H_n$ unnecessary too. Instead of completely removing those terms, a random value is added by the prover, but with another purpose. It is called the <em>blinding factor</em> and it’s there to add zero knowledge to the protocols.</p>
+<h3 id="setup-1">Setup</h3>
+<p>As with IPA, there is a setup phase where the needed ingredients are produced:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * A commutative group $\mathbb{G}$ with $p$ elements. As before, we&#39;ll use additive notation.</span></span>
+<span class="giallo-l"><span>    * A sequences of elements $G_0,\dots, G_{n-1} \in \mathbb{G}$ and a single element $H\in\mathbb{G}$.</span></span></code></pre><h3 id="commit-1">Commit</h3>
+<p>Given a polynomial $p = \sum_{i=0}^{n-1} a_i X^i$, to produce the commitment $[p]$ of it, the prover chooses a random value $r\in\mathbb{F}$ and computes</p>
+<p>$$[p] := a_0G_0 + \cdots + a_{n-1}G_{n-1} + rH.$$</p>
+<p>The value $r$ is called the <em>blinding factor</em>. The prover always keeps track of which values $r$ were used for each of the produced commitments $[p]$. This is because he’ll need them later on for the Open protocol. Formally, what we described is a commitment to the pair $(p, r)$ and we should write it as $[(p,r)]$. But to ease notation we drop the explicit mention to the blinding factor $r$.</p>
+<h3 id="open-1">Open</h3>
+<p>Recall we are assuming here that the verifier already holds a commitment $[p]$ to a polynomial $p$, known to the prover. The prover also knows the value $r$ he used to produce the commitment $[p]$. Also, the verifier has already sent an element $z$ in $\mathbb{F}$ at which he wants to know the value of $p(z)$. The prover responded with a purpoted value $c$. What follows is the Open protocol in which they engage to convince the verifier that $c = p(z)$.</p>
+<h4 id="case-n-2-1">Case $n=2$</h4>
+<p>Let’s begin with the base case. As with IPA, this will be the base case to which all the other cases reduce to.</p>
+<p>When $n=2$, the polynomial $p$ is of degree at most $1$, that is, $p=a_0 + a_1 X$. Let $A=(a_0, a_1)$ and $B=(1, z)$. Define $b_0 = 1$ and $b_1=z$.</p>
+<p>The interaction starts with the verifier choosing a random element $U$ in $\mathbb{G}$ and sending it to the prover.</p>
+<p>The prover chooses random values $s, s’ \in \mathbb{F}$ and responds the verifier with the following elements</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $L := a_0G_1 + sH + a_0b_1U$ and</span></span>
+<span class="giallo-l"><span>    * $R := a_1G_0 + s&#39;H + a_1b_0U$.</span></span></code></pre>
+<p>The verifier chooses a random non-zero value $x\in\mathbb{F}$ and sends it to the prover, who uses it to compute the following elements.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $a&#39; := a_0 x + a_1 x^{-1}$</span></span>
+<span class="giallo-l"><span>    * $b&#39; := b_0 x^{-1} + b_1 x$</span></span></code></pre>
+<p>The prover sends $a’$ and $b’$ to the verifier along with the element $r’ := sx^2 + r + s’x^{ - 2}$. Finally, the verifier checks that:</p>
+<p>$$<br />
+\begin{equation}<br />
+x^2 L + [p] + x^{-2} R + c U = x^{-1} a’ G_0 + xa’ G_1 + r’ H + a’b’U<br />
+\end{equation}<br />
+$$</p>
+<p>The verifier accepts if and only if the above equality holds.</p>
+<h4 id="general-case-n-2-k">General case $n=2^k$</h4>
+<p>The idea is the same as in IPA. It is a recursive argument.</p>
+<p>Let $n = 2^k$ and suppose $k&gt;1$. If $k=1$, we follow the case $n=2$ described above.<br />
+Write $p = \sum_{i=0}^{n-1}a_iX^i$. As before, define $A = (a_0,\dots, a_{2^k-1})$ and $B=(1, z, \dots, z^{n-1})$. Let the lower and higher parts of $A$ be the first and second halves of it. The same for the rest of the vectors involved.</p>
+<p>The protocol starts also with the verifier choosing a random element $U$ in $\mathbb{G}$ and sending it to the prover.</p>
+<p>The prover chooses random elements $s, s’$ in $\mathbb{F}$. He computes the following vectors and sends them to the verifier</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $L := \langle A_{lo}, G_{hi} \rangle + sH + \langle A_{lo}, B_{hi}\rangle U$, and</span></span>
+<span class="giallo-l"><span>    * $R := \langle A_{hi}, G_{lo} \rangle + s&#39;H + \langle A_{hi}, B_{lo}\rangle U$.</span></span></code></pre>
+<p>The verifier chooses a random non-zero value $x\in\mathbb{F}$ and sends it to the prover.</p>
+<p>At this point, the next step starts. The prover computes</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $A&#39; := x A_{lo} + x^{-1} A_{hi}$,</span></span>
+<span class="giallo-l"><span>    * $B&#39; := x^{-1} B_{lo} + x B_{hi}$.</span></span></code></pre>
+<p>These will take the roles of $A$ and $B$. The following basis is used in the next round instead of $G$:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $G&#39; := x^{-1} G_{lo} + x G_{hi}$.</span></span></code></pre>
+<p>The verifier accepts if and only if the check at the last step ($n$=2) succeeds.</p>
+<h1 id="to-be-continued">To be continued</h1>
+<p>In a follow-up blogpost we’ll discuss the complexity of these protocols and we’ll see how they can be optimized and used in recursive arguments of knowledge.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

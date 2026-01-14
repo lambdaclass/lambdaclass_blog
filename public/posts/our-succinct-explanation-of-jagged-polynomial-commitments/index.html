@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Succinct explanation of jagged polynomial commitments - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Our Succinct explanation of jagged polynomial commitments</h1>
+        
+        <div class="page-meta">
+            <time datetime="2025-06-06">June 06, 2025</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>Few weeks ago, Succinct release their paper <a rel="noopener external" target="_blank" href="https://github.com/succinctlabs/hypercube-verifier/blob/main/jagged-polynomial-commitments.pdf">Jagged Polynomial Commitments</a> and their verifier using the techniques described there, allowing them to prove Ethereum blocks in around 12 seconds, showing that real-time proving of the chain is possible. While this represents <a rel="noopener external" target="_blank" href="https://x.com/VitalikButerin/status/1925050155922862526">the average case and energy consumption is still high</a>, it is a major step towards scaling Ethereum using ZK. The paper makes heavy use of multilinear polynomials and the sumcheck protocol, so we recommend you read our post on <a href="/have-you-checked-your-sums/">sumcheck</a>, <a href="/gkr-protocol-a-step-by-step-example/">GKR</a> and <a href="/gkr-protocol-a-step-by-step-example/">Basefold</a> if you are unfamiliar with them. For more background on sparse commitments and its uses, see <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2025/105.pdf">twist and shout</a> and <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2023/1216.pdf">Lasso</a>. For more background on read-once branching programs and their use in evaluating multilinear extensions, see <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2018/861.pdf">here</a>.</p>
+<h2 id="jagged-functions">Jagged functions</h2>
+<p>Typical arithmetization schemes consist of several tables (for example, one for the CPU, one for the ALU, another for memory, etc) and a set of algebraic constraints that have to be enforced over the table. Each column of the tables is encoded using univariate or multivariate polynomials and the prover then commits to these encodings (using a polynomial commitment scheme, PCS). In both cases, we require that the length of the columns is a power of 2, since this enables efficient encoding, either via the fast Fourier transform (FFT) or the multilinear Lagrange basis polynomials. This imposes several constraints:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. All columns in a table must have the same length</span></span>
+<span class="giallo-l"><span>    2. We need to pad the columns to ensure their length is equal to a power of 2.</span></span></code></pre>
+<p>This results in a lot of overhead, since we need to pad all columns to the same length and store a large number of dummy entries in the tables (for example, zero values). We would like to use some sparse representation of the data, that is, just storing all the non-dummy values. Moreover, we would like to compress everything into a single column to commit to just one encoding. This is precisely one of the main points of the paper, which finds a way to obtain a dense representation of the tables, without all the padding (note that we will need the column to have a length equal to a power of 2, and some padding might be necessary).</p>
+<p>We will explain the idea behind the dense representation using one table, but the idea can be extended to several tables, adding one additional variable keeping track of the number of table and the number of columns each table has. Suppose we have a table which has 32 columns ($32 = 2^5$). For each column, we keep the length $l_k$ of each column, consisting of the non-dummy entries. For example, $l_0 = 2^{20}$, $l_1 = 2^{18} + 15$, $l_2 = 2^{16} + 1475$, and so on and so forth. The prover can construct a vector whose entries are the added lengths of the columns, $t$. So, $t_0 = l_0$, $t_1 = l_0 + l_1$, $t_2 = l_0 + l_1 + l_2$. In summary,<br />
+$t_0 = l_0$<br />
+$t_{k + 1} = t_k + l_{k + 1}$<br />
+Note that, since the $l_k$ are all positive, the vector $t$ has non-decreasing entries. We can merge all the columns into a single one, by stacking them one below the other. Given an index $j$ for the vector of stacked columns, we can find where the original element was. First, we look for the smallest $k$, such that $j &lt; t_k$. This $k$ gives the column where the element belongs. Then, we can compute the row by doing $i = j - t_{k - 1}$ (if $k = 0$, then $i = j$). This yields a one-to-one correspondence between the original table and the stacked columns (we will call this, the dense representation form now on). The dense representation has a length equal to $2^m$, where $m = \lceil \log_2 \max{t} \rceil$. Given the procedure to find the row and column, we can define two functions,<br />
+$\mathrm{col}(j) = \min_k \{t_k &gt; j \}$<br />
+$\mathrm{row}(j) = j - t_{k - 1}$<br />
+Using the letter $q$ to denote the multilinear encoding of the dense representation, we see that each entry corresponds to the non-dummy part of the multilinear extension of the whole table, $p$.<br />
+$p(\mathrm{row}(j), \mathrm{col}(j)) = q(j)$.</p>
+<p>This saves a lot of space to represent the whole table, at the expense of having the prover send the vector $t$. We can then show that if we want to evaluate $p(z_r , z_c)$ this is equivalent to,<br />
+$p(z_r , z_c) = \sum p(x , y) \mathrm{eq} (x , z_r) \mathrm{eq} (y , z_c) = \sum q(i) \mathrm{eq}(\mathrm{row}(i) , z_r) \mathrm{eq}(\mathrm{col}(i) , z_c)$<br />
+since any zero entry of $p(x,y)$ does not contribute to the sum.</p>
+<h2 id="why-does-this-work-with-multilinear-polynomials">Why does this work with multilinear polynomials?</h2>
+<p>Multivariate polynomials use the sumcheck protocol to reduce statements to the evaluation of the polynomial at a random point. For example, we can use the sumcheck protocol to show that the multivariate polynomial $g$ evaluates to zero over the hypercube using the zero-check,<br />
+$$\sum \mathrm{eq}(r,x) g(x) = 0$$<br />
+and, by interacting with the prover, the verifier is left to perform one evaluation at $z$ for $\mathrm{eq} (r,z) g(z)$, plus some simple checks involving univariate polynomials. Using a PCS, the prover can give the verifier access to $g$ and query for the evaluation at $z$ using the evaluation protocol of the PCS.</p>
+<p>In the case of univariate polynomials, we show that $g(x)$ has zeros over a domain $D$ by quotienting with the zerofier/vanishing polynomial over $D$, $Z_D (x)$. In general, if $D$ has a nice structure (for example, $D$ consists of the n-th roots of unity), the vanishing polynomial can be evaluated very efficiently (in our example, $Z_D (x) = x^n - 1$. In the case of sparse polynomials, the representation of $Z_D (x)$ may be complicated and thus not efficiently computable.</p>
+<p>Thus, multilinear polynomials do not require computing quotients and you can work a priori on more general fields (FFTs, on the other hand, need smooth domains where $|F| - 1 = 2^n c$, where $n$ is typically at least $24$).</p>
+<h2 id="how-to-handle-a-large-number-of-columns">How to handle a large number of columns</h2>
+<p>The paper offers two optimizations to deal with a large number of columns:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Fancy jagged: if all the columns in a table have the same height, we reduce the amount of information we need to pass to compute $t$.</span></span>
+<span class="giallo-l"><span>    2. Commit to the column heights. The prover can include the column heights (prepending them to the table) in the table and commit to them.</span></span></code></pre><h2 id="jagged-pcs">Jagged PCS</h2>
+<p>Another core part of the paper consists in developing a PCS for sparse/jagged polynomials. Remember that, from the discussion above,<br />
+$p(z_r , z_c) = \sum p(x , y) \mathrm{eq} (x , z_r) \mathrm{eq} (y , z_c) = \sum q(i) \mathrm{eq}(\mathrm{row}(i) , z_r) \mathrm{eq}(\mathrm{col}(i) , z_c)$<br />
+We can find the multilinear extension of a function $f_t$ given by<br />
+$f_t (x) = \mathrm{eq}(\mathrm{row}(x) , z_r) \mathrm{eq}(\mathrm{col}(x) , z_c)$<br />
+Using the sumcheck protocol for products of multilinears, it suffices for the verifier to show that $v = q(\alpha) f_t (\alpha)$, which in turn amounts to $q(\alpha) = \beta_1$ and $f_t (\alpha) = \beta_2$. The key point lies in that $f_t$ can be efficiently evaluated by the verifier. This is proven in claim 3.2.1.</p>
+<p>To show that the function can be computed efficiently, the paper introduces a function $g(w,x,y,z)$ which satisfies that $g(w,x,y,z) = 1$ if and only if $x &lt; z$ and $x = w + y$. This function can be directly related to $f_t$ and $g$ can be computed efficiently using a width 4 branching program:<br />
+$f_t (z_r , z_c , i) = \sum_y \mathrm{eq} (z_r , y) g(z_c , y , t_{y - 1} , t_y )$</p>
+<p>The proof relies on the uniqueness of the multilinear extension, so it suffices to check the equality for $z_r , z_c , i$ as binary strings. If $g(z_r , i , t_{ y - 1} , t_y ) = 1$, then $i &lt; t_y$ and $i = z_r + t_{ y - 1}$. Since $z_r \geq 0$, it follows that $t_{y - 1} \leq i &lt; t_y$ and $z_r = i - t_{y - 1}$. Since we have that $\mathrm{col}_t (i) = z_c$ and $\mathrm{row}_t (i) = z_r$, it follows that $f_t (z_r , z_c , i) = 1$. Similarly, if $f_t (z_r , z_c , i) = 1$, then the variables $w, x, y , z$ automatically satisfy the conditions for $g(w,x,y,z) = 1$.</p>
+<p>From the above, we see that we can compute $f_t$ by calculating $2^k$ evaluations of $g$. By claim 3.2.2, a width-4 read-once branching program can compute efficiently $g$, by inspecting each bit of $w, x, y, z$ in a streaming fashion. The conditions $i &lt; t_y$ and $z_r = i - t_{ y - 1}$ for non-vanishing $g$ can be inspected by looking at 4 bits at a time and keeping track of two additional variables.</p>
+<p>The paper then discusses how to produce symbolic evaluations using a read-once matrix branching program, which we will need for batch-proving multiple evaluations. The program is defined by a sequence of matrices $M = {M_j^\sigma }$ where $\sigma \in { 0,1 }^b$ and $j = 1, 2, … , n$ and a sink vector $u$. Given an input $x \in {0 , 1 }^n$, the output of the program is the first component of the vector given by $(\prod M_j^{ x_j }) u$, that is $e_1^t (\prod M_j^{ x_j }) u$, where $e_{1j} = \delta_{1j}$ (one if and only if $j = 1$, zero otherwise).</p>
+<p>If the matrices are boolean matrices (having as entries either $0$ or $1$), matrix multiplication involves only additions (the paper calls matrices multiplication friendly if computing their product involves a linear number of additions and no multiplications).</p>
+<p>When the sink vector $u$ is not given, the evaluation can be done in symbolic form, and, when the vector is finally given, get the final value of the matrix branching program. The idea is that we can get a vector $\mathrm{res}$ such that $\mathrm{res} . u = f_{M,u} (z)$, where $f$ is the multilinear extension of the matrix branching program given by $M$ and $u$. The vector $\mathrm{res}$ is given by<br />
+$$\mathrm{res} = e_1^t \prod_j \left( \sum_\sigma \mathrm{eq} (z_j , \sigma) M_j^\sigma \right)$$</p>
+<h2 id="batch-proving-of-multiple-evaluations">Batch-proving of multiple evaluations</h2>
+<p>The problem we face is that the verifier should compute $k$ evaluations, which can be prohibitely costly. However, by interacting with the prover, we can boil everything down to just one evaluation. This follows a standard technique, where the verifier selects random weights $\alpha_0, \alpha_1, … \alpha_{ k - 1}$ and the prover performs a random linear combination. More precisely, suppose that we want to prove that<br />
+$h (z_0 ) = v_0$<br />
+$h (z_1 ) = v_1$<br />
+$\vdots$<br />
+$h (z_{ k - 1} ) = v_{ k - 1}$<br />
+The prover then does the following linear combination with $\alpha_j$,<br />
+$\sum_j \alpha_j h( z_j ) = \sum_j \alpha_j v_j$<br />
+The prover wants to convince the verifier that $h( z_j ) = v_j$ holds for every $j$, so $v_j$ is sent to the verifier. The verifier can compute the sum on the right-hand side on his own, $\sum \alpha_j v_j$.</p>
+<p>The left-hand side can be calculated efficiently by the prover. First, note that<br />
+$h( z_j ) = \sum h (b) \mathrm{eq} (b , z_j) = \sum h_k \mathrm{eq} (b , z_j)$<br />
+where $k = \sum_j b_j 2^j$ with $b = b_0 b_1 b_2 … b_{ k - 1}$. In other words, the evaluation $h (z_j)$ can be computed as the inner product between the vector h, such that $h_k = h(b)$, and the vector of Lagrange basis polynomials $\mathrm{eq}(b , z_j)$. Since the inner product is (bi)linear, we can write the linear combination as<br />
+$\sum \alpha_j h( z_j ) = \sum h(b) \left(\sum \alpha_j \mathrm{eq} (b , z_j) \right)$<br />
+The prover and verifier can run the sumcheck protocol on $\left(h(b) \sum \alpha_j \mathrm{eq} (b , z_j) \right)$ and at the end the verifier has to compute $h(\rho ) \sum \alpha_j \mathrm{eq} (\rho , z_j)$ at the random point $\rho$, which in practice would be an oracle query for $h$ plus computing the linear combination $\sum \alpha_j \mathrm{eq} (\rho , z_j)$. Some optimizations used in the sumcheck protocol are presented in <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2024/108.pdf">improvements on zerocheck</a>.</p>
+<h2 id="where-does-all-this-fit-in-and-future-work">Where does all this fit in and future work</h2>
+<p>The jagged approach allows us to commit to the non-zero part of tables and save a lot of work, both in terms of memory requirements as well as commitment times. If we combine this idea with <a rel="noopener external" target="_blank" href="https://www.binius.xyz/basics/arithmetization/m3">M3 arithmetization</a>, where we do not need to commit to polynomials that can be computed via certain operations from trace polynomials (virtual polynomials), we see a massive reduction in the amount of work we have to do. This, in turn, could drive proving time, proving cost and memory footprint down, allowing us to prove bigger Ethereum and L2 blocks, effectively scaling it to bring more users and power more usecases.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

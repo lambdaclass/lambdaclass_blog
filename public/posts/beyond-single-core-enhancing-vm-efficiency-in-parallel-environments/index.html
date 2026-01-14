@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond Single-Core: Enhancing VM Efficiency in Parallel Environments - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Beyond Single-Core: Enhancing VM Efficiency in Parallel Environments</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-03-22">March 22, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p>At LambdaClass, benchmarks and performance analysis are critical aspects of our development process. We always perform performance analysis in every PR via our CI pipelines to spot any performance issues.</p>
+<p>The <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/cairo-vm">Cairo virtual machine</a> is not an exception since it is a core part of the <a rel="noopener external" target="_blank" href="https://www.starknet.io/en">Starknet</a> network. In this post, we will delve into how we investigated a performance regression and then optimized a core data structure in the library to improve its multicore performance.</p>
+<p><img src="/images/external/Ske40pOAa.png" alt="Screenshot 2024-03-15 at 17.58.47" /></p>
+<h2 id="a-first-look">A first look</h2>
+<p>Some background: Not long ago, we introduced an optional feature, <code>lambdaworks-felt,</code> which marked a significant improvement in our performance metrics. It uses the Felt (field element) implementation from our cryptography library, <a href="/lambdaworks-design-and-usage-part-1-finite-fields/">LambdaWorks</a>, which replaced a more naive implementation using <code>BigInt</code>.</p>
+<p>Last week, the <a rel="noopener external" target="_blank" href="https://github.com/eqlabs/pathfinder">Pathfinder</a> team from Equilibrium (as always, we want to thank them for finding and raising this issue) observed an unexpected scaling behavior when they tried to re-execute some Sepolia testnet blocks using their <code>re_execute</code> tool that spins up several CairoVMs to run the block’s transactions in parallel.</p>
+<p>When several instances of the CairoVM with the lambda works-felt feature enabled are executed on a hyperthreading-enabled processor, execution time does not scale with the number of enabled threads as well as without the lambda works-felt feature.</p>
+<p><img src="/images/external/ByrB06O0T.png" alt="Untitled (2)" /></p>
+<p>The figure, contributed by the Pathfinder team, shows the results of a benchmark performed on a Ryzen 5900X. As you can see, the CairoVM with the lambdaworks-felt feature performs better when you execute it with fewer threads. Still, the run with defaults implementation (Felt type implemented using the <a rel="noopener external" target="_blank" href="https://docs.rs/num-bigint/latest/num_bigint/">num_bigint</a> crate) scales better as the number of threads increases.</p>
+<h2 id="digging-deeper">Digging deeper</h2>
+<p>Our first task was to reproduce what had been reported. Once we saw the same results as the Pathfinder team, we could start investigating possible causes. After that, we started investigating this behavior and found that we had many cache misses when using the lambdaworks-based felt.</p>
+<p>VM with Bigint felt:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>$ perf stat -e cache-misses ./binaries/re_execute_main sepolia-testnet_0.11.0_47191.sqlite 47000 47191</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span> Performance counter stats for &#39;./binaries/re_execute_main sepolia-testnet_0.11.0_47191.sqlite 47000 47191&#39;:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        2094269051      cache-misses</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>       5.926431912 seconds time elapsed</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>     168.877378000 seconds user</span></span>
+<span class="giallo-l"><span>       3.675086000 seconds sys</span></span></code></pre>
+<p>VM with Lambdaworks felt:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>$ perf stat -e cache-misses ./binaries/re_execute_main_lambdaworks sepolia-testnet_0.11.0_47191.sqlite 47000 47191</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span> Performance counter stats for &#39;./binaries/re_execute_main_lambdaworks sepolia-testnet_0.11.0_47191.sqlite 47000 47191&#39;:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        2426557083      cache-misses</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>       6.931543878 seconds time elapsed</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>     197.086250000 seconds user</span></span>
+<span class="giallo-l"><span>       6.588698000 seconds sys</span></span></code></pre>
+<p>So, here we can see that the lambdaworks felt has 16% more cache misses than the BigInt implementation.</p>
+<p>How does this inform our search for a cause? We talked to the team member who originally benchmarked the CairoVM and its relation to memory allocation when running and integrated lambdaworks-felt into the CairoVM. When we showed him these results, he mentioned that looking at the felt layout in memory when the VM is running would be a good idea.</p>
+<p>When the CairoVM runs a program, it stores the felt values in its memory representation, which encodes the rules and guarantees necessary for proving. So for a running program, memory is a collection of <code>MemoryCell</code>s, which in turn wraps a boolean that signals if the memory cell was accessed during the program execution and a <code>MaybeRelocatable</code> value, an enum that can be either a felt or a Relocatable value:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub(crate) struct MemoryCell(MaybeRelocatable, bool);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub enum MaybeRelocatable {</span></span>
+<span class="giallo-l"><span>    RelocatableValue(Relocatable),</span></span>
+<span class="giallo-l"><span>    Int(Felt252),</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>When looking at cache issues, one usually looks at the shape or layout that values take when in memory. We noticed that when using the <code>lambdaworks-felt</code> feature, the <code>MemoryCell</code> structure size increased from 40 to 48 bytes, which was the root cause of the increase in cache misses when running parallel workloads.</p>
+<p>We can guess that since multiple VMs are trying to populate the cache with their values, felts running over a line would cause more cache thrashing.</p>
+<p>Another factor to take into account is the use of SMT (Simultaneous multithreading,** also known as Hyper-Threading) in AMD and Intel CPUs. This technique basically runs two logical cores inside a single physical core, which usually improves overall performance.</p>
+<p>But that’s not always the case; sometimes, it gets in the way. For example, one logical core can evict cached items that later the other logical core will need, leading to more cache misses.</p>
+<p>Just guessing is magical thinking, which is for astrologists, so we decided to implement a change and measure the impact.</p>
+<p>To address this, we refactored that structure to a more cache-friendly representation. The new optimized <code>MemoryCell</code> can now fit in half a 64-byte cache line instead of almost a full cache line. The new structure now stores the data and metadata in a raw form using the spare bits in the felt representation, and the <code>MaybeRelocatable</code> instances are built as needed from it.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>/// [`MemoryCell`] represents an optimized storage layout for the VM memory.</span></span>
+<span class="giallo-l"><span>/// It&#39;s specified to have both size an alignment of 32 bytes to optimize cache access.</span></span>
+<span class="giallo-l"><span>/// Typical cache sizes are 64 bytes; a few cases might be 128 bytes, meaning 32 bytes aligned to</span></span>
+<span class="giallo-l"><span>/// 32 bytes boundaries will never get split into two separate lines, avoiding double stalls and</span></span>
+<span class="giallo-l"><span>/// reducing false sharing and evictions.</span></span>
+<span class="giallo-l"><span>/// The trade-off is extra computation for conversion to our &quot;in-flight&quot; `MaybeRelocatable` and</span></span>
+<span class="giallo-l"><span>/// `Felt252` as well as some extra copies. Empirically, this seems to be offset by the improved</span></span>
+<span class="giallo-l"><span>/// locality of the bigger structure for Lambdaworks. There is a big hit from the conversions when</span></span>
+<span class="giallo-l"><span>/// using the `BigUint` implementation, since those force allocations on the heap, but since that&#39;s</span></span>
+<span class="giallo-l"><span>/// dropped in later versions anyway it&#39;s not a priority. For Lambdaworks, the new copies are mostly</span></span>
+<span class="giallo-l"><span>/// to the stack, which is typically already in the cache.</span></span>
+<span class="giallo-l"><span>/// The layout uses the 4 MSB in the first `u64` as flags:</span></span>
+<span class="giallo-l"><span>/// - BIT63: NONE flag, 1 when the cell is actually empty.</span></span>
+<span class="giallo-l"><span>/// - BIT62: ACCESS flag, 1 when the cell has been accessed in a way observable to Cairo.</span></span>
+<span class="giallo-l"><span>/// - BIT61: RELOCATABLE flag, 1 when the contained value is a `Relocatable`, 0 when it is a</span></span>
+<span class="giallo-l"><span>/// `Felt252`.</span></span>
+<span class="giallo-l"><span>/// `Felt252` values are stored in big-endian order to keep the flag bits free.</span></span>
+<span class="giallo-l"><span>/// `Relocatable` values are stored as native endian, with the 3rd word storing the segment index</span></span>
+<span class="giallo-l"><span>/// and the 4th word storing the offset.</span></span>
+<span class="giallo-l"><span>#[repr(align(32))]</span></span>
+<span class="giallo-l"><span>pub(crate) struct MemoryCell([u64; 4]);</span></span></code></pre>
+<p>After this change, when we re-execute some old Sepolia testnet blocks, we can see that the new cache-friendly <code>MemoryCell</code> scales better when using hyper threading. Outperforming both the old <code>MemoryCell</code> with a <code>BigUint</code> -backed Felt and our previous implementation of the <code>MemoryCell</code> with the <code>Lambdaworks</code> felt.</p>
+<p><img src="/images/external/HkqL06d0a.png" alt="benchs_x86 (2)" /></p>
+<p>Benchmarks run on AMD Ryzen 9 5950X 16-Core Processor, Architecture:x86, CPU(s): 32</p>
+<p>That figure was generated with the data extracted by running hyperfine, a CLI-based benchmarking tool, with different number of threads so we can get how each change performed as we increase the number of threads.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>Running benchmark for 1 threads</span></span>
+<span class="giallo-l"><span>Benchmark 1: re_execute_main threads: 1</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        57.351 s               [User: 55.107 s, System: 2.174 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 2: re_execute_fixed_felt threads: 1</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        44.760 s               [User: 42.510 s, System: 2.197 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 3: re_execute_main_lambdaworks threads: 1</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        47.458 s               [User: 45.454 s, System: 1.948 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Summary</span></span>
+<span class="giallo-l"><span>  re_execute_fixed_felt threads: 1 ran</span></span>
+<span class="giallo-l"><span>    1.06 times faster than re_execute_main_lambdaworks threads: 1</span></span>
+<span class="giallo-l"><span>    1.28 times faster than re_execute_main threads: 1</span></span>
+<span class="giallo-l"><span>Running benchmark for 2 threads</span></span>
+<span class="giallo-l"><span>Benchmark 1: re_execute_main threads: 2</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        28.247 s               [User: 54.708 s, System: 1.647 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 2: re_execute_fixed_felt threads: 2</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        21.625 s               [User: 41.931 s, System: 1.231 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 3: re_execute_main_lambdaworks threads: 2</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        23.607 s               [User: 45.111 s, System: 1.987 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Summary</span></span>
+<span class="giallo-l"><span>  re_execute_fixed_felt threads: 2 ran</span></span>
+<span class="giallo-l"><span>    1.09 times faster than re_execute_main_lambdaworks threads: 2</span></span>
+<span class="giallo-l"><span>    1.31 times faster than re_execute_main threads: 2</span></span>
+<span class="giallo-l"><span>Running benchmark for 4 threads</span></span>
+<span class="giallo-l"><span>Benchmark 1: re_execute_main threads: 4</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        14.718 s               [User: 56.848 s, System: 1.445 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 2: re_execute_fixed_felt threads: 4</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        11.516 s               [User: 44.374 s, System: 1.264 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 3: re_execute_main_lambdaworks threads: 4</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):        12.472 s               [User: 47.662 s, System: 1.627 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Summary</span></span>
+<span class="giallo-l"><span>  re_execute_fixed_felt threads: 4 ran</span></span>
+<span class="giallo-l"><span>    1.08 times faster than re_execute_main_lambdaworks threads: 4</span></span>
+<span class="giallo-l"><span>    1.28 times faster than re_execute_main threads: 4</span></span>
+<span class="giallo-l"><span>Running benchmark for 8 threads</span></span>
+<span class="giallo-l"><span>Benchmark 1: re_execute_main threads: 8</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         7.904 s               [User: 61.202 s, System: 0.705 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 2: re_execute_fixed_felt threads: 8</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         6.186 s               [User: 47.780 s, System: 0.771 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 3: re_execute_main_lambdaworks threads: 8</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         6.800 s               [User: 52.407 s, System: 0.947 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Summary</span></span>
+<span class="giallo-l"><span>  re_execute_fixed_felt threads: 8 ran</span></span>
+<span class="giallo-l"><span>    1.10 times faster than re_execute_main_lambdaworks threads: 8</span></span>
+<span class="giallo-l"><span>    1.28 times faster than re_execute_main threads: 8</span></span>
+<span class="giallo-l"><span>Running benchmark for 16 threads</span></span>
+<span class="giallo-l"><span>Benchmark 1: re_execute_main threads: 16</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         5.248 s               [User: 77.844 s, System: 1.159 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 2: re_execute_fixed_felt threads: 16</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         4.443 s               [User: 65.118 s, System: 1.575 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 3: re_execute_main_lambdaworks threads: 16</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         5.456 s               [User: 80.535 s, System: 1.852 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Summary</span></span>
+<span class="giallo-l"><span>  re_execute_fixed_felt threads: 16 ran</span></span>
+<span class="giallo-l"><span>    1.18 times faster than re_execute_main threads: 16</span></span>
+<span class="giallo-l"><span>    1.23 times faster than re_execute_main_lambdaworks threads: 16</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>Running benchmark for 32 threads</span></span>
+<span class="giallo-l"><span>Benchmark 1: re_execute_main threads: 32</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         5.967 s               [User: 168.953 s, System: 3.411 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 2: re_execute_fixed_felt threads: 32</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         5.345 s               [User: 149.728 s, System: 4.033 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Benchmark 3: re_execute_main_lambdaworks threads: 32</span></span>
+<span class="giallo-l"><span>  Time (abs ≡):         7.010 s               [User: 199.011 s, System: 5.984 s]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Summary</span></span>
+<span class="giallo-l"><span>  re_execute_fixed_felt threads: 32 ran</span></span>
+<span class="giallo-l"><span>    1.12 times faster than re_execute_main threads: 32</span></span>
+<span class="giallo-l"><span>    1.31 times faster than re_execute_main_lambdaworks threads: 32</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    1.32 times faster than re_execute_main_lambdaworks threads: 48</span></span></code></pre>
+<p>We also ran <code>perf stat</code> to check the cache misses using this new version, and it is indeed more cache efficient, reducing the cache misses by %21 concerning the old MemoryCell implementation with Lambdaworks and 9% less cache misses than the one with Bigints.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>$ perf stat -e cache-misses ./binaries/re_execute_fixed_felt sepolia-testnet_0.11.0_47191.sqlite 47000 47191</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span> Performance counter stats for &#39;./binaries/re_execute_fixed_felt sepolia-testnet_0.11.0_47191.sqlite 47000 47191&#39;:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        1906296012      cache-misses</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>       5.278474869 seconds time elapsed</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>     148.647511000 seconds user</span></span>
+<span class="giallo-l"><span>       4.168127000 seconds sys</span></span></code></pre><h3 id="arm-architecture-considerations"><strong>ARM Architecture Considerations</strong></h3>
+<p>While we have seen a performance regression related to cache misses in multi-threaded environments for x86_64 architectures, it’s important to note that this issue is not prevalent in systems utilizing ARM CPUs. Our benchmarks, conducted on a MacBook M3 Pro equipped with 18 GB of RAM and 11 cores, showcase a different performance profile.</p>
+<p><img src="/images/external/S1tUaVi0p.png" alt="benchs_mac_2 (1)" /></p>
+<p>In the image, you can notice that:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * In an SMT context, the ARM-based system displays superior scalability when using the lambdaworks-based MemoryCell struct instead of the BigInt implementation.</span></span>
+<span class="giallo-l"><span>    * The MemoryCell modifications don&#39;t impact the execution performance on ARM systems.</span></span></code></pre>
+<p>This distinction in performance between ARM and more traditional x86_64 processors (such as those from Intel or AMD) can be attributed to architectural differences in cache management and bigger cache line sizes (128 bytes in the Apple Silicon processors). ARM processors are designed with a unique approach to cache utilization, wherein individual cores possess dedicated cache resources. This design choice prevents the scenario of cache contention where two cores compete for the same cache lines, a situation that can lead to increased cache misses.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>So all is well and nice, but two questions remain: Why didn’t we see this before, and how do we ensure we see it in the future? How can we improve our engineering processes by considering what we learned?</p>
+<p>Our benchmarks modeled a workload without the necessary concurrency to surface the issue.</p>
+<p>To ensure a performance regression test, we need to write some code that will trigger it in the right circumstances, a minimal version of <code>re_execute</code> that will allow us to vary parameters to cover a broader area of the problem space (number of VMs running in parallel, number of threads, number of processors used, processor architecture, etc.).</p>
+<p>Two lessons learned (or rather, reinforced) are:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Don’t assume your code will only run under specific workloads. Try to model the real world as much as possible and measure to make sure.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    2. Don’t assume that a change to the code that shows a performance improvement measured “locally” will positively impact the overall performance of the entire program.</span></span></code></pre>
+<p>This experience highlights that achieving maximum performance in Rust often requires consideration of lower-level details beyond merely using enums. It underscores the importance of understanding and optimizing CPU cache behavior in performance-sensitive applications.</p>
+<p>By rethinking our approach to data storage and access and getting a little creative with our structures, we’ve reduced cache misses and significantly improved the scaling of our VMs on multicore systems.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

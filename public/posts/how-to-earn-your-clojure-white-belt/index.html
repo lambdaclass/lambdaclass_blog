@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to earn your Clojure white belt - LambdaClass Blog</title>
+    <meta name="description" content="I tend to think that if I do not know how to implement something then I do not undestand completely how it works. That is why I want to…">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">How to earn your Clojure white belt</h1>
+        
+        <div class="page-meta">
+            <time datetime="2015-09-07">September 07, 2015</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p><img src="/images/max/2000/1-uFlthCHz1YbmOvzhdVBrFw.jpeg" alt="" /></p>
+<p>I tend to think that if I do not know how to implement something then I do not undestand completely how it works. That is why I want to learn so many things: new frameworks, programming languages, garbage collectors, type systems, compilers, editors, operating systems, protocols, kernel development. The road to enlightenment is long and difficult. To make things worse, you need to invest time on keeping up to date with technologies you thought you already knew. I usually feel like Mario in one of those levels where he needs to jump between moving clouds to reach the finish line.</p>
+<p>That is why one of the best skills to get is being able to separate the wheat from the chaff. We have finite time and distractions are infinite. If you are going to invest time in learning a new language then you should consider Lisp which is definitely wheat of the best quality. If you don’t know why, then go read <a rel="noopener external" target="_blank" href="http://www.paulgraham.com/avg.html">Beating the Averages</a> article. Clojure is a member of the Lisp family. If you have used a Lisp dialect such as <a rel="noopener external" target="_blank" href="http://www.schemers.org/">Scheme</a>, <a rel="noopener external" target="_blank" href="https://common-lisp.net/">Common Lisp</a>, <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Emacs_Lisp">Emacs Lisp</a>, or even really alien and amazing creatures such <a rel="noopener external" target="_blank" href="http://www.shenlanguage.org/">Shen</a>, <a rel="noopener external" target="_blank" href="http://lfe.io/">LFE</a>, <a rel="noopener external" target="_blank" href="http://racket-lang.org/">Racket</a>, <a rel="noopener external" target="_blank" href="https://github.com/pixie-lang/pixie">Pixie</a> you might ask yourself why you should be learning Clojure. This is my opinionated point of view:</p>
+<ul>
+<li>The language’s creator: Rich Hickey has a holistic understanding of this era development issues. You should read/watch his talks called <a rel="noopener external" target="_blank" href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/AreWeThereYet.md">Are We There Yet?</a>, <a rel="noopener external" target="_blank" href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/SimpleMadeEasy.md">Simple Made Easy</a>, <a rel="noopener external" target="_blank" href="https://youtu.be/ROor6_NGIWU">The Language of the System</a>. I see Clojure as a step in the right direction for tackling this era’s development issues</li>
+<li>Great functional programming support: First class functions, persistent, immutable data structures and lazy <a rel="noopener external" target="_blank" href="http://www.braveclojure.com/core-functions-in-depth/#2__The_Sequence_Abstraction">sequences</a>. It has great support of polimorphism thanks to <a rel="noopener external" target="_blank" href="http://clojure-doc.org/articles/language/polymorphism.html">multimethods and protocols</a></li>
+<li>Concurrency support from its inception thanks to <a rel="noopener external" target="_blank" href="http://clojure-doc.org/articles/language/concurrency_and_parallelism.html">atoms, agents, refs, a software transactional memory </a>system and asynchronous programming using channels a la <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Communicating_sequential_processes">CSP</a> with <a rel="noopener external" target="_blank" href="http://clojure.com/blog/2013/06/28/clojure-core-async-channels.html">core.async</a> library</li>
+<li>Batteries included: good core libraries and <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=6mTbuzafcII">transducers</a> support</li>
+<li>Clojurescript: Clojure that targets JavaScript with great libraries such as <a rel="noopener external" target="_blank" href="https://github.com/reagent-project/reagent">reagent</a>, an interface to React.js that is really simple and useful. Check David Nolen’s talks called ClojureScript: <a rel="noopener external" target="_blank" href="https://youtu.be/MTawgp3SKy8">Lisp’s Revenge</a> and <a rel="noopener external" target="_blank" href="https://youtu.be/-I5ldi2aJTI">Introduction to ClojureScript</a></li>
+<li>JVM’s power (available almost everyhwere, optimized garbage collector, JIT compilation, Java interoperability), but also some issues such as not being able to properly support tail call optimization and awful stacktraces. If you are a Java developer you should check part <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=P76Vbsk_3J0">I</a> and <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=hb3rurFxrZ8">II</a> from Rich Hickey’s Clojure for Java Programmers talk</li>
+</ul>
+<h3 id="ready-steady-go">Ready, steady, go!</h3>
+<p>Install <a rel="noopener external" target="_blank" href="http://leiningen.org/#install">Leiningen</a> and configure your editor of choice.</p>
+<ul>
+<li>Emacs with <a rel="noopener external" target="_blank" href="https://github.com/clojure-emacs/cider">Cider</a> <a rel="noopener external" target="_blank" href="https://github.com/clojure-emacs/clojure-mode">Clojure mode</a> and <a rel="noopener external" target="_blank" href="http://company-mode.github.io">Company mode</a></li>
+<li>Vim with <a rel="noopener external" target="_blank" href="https://github.com/tpope/vim-fireplace">vim-fireplace</a>, <a rel="noopener external" target="_blank" href="https://github.com/tpope/vim-sexp-mappings-for-regular-people">im-sexp-mappings-for-regular-people</a>, <a rel="noopener external" target="_blank" href="https://github.com/tpope/vim-salve">vim-salve</a>, <a rel="noopener external" target="_blank" href="https://github.com/luochen1990/rainbow">rainbow</a></li>
+<li><a rel="noopener external" target="_blank" href="http://lighttable.com/">Light Table</a></li>
+<li><a rel="noopener external" target="_blank" href="https://sekao.net/nightcode/">Nightcode</a></li>
+<li>Sublime with <a rel="noopener external" target="_blank" href="https://github.com/odyssomay/paredit">paredit</a>, <a rel="noopener external" target="_blank" href="https://github.com/odyssomay/sublime-lispindent">Lispindent</a> and <a rel="noopener external" target="_blank" href="https://www.google.com.ar/search?q=SublimeREPL">SublimeREPL</a></li>
+<li><a rel="noopener external" target="_blank" href="https://cursiveclojure.com/">Cursive</a> (IntelliJ)</li>
+<li><a rel="noopener external" target="_blank" href="http://doc.ccw-ide.org/documentation.html#install-as-standalone-product">Counterclockwise</a> (Eclipse)</li>
+</ul>
+<h4 id="good-tools-that-deserve-a-mention">Good tools that deserve a mention</h4>
+<ul>
+<li>Linter <a rel="noopener external" target="_blank" href="https://github.com/jonase/eastwood">Eastwood</a></li>
+<li>Idiomatic Clojure checker <a rel="noopener external" target="_blank" href="https://github.com/jonase/kibit">kibit</a></li>
+<li>Clojure formatter <a rel="noopener external" target="_blank" href="https://github.com/weavejester/cljfmt">cljfmt</a></li>
+<li>Check simple issues in your code <a rel="noopener external" target="_blank" href="https://github.com/dakrone/lein-bikeshed">bikeshed</a></li>
+</ul>
+<h3 id="love-at-first-sight">Love at first sight</h3>
+<p>First of all get an idea of Clojure syntax and semantics:</p>
+<ol>
+<li><a rel="noopener external" target="_blank" href="http://learnxinyminutes.com/docs/clojure/">Learn X in Y minutes where X=clojure</a></li>
+<li><a rel="noopener external" target="_blank" href="https://kimh.github.io/clojure-by-example/">Clojure by example</a></li>
+<li><a rel="noopener external" target="_blank" href="http://howistart.org/posts/clojure/1/">How I start Clojure</a></li>
+<li><a rel="noopener external" target="_blank" href="http://www.se-radio.net/2010/03/episode-158-rich-hickey-on-clojure/">Listen to Software Engineering Radio’s interview with Rich Hickey</a></li>
+</ol>
+<p>If you do not understand something move on. At this stage the only objective is to grasp some basic ideas about Clojure.</p>
+<h4 id="practice-plus-reading-equals-perfection">Practice plus reading equals perfection</h4>
+<ol>
+<li>First practice with the <a rel="noopener external" target="_blank" href="http://clojurekoans.com/">Koans</a></li>
+<li>Then read <a rel="noopener external" target="_blank" href="http://www.braveclojure.com/">Clojure for the Brave and True</a>, a simple and short book. If you prefer to watch videos, you can buy the course <a rel="noopener external" target="_blank" href="http://www.purelyfunctional.tv/intro-to-clojure">Introduction to Clojure</a> from PurelyFunctionalTV.</li>
+<li>Practice again with <a rel="noopener external" target="_blank" href="https://www.4clojure.com/">4clojure problems</a></li>
+<li>Follow the road to perfection with <a rel="noopener external" target="_blank" href="http://exercism.io/languages/clojure">Clojure exercism</a></li>
+<li>Finish the practice with <a rel="noopener external" target="_blank" href="https://github.com/gigasquid/wonderland-clojure-katas">Wanderland Clojure Katas</a></li>
+</ol>
+<p>It is always a good idea to have the <a rel="noopener external" target="_blank" href="http://clojure.org/api/cheatsheet">cheatsheet</a> at hand.</p>
+<p>Other two good tutorials worth mentioning are <a rel="noopener external" target="_blank" href="https://aphyr.com/tags/Clojure-from-the-ground-up">Clojure from the ground up</a> and <a rel="noopener external" target="_blank" href="http://hitchhikersclojure.com/">Hitchhiker’s Guide to Clojure</a>.</p>
+<h4 id="idiomatic-clojure">Idiomatic Clojure</h4>
+<p>Clojure is not Java, neither Common Lisp or Scheme. You should learn to write idiomatic Clojure. The Joy of Clojure is your best friend to become a native Clojure speaker:</p>
+<p><a rel="noopener external" target="_blank" href="http://www.joyofclojure.com/the-book/">About The Joy of ClojureWhen this book was conceived, our first instinct was to create a comprehensive com- parison between Clojure and its…www.joyofclojure.com<img src="https://cdn-images-1.medium.com/fit/c/160/160/0*B4upiW5LhjZYt_TK." alt="" /></a></p>
+<p>It is also important to follow table manners or the <a rel="noopener external" target="_blank" href="https://github.com/bbatsov/clojure-style-guide">Clojure style guide</a>.</p>
+<p>If you have trouble like me grasping macros, then you should also check out <a rel="noopener external" target="_blank" href="https://pragprog.com/book/cjclojure/mastering-clojure-macros">Mastering Clojure Macros</a>.</p>
+<p>Oh, if you miss your type checking then now it is a good time that you read about <a rel="noopener external" target="_blank" href="http://typedclojure.org/">optional type system</a> for Clojure.</p>
+<h4 id="keep-up-to-date">Keep up to date</h4>
+<ul>
+<li><a rel="noopener external" target="_blank" href="http://planet.clojure.in/">Planet Clojure</a></li>
+<li><a rel="noopener external" target="_blank" href="http://www.clojuregazette.com/">Clojure Gazette</a></li>
+<li><a rel="noopener external" target="_blank" href="http://reborg.tumblr.com/">Clojure Weekly</a></li>
+<li><a rel="noopener external" target="_blank" href="https://www.reddit.com/r/Clojure/">Reddit</a></li>
+<li><a rel="noopener external" target="_blank" href="https://www.youtube.com/user/ClojureTV">ClojureTV</a></li>
+</ul>
+<h4 id="know-the-full-arsenal-at-your-disposal">Know the full arsenal at your disposal</h4>
+<ul>
+<li><a rel="noopener external" target="_blank" href="http://www.clojure-toolbox.com/">Clojure Toolbox</a></li>
+<li><a rel="noopener external" target="_blank" href="https://github.com/razum2um/awesome-clojure">Awesome Clojure</a></li>
+</ul>
+<h4 id="get-help">Get help</h4>
+<ul>
+<li><a rel="noopener external" target="_blank" href="https://groups.google.com/forum/#!forum/clojure">Google Group</a></li>
+<li>IRC: #clojure channel in Freenode server</li>
+<li><a rel="noopener external" target="_blank" href="https://clojurians.slack.com/">Clojurians Slack</a></li>
+</ul>
+<h4 id="introduction-to-clojurescript">Introduction to Clojurescript</h4>
+<p>Clojure on the frontend trench:</p>
+<ol>
+<li><a rel="noopener external" target="_blank" href="https://github.com/clojure/clojurescript/wiki/Quick-Start">Quickstart</a></li>
+<li><a rel="noopener external" target="_blank" href="https://github.com/clojure/clojurescript/wiki/Differences-from-Clojure">Differences from Clojure</a></li>
+<li><a rel="noopener external" target="_blank" href="https://github.com/magomimmo/modern-cljs">A series of tutorials on Clojurescript</a></li>
+</ol>
+<h4 id="building-your-own-lisp">Building your own Lisp</h4>
+<p>Building a Lisp is similar to a road trip with friends and good music but with no particular destination. Make yourself comfortable and enjoy the ride!</p>
+<ul>
+<li><a rel="noopener external" target="_blank" href="http://www.buildyourownlisp.com/">Build your own Lisp</a></li>
+<li><a rel="noopener external" target="_blank" href="https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours">Write Yourself a Scheme in 48 hours</a></li>
+<li><a rel="noopener external" target="_blank" href="http://norvig.com/lispy.html">(How to Write a (Lisp) Interpreter (in Python))</a></li>
+</ul>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

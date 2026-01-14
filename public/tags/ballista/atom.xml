@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>LambdaClass Blog - Ballista</title>
+    <subtitle>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://blog.lambdaclass.com/tags/ballista/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2021-01-28T00:00:00+00:00</updated>
+    <id>https://blog.lambdaclass.com/tags/ballista/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Ballista, a distributed compute platform made with Rust and Apache Arrow</title>
+        <published>2021-01-28T00:00:00+00:00</published>
+        <updated>2021-01-28T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/ballista-a-distributed-compute-platform-made-with-rust-and-apache-arrow/"/>
+        <id>https://blog.lambdaclass.com/posts/ballista-a-distributed-compute-platform-made-with-rust-and-apache-arrow/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/ballista-a-distributed-compute-platform-made-with-rust-and-apache-arrow/">&lt;h4 id=&quot;an-interview-with-its-creator-andy-grove&quot;&gt;An interview with its creator, Andy Grove&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-L6SAuZiiRQ4bBaCCiDaP_w.png&quot; alt=&quot;&quot; &#x2F;&gt;Ballista demo. Source: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;andygrove.io&#x2F;2020&#x2F;07&#x2F;ballista-one-year-on&#x2F;&quot;&gt;Andy Grove&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;“I have become frustrated over the years with the proliferation of Big Data tools built in JVM languages. I understand the reasons for this — Java, and especially Kotlin and Scala, are productive languages to work in, the ecosystem is very mature, and skills are widespread. However, it really isn’t the best language for these platforms. The most obvious alternative has been C++ for a long time, but I thought it would be really interesting to see what was possible with Rust.” — Andy Grove&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;As distributed computing platforms continue to become more relevant and new programming languages emerge with a modern approach and a focus on features that more traditional languages aren’t suited for, new and interesting technologies start appearing. In this interview, Andy Grove, software engineer and creator of &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;ballista-compute&#x2F;ballista&quot;&gt;Ballista&lt;&#x2F;a&gt;, a fresh distributed computing platform built primarily on Rust and powered by Apache Arrow technologies, provides some insight on the motivations behind the project as well as the technical details and features that make Ballista different.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-kYa4OnwY6NrvClA6wPpjZQ.png&quot; alt=&quot;&quot; &#x2F;&gt;Ballista is a work in progress. Once completed, its integrations will work like this. (Source: official documentation)&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h4 id=&quot;what-is-ballista-and-what-kind-of-problems-does-it-solve&quot;&gt;What is Ballista and what kind of problems does it solve?&lt;&#x2F;h4&gt;
+&lt;p&gt;Ballista is a distributed compute platform with a current focus on executing ETL (extract, transform, and load) jobs based on queries which are defined using either a DataFrame API, SQL, or a combination of both.&lt;&#x2F;p&gt;
+&lt;p&gt;Ballista is implemented in Rust and powered by Apache Arrow.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-are-the-main-advantages-of-using-apache-arrow-technologies&quot;&gt;What are the main advantages of using Apache Arrow technologies?&lt;&#x2F;h4&gt;
+&lt;p&gt;In my opinion, there are quite a few advantages in using Apache Arrow for this project.&lt;&#x2F;p&gt;
+&lt;p&gt;The Arrow memory format is optimized to support vectorized processing of columnar data and therefore enables significant performance improvements over row-based processing, especially when taking advantage of hardware that natively supports vectorized processing, such as SIMD and GPU.&lt;&#x2F;p&gt;
+&lt;p&gt;Arrow also provides a “Flight” protocol, designed to enable Arrow data to be streamed efficiently (without &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;docs.serde.rs&#x2F;serde&#x2F;&quot;&gt;serde&lt;&#x2F;a&gt; overhead) between processes, and Ballista’s executors implement this protocol.&lt;&#x2F;p&gt;
+&lt;p&gt;In addition to these benefits, Arrow is a standard that is becoming adopted more widely over time, so designing Ballista from the ground-up to be Arrow-native helps ensure compatibility with other projects in the ecosystem.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-are-advantages-of-an-implementation-based-on-apache-arrow-over-native-data-structures&quot;&gt;What are advantages of an implementation based on Apache Arrow over native data structures?&lt;&#x2F;h4&gt;
+&lt;p&gt;Arrow offers a mature type system and in-memory format for representing columnar data that has been tested and refined over many years, so I think this helps accelerate the development of the Ballista platform since there is no need to reinvent the wheel. It also ensures efficient compatibility with other projects that have also adopted Apache Arrow.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;can-you-tell-us-more-about-the-ballista-query-engine&quot;&gt;Can you tell us more about the Ballista query engine?&lt;&#x2F;h4&gt;
+&lt;p&gt;Sure. Ballista is based on the Volcano design but has less overhead as a result of being designed to process batches of columnar data. Its design is very much inspired by Apache Spark but with a focus on being language-agnostic so that it can efficiently support popular programming languages such Python, Java, and C++.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;ballista-has-a-very-similar-usage-to-apache-spark-what-are-the-main-advantages-of-ballista-over-it&quot;&gt;Ballista has a very similar usage to Apache Spark, what are the main advantages of Ballista over it?&lt;&#x2F;h4&gt;
+&lt;p&gt;The main advantages of Ballista (at least, once it is more mature) are:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Columnar Design&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Although Apache Spark does have some support for columnar processing, it is still largely row-based. Because Ballista is natively columnar and is implemented in a systems level language, it can take advantage of vectorized processing with SIMD and GPU.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Language Agnostic&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Apache Spark is implemented in Scala and tends to have a Scala-first approach, with other languages paying a penalty to interact with Spark due to overheads of serde. Ballista has been architected to use language-agnostic protocols and serialization formats to avoid this.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Memory Efficiency&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Because Ballista is implemented in Rust, there are no GC pauses, and performance is very consistent and predictable. The combination of Rust and Arrow also results in much lower memory usage than Apache Spark — up to 5x lower memory usage in some cases. This means that more processing can fit on a single node, reducing the overhead of distributed compute.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;how-does-it-compare-to-dask&quot;&gt;How does it compare to Dask?&lt;&#x2F;h4&gt;
+&lt;p&gt;I actually do not have any experience with Dask yet, although it has been on my “to do” list for a while now. I have heard a lot of positive things about Dask and I am sure that I could learn a lot from this project.&lt;&#x2F;p&gt;
+&lt;p&gt;Dask is obviously Python-centric, so I suspect that is going to be the main differentiator. Although the Ballista scheduler is being implemented in Rust, it is designed to work with executors implemented in any language due to the use of Arrow’s Flight protocol, and Google Protocol Buffers to represent query plans and scheduler tasks.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-are-the-reasons-behind-the-choice-of-rust-as-the-main-execution-language&quot;&gt;What are the reasons behind the choice of Rust as the main execution language?&lt;&#x2F;h4&gt;
+&lt;p&gt;The reason that I started this project (first with DataFusion at the start of 2018, and now with Ballista) is that I have become frustrated over the years with the proliferation of Big Data tools built in JVM languages. I understand the reasons for this — Java, and especially Kotlin and Scala, are productive languages to work in, the ecosystem is very mature, and skills are widespread. However, it really isn’t the best language for these platforms. The most obvious alternative has been C++ for a long time, but I thought it would be really interesting to see what was possible with Rust.&lt;&#x2F;p&gt;
+&lt;p&gt;I see Rust as being a good compromise between Java and C++. It has the memory-safety of Java (but implemented in a very different way) and the performance and predictability of C++.&lt;&#x2F;p&gt;
+&lt;p&gt;The cost of compute can be very high with Big Data platforms, so it makes sense to use a language that can make efficient use of the available memory and processing power on each node. In some cases, Ballista uses a fraction of the memory of an equivalent Apache Spark job, and this means that each node in a cluster can process a multiple of the amount of data that Spark can support, resulting in smaller clusters that are utilized more effectively.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;apache-spark-has-mllib-a-library-for-handling-machine-learning-projects-what-features-does-ballista-offer-for-these-tasks&quot;&gt;Apache Spark has MLlib, a library for handling Machine Learning projects. What features does Ballista offer for these tasks?&lt;&#x2F;h4&gt;
+&lt;p&gt;So far, the focus of Ballista has very much been on ETL workloads. There have been some discussions about supporting ML workloads but this is an area that I do not have experience with so I am hoping that once Ballista is a little more mature in terms of ETL processing then we can start to look at other areas like ML and listen to what the current pain points are.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-will-be-the-main-areas-of-focus-for-future-releases&quot;&gt;What will be the main areas of focus for future releases?&lt;&#x2F;h4&gt;
+&lt;p&gt;The main focus now is getting the platform to a level of maturity where users can run real-world ETL workloads, using the TPC-H benchmarks to measure progress.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;beyond-performance-what-are-the-next-goals-for-the-ballista-project&quot;&gt;Beyond performance, what are the next goals for the Ballista project?&lt;&#x2F;h4&gt;
+&lt;p&gt;Personally, I think that the most important goal for the Ballista project is to build a community around it. It started out as a personal side-project but I can only commit a relatively small number of hours each weekend to work on the project, and that time is better spent on writing requirements and building a community than trying to code everything myself.&lt;&#x2F;p&gt;
+&lt;p&gt;To this end, I have started a weekly newsletter, named &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;ballistacompute.org&#x2F;this-week-in-ballista&#x2F;&quot;&gt;“This Week in Ballista”,&lt;&#x2F;a&gt; to share news about progress and where help is needed. I am mostly spending my time on the project on tasks such as filing issues and responding to questions in Discord. I am also prototyping new features and then asking for help from the community to complete them.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;do-you-have-any-book-recommendations-on-distributed-computing&quot;&gt;Do you have any book recommendations on distributed computing?&lt;&#x2F;h4&gt;
+&lt;p&gt;Last year, I wrote &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.andygrove.io&#x2F;2020&#x2F;02&#x2F;how-query-engines-work&#x2F;&quot;&gt;“How Query Engines Work”&lt;&#x2F;a&gt;, which is an introductory guide to query engines and it does cover distributed computing at a high level. I would be hesitant in recommending this book specifically to learn about distributed computing though, since it doesn’t have very much content on this subject yet, although I do plan on extending the content once Ballista is farther along.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

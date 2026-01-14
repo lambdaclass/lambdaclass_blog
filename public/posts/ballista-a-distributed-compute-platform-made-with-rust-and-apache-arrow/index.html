@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ballista, a distributed compute platform made with Rust and Apache Arrow - LambdaClass Blog</title>
+    <meta name="description" content="An interview with its creator, Andy Grove">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Ballista, a distributed compute platform made with Rust and Apache Arrow</h1>
+        
+        <div class="page-meta">
+            <time datetime="2021-01-28">January 28, 2021</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h4 id="an-interview-with-its-creator-andy-grove">An interview with its creator, Andy Grove</h4>
+<p><img src="/images/max/2000/1-L6SAuZiiRQ4bBaCCiDaP_w.png" alt="" />Ballista demo. Source: <a rel="noopener external" target="_blank" href="https://andygrove.io/2020/07/ballista-one-year-on/">Andy Grove</a></p>
+<blockquote>
+<p>“I have become frustrated over the years with the proliferation of Big Data tools built in JVM languages. I understand the reasons for this — Java, and especially Kotlin and Scala, are productive languages to work in, the ecosystem is very mature, and skills are widespread. However, it really isn’t the best language for these platforms. The most obvious alternative has been C++ for a long time, but I thought it would be really interesting to see what was possible with Rust.” — Andy Grove</p>
+</blockquote>
+<p>As distributed computing platforms continue to become more relevant and new programming languages emerge with a modern approach and a focus on features that more traditional languages aren’t suited for, new and interesting technologies start appearing. In this interview, Andy Grove, software engineer and creator of <a rel="noopener external" target="_blank" href="https://github.com/ballista-compute/ballista">Ballista</a>, a fresh distributed computing platform built primarily on Rust and powered by Apache Arrow technologies, provides some insight on the motivations behind the project as well as the technical details and features that make Ballista different.</p>
+<p><img src="/images/max/2000/1-kYa4OnwY6NrvClA6wPpjZQ.png" alt="" />Ballista is a work in progress. Once completed, its integrations will work like this. (Source: official documentation)</p>
+<hr />
+<h4 id="what-is-ballista-and-what-kind-of-problems-does-it-solve">What is Ballista and what kind of problems does it solve?</h4>
+<p>Ballista is a distributed compute platform with a current focus on executing ETL (extract, transform, and load) jobs based on queries which are defined using either a DataFrame API, SQL, or a combination of both.</p>
+<p>Ballista is implemented in Rust and powered by Apache Arrow.</p>
+<h4 id="what-are-the-main-advantages-of-using-apache-arrow-technologies">What are the main advantages of using Apache Arrow technologies?</h4>
+<p>In my opinion, there are quite a few advantages in using Apache Arrow for this project.</p>
+<p>The Arrow memory format is optimized to support vectorized processing of columnar data and therefore enables significant performance improvements over row-based processing, especially when taking advantage of hardware that natively supports vectorized processing, such as SIMD and GPU.</p>
+<p>Arrow also provides a “Flight” protocol, designed to enable Arrow data to be streamed efficiently (without <a rel="noopener external" target="_blank" href="https://docs.serde.rs/serde/">serde</a> overhead) between processes, and Ballista’s executors implement this protocol.</p>
+<p>In addition to these benefits, Arrow is a standard that is becoming adopted more widely over time, so designing Ballista from the ground-up to be Arrow-native helps ensure compatibility with other projects in the ecosystem.</p>
+<h4 id="what-are-advantages-of-an-implementation-based-on-apache-arrow-over-native-data-structures">What are advantages of an implementation based on Apache Arrow over native data structures?</h4>
+<p>Arrow offers a mature type system and in-memory format for representing columnar data that has been tested and refined over many years, so I think this helps accelerate the development of the Ballista platform since there is no need to reinvent the wheel. It also ensures efficient compatibility with other projects that have also adopted Apache Arrow.</p>
+<h4 id="can-you-tell-us-more-about-the-ballista-query-engine">Can you tell us more about the Ballista query engine?</h4>
+<p>Sure. Ballista is based on the Volcano design but has less overhead as a result of being designed to process batches of columnar data. Its design is very much inspired by Apache Spark but with a focus on being language-agnostic so that it can efficiently support popular programming languages such Python, Java, and C++.</p>
+<h4 id="ballista-has-a-very-similar-usage-to-apache-spark-what-are-the-main-advantages-of-ballista-over-it">Ballista has a very similar usage to Apache Spark, what are the main advantages of Ballista over it?</h4>
+<p>The main advantages of Ballista (at least, once it is more mature) are:</p>
+<p><strong>Columnar Design</strong></p>
+<p>Although Apache Spark does have some support for columnar processing, it is still largely row-based. Because Ballista is natively columnar and is implemented in a systems level language, it can take advantage of vectorized processing with SIMD and GPU.</p>
+<p><strong>Language Agnostic</strong></p>
+<p>Apache Spark is implemented in Scala and tends to have a Scala-first approach, with other languages paying a penalty to interact with Spark due to overheads of serde. Ballista has been architected to use language-agnostic protocols and serialization formats to avoid this.</p>
+<p><strong>Memory Efficiency</strong></p>
+<p>Because Ballista is implemented in Rust, there are no GC pauses, and performance is very consistent and predictable. The combination of Rust and Arrow also results in much lower memory usage than Apache Spark — up to 5x lower memory usage in some cases. This means that more processing can fit on a single node, reducing the overhead of distributed compute.</p>
+<h4 id="how-does-it-compare-to-dask">How does it compare to Dask?</h4>
+<p>I actually do not have any experience with Dask yet, although it has been on my “to do” list for a while now. I have heard a lot of positive things about Dask and I am sure that I could learn a lot from this project.</p>
+<p>Dask is obviously Python-centric, so I suspect that is going to be the main differentiator. Although the Ballista scheduler is being implemented in Rust, it is designed to work with executors implemented in any language due to the use of Arrow’s Flight protocol, and Google Protocol Buffers to represent query plans and scheduler tasks.</p>
+<h4 id="what-are-the-reasons-behind-the-choice-of-rust-as-the-main-execution-language">What are the reasons behind the choice of Rust as the main execution language?</h4>
+<p>The reason that I started this project (first with DataFusion at the start of 2018, and now with Ballista) is that I have become frustrated over the years with the proliferation of Big Data tools built in JVM languages. I understand the reasons for this — Java, and especially Kotlin and Scala, are productive languages to work in, the ecosystem is very mature, and skills are widespread. However, it really isn’t the best language for these platforms. The most obvious alternative has been C++ for a long time, but I thought it would be really interesting to see what was possible with Rust.</p>
+<p>I see Rust as being a good compromise between Java and C++. It has the memory-safety of Java (but implemented in a very different way) and the performance and predictability of C++.</p>
+<p>The cost of compute can be very high with Big Data platforms, so it makes sense to use a language that can make efficient use of the available memory and processing power on each node. In some cases, Ballista uses a fraction of the memory of an equivalent Apache Spark job, and this means that each node in a cluster can process a multiple of the amount of data that Spark can support, resulting in smaller clusters that are utilized more effectively.</p>
+<h4 id="apache-spark-has-mllib-a-library-for-handling-machine-learning-projects-what-features-does-ballista-offer-for-these-tasks">Apache Spark has MLlib, a library for handling Machine Learning projects. What features does Ballista offer for these tasks?</h4>
+<p>So far, the focus of Ballista has very much been on ETL workloads. There have been some discussions about supporting ML workloads but this is an area that I do not have experience with so I am hoping that once Ballista is a little more mature in terms of ETL processing then we can start to look at other areas like ML and listen to what the current pain points are.</p>
+<h4 id="what-will-be-the-main-areas-of-focus-for-future-releases">What will be the main areas of focus for future releases?</h4>
+<p>The main focus now is getting the platform to a level of maturity where users can run real-world ETL workloads, using the TPC-H benchmarks to measure progress.</p>
+<h4 id="beyond-performance-what-are-the-next-goals-for-the-ballista-project">Beyond performance, what are the next goals for the Ballista project?</h4>
+<p>Personally, I think that the most important goal for the Ballista project is to build a community around it. It started out as a personal side-project but I can only commit a relatively small number of hours each weekend to work on the project, and that time is better spent on writing requirements and building a community than trying to code everything myself.</p>
+<p>To this end, I have started a weekly newsletter, named <a rel="noopener external" target="_blank" href="https://ballistacompute.org/this-week-in-ballista/">“This Week in Ballista”,</a> to share news about progress and where help is needed. I am mostly spending my time on the project on tasks such as filing issues and responding to questions in Discord. I am also prototyping new features and then asking for help from the community to complete them.</p>
+<h4 id="do-you-have-any-book-recommendations-on-distributed-computing">Do you have any book recommendations on distributed computing?</h4>
+<p>Last year, I wrote <a rel="noopener external" target="_blank" href="https://www.andygrove.io/2020/02/how-query-engines-work/">“How Query Engines Work”</a>, which is an introductory guide to query engines and it does cover distributed computing at a high level. I would be hesitant in recommending this book specifically to learn about distributed computing though, since it doesn’t have very much content on this subject yet, although I do plan on extending the content once Ballista is farther along.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

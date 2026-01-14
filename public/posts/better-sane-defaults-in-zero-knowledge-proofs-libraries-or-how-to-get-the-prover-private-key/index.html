@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Better sane defaults in Zero Knowledge Proofs libraries or how to get the prover&#x27;s private key - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Better sane defaults in Zero Knowledge Proofs libraries or how to get the prover&#x27;s private key</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-03-09">March 09, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>Many ZK libraries allow the creation of pair of points $(x,y)$ which do not belong to the elliptic curve they are working with when building circuits. Some also do not check that the points belong to the appropriate subgroup, which can lead to vulnerabilities.</p>
+<p>The argument being made is that invalid points should not reach a prover. What is more surprising is that we would expect the example code or applications to tackle this issue, but they do not. They are not even giving thought to whether these additional checks are needed or not. Of course, many are worried about benchmarks since adding the constraints would make things slower, but removing the safety net and ignoring some attacks published many years ago is not a good long-term strategy. Even if these checks aren’t part of the prover, they must be somewhere and in many cases they aren’t! If builders take points, like Public Keys, from untrusted users, their system may be compromised, and secret keys may get stolen.</p>
+<p>Secret keys may reveal encrypted data or hold access to funds the server may need to operate.</p>
+<p>Going back to the checks, as we said before, they may not be needed if the application validates inputs before they reach the prover or if there is a thoughtful analysis of the protocol.</p>
+<p>But the first solution, while easy, may lead to censorship. Why should a prover reject a proof generation, saying the input is invalid, without proof that it is invalid?</p>
+<p>If there’s another bug in the code, there may be even more issues since a malicious user may have even more ways to scramble the program.</p>
+<p>In a practical example, some weeks ago, we found a bug that allows us to <a rel="noopener external" target="_blank" href="https://github.com/dusk-network/plonk/pull/721/files">make the prover believe two points are equal when they are not</a>. Basically, they did not check that, given $A=(x_A,y_A)$ and $B=(x_B,y_B)$, $y_A=y_B$. If they check the points are in the elliptic curve, then necessarily, for the same $x=x_A=x_B$, there are only two possibilities, either $y_A=y_B$ or $y_A=-y_B$, since they have to satisfy the curve’s equation. If there is no such check (because the developer did not deem it necessary), then there are as many values as the order of the prime field for the $y$ coordinate.</p>
+<p>So, even if the protocol is not vulnerable, it is a good idea and engineering practice to keep some extra checks as a <em>“defense in depth”</em> , to make the program more robust in case there are any other bugs that may be used in tandem with the lack of verifications to create exploits.</p>
+<h2 id="a-history-of-attacks-and-vulnerabilities">A history of attacks and vulnerabilities.</h2>
+<p>The issue of not checking that a point belongs to a subgroup was first reported in 1997 by Chae Hoon Lira and Pil Joong Lee in <a rel="noopener external" target="_blank" href="https://www.iacr.org/archive/crypto2000/18800131/18800131.pdf"> “A Key Recovery Attack on Discrete Log-based Schemes Using a Prime Order Subgroup”</a>.</p>
+<p>Meanwhile, the issue with not checking bad curves was first reported in the year 2000 by Bhiel in <a rel="noopener external" target="_blank" href="https://www.iacr.org/archive/crypto2000/18800131/18800131.pdf"> “Differential fault attacks on elliptic curve cryptosystems “</a>. <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2017/554.pdf">This article</a> also shows some problems when the code does not verify belonging to the elliptic curve.</p>
+<p>Let’s see how this exploit works with an example. We can write elliptic curves in Weierstrass form,<br />
+$$ y^2 = x^3 +a x + b $$<br />
+One crucial fact is that addition and doubling formulas do not depend on the value $b$. This means that two curves $E$ and $E^\prime$ have the same operations if they only differ in $b$. The curve $E^\prime$ is called an invalid curve relative to $E$, and an attacker may choose an $E^\prime$ with much weaker security.</p>
+<p>Suppose an attacker sends some point $Q$ of low order $k$ (the simplest case is $k=2$, which means that $2Q=\mathcal{O}$). If the attacker performs a key exchange with the user $A$ to derive a shared key $K=KDF(sk_A Q)$ and $A$ sends some message $m$ to the attacker, then he can learn $sk \equiv sk_k \pmod{k}$</p>
+<p>If the attacker repeats this process several times (using points of different order, all coprime), possibly using different invalid curves, he gets a system of congruences.</p>
+<p>$sk\equiv sk_1 \pmod{k_1}$<br />
+$sk\equiv sk_2 \pmod{k_2}$<br />
+$sk\equiv sk_3 \pmod{k_3}$<br />
+$sk\equiv sk_4 \pmod{k_4}$</p>
+<p>Then, he can use the Chinese Remainder Theorem to reconstruct $sk$ or at least a list of candidates and solve the remaining problem with brute force search. This leads to the attacker learning the secret key and impersonating the server or user, and even signing transactions on behalf of the user (leading to fund stealing, for example)</p>
+<p>We can extend this attack for protocols with a key exchange that starts diverging from the straightforward original example. For another example, see <a rel="noopener external" target="_blank" href="https://link.springer.com/chapter/10.1007/978-3-319-24174-6_21#Sec12">Practical Invalid Curve Attacks on TLS-ECDH<br />
+</a></p>
+<h2 id="summary">Summary</h2>
+<p>Many cryptographic libraries for zero-knowledge-proof applications remove or ignore some basic checks on elliptic curves, which can lead to vulnerabilities. We’re talking with the contributors of the libraries to fix these issues and disclose them.</p>
+<p>Even if they have been known for over 20 years, eagerness for performance has led to ignoring these issues, creating potential problems for developers building on top of these libraries. The question remains then, how far are our applications from these kinds of exploits, and how careful will the programmers be when handling data that can be poisoned.</p>
+<p>Good defaults are important. From our point of view, all the checks should be done by default in libraries and if they aren’t this should be made mor explicit. Good examples with sane defaults should be part of the libraries. Leaving the optimizing of code by removing checks for highly audited code where skipping those checks gives a real improvement to real users.</p>
+<p>Thanks to Diego Kingston and Mauro Toscano from LambdaClass for helping write this.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsible disclosure: A potential sequencer-prover inconsistency in the Cairo VM - LambdaClass Blog</title>
+    <meta name="description" content="On January 26th Starkware informed us that they had found a critical issue in the Cairo VM related to a program that would successfully execute on the VM but would violate the AIR constraints. A fix was already implemented in a PR, merged, and a release was made and deployed.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Responsible disclosure: A potential sequencer-prover inconsistency in the Cairo VM</h1>
+        
+        <div class="page-meta">
+            <time datetime="2025-02-07">February 07, 2025</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="overview">Overview</h2>
+<p>On Sunday, January 26th, Starkware informed us that they had found a critical issue in the <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/cairo-vm">Cairo VM</a> related to a program that would successfully execute on the VM but would violate the AIR constraints. The bug was found while investigating a separate issue reported by a third party and a fix was already implemented in a PR. The PR was merged, and a release was cut, which is already updated. You can read Starkware’s disclosure post <a rel="noopener external" target="_blank" href="https://community.starknet.io/t/remediating-a-potential-sequencer-prover-inconsistency-in-the-cairo-vm/115313">here</a>.</p>
+<h3 id="technical-implementation">Technical Implementation</h3>
+<p>The fix in pull request <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/cairo-vm/pull/1925">#1925</a> adds two changes:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Additional verification while decoding instructions</span></span>
+<span class="giallo-l"><span>    * Additional verification on `verify_secure_runner`.</span></span></code></pre><h4 id="instruction-decoding-call-instruction">Instruction Decoding**: Call Instruction**</h4>
+<p>The call instruction does roughly the following:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Saves the current frame pointer to `[ap]`</span></span>
+<span class="giallo-l"><span>    2. Saves the call return address to `[ap + 1]`</span></span>
+<span class="giallo-l"><span>    3. Updates both `fp` and `ap` to `ap + 2`, skipping over the saved data.</span></span>
+<span class="giallo-l"><span>    4. Updates the `pc` to the start of the target function</span></span></code></pre>
+<p>As some of the flags of the call instruction are fixed, we can verify that:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * The `dst` register holds `ap+0`, where the current frame pointer will be stored.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dst_register == AP</span></span>
+<span class="giallo-l"><span>dst_offset   == 0</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * The `op0` register holds `ap+1`, where the call return address will be stored.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>op0_register == AP</span></span>
+<span class="giallo-l"><span>op0_offset   == 1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * Both `fp` and `ap` are updated to `ap+2`:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ap_update == Add2</span></span>
+<span class="giallo-l"><span>fp_update == APPlus2</span></span></code></pre>
+<p>If these conditions are not met, the decoding fails.</p>
+<h4 id="instruction-decoding-return-instruction">Instruction Decoding**: Return Instruction**</h4>
+<p>The return instruction does roughly the following:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Restores the previous frame pointer (at `[fp - 2]`)</span></span>
+<span class="giallo-l"><span>    2. Jumps to the call return address (at `[fp - 1]`)</span></span></code></pre>
+<p>As some of the flags of the return instruction are fixed, we can verify that:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * The program counter is updated with an absolute jump</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pc_update == Jump</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * The jump location is taken from `res`, which equals `fp-1`:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>res_logic   == Op1</span></span>
+<span class="giallo-l"><span>op1_offset  == -1</span></span>
+<span class="giallo-l"><span>op1_address == FP</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    * The next frame pointer is taken from `dst`, which equals `fp-2`</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fp_update    == Dst</span></span>
+<span class="giallo-l"><span>dst_register == FP</span></span>
+<span class="giallo-l"><span>dst_offset   == -2</span></span></code></pre>
+<p>If these conditions are not met, the decoding also fails.</p>
+<h4 id="conditional-jump">Conditional Jump</h4>
+<p>This PR also enforces that when <code>pc_update</code> is equal to <code>4</code> (conditional jump), then <code>res_logic</code> must equal <code>0</code> (which implies ignoring that field).</p>
+<blockquote>
+<p>This behavior is documented in the Cairo Whitepaper, page 33:</p>
+</blockquote>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>if pc_update == 4:</span></span>
+<span class="giallo-l"><span>    if res_logic == 0 &amp;&amp; opcode == 0 &amp;&amp; ap_update != 1:</span></span>
+<span class="giallo-l"><span>        res = Unused</span></span>
+<span class="giallo-l"><span>    else:</span></span>
+<span class="giallo-l"><span>        Undefined Behavior</span></span></code></pre><h4 id="secure-runner-verification"><strong>Secure runner verification</strong></h4>
+<p>The <code>verify_secure_runner</code> function verifies that the completed run in a runner is safe to be relocated and used by other Cairo programs.</p>
+<p>The PR verifies that the final frame pointer coincides with the caller’s frame pointer, stored at <code>[initial_frame_pointer - 2]</code>.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * When using `ExecutionMode::ProofModeCanonical`, the whole address must match.</span></span>
+<span class="giallo-l"><span>    * When using `ExecutionMode::RunnerMode`, only the offset must match.</span></span></code></pre><h3 id="impact-analysis">Impact Analysis</h3>
+<p>As noted in Starkware’s <a rel="noopener external" target="_blank" href="https://community.starknet.io/t/remediating-a-potential-sequencer-prover-inconsistency-in-the-cairo-vm/115313">release</a>:</p>
+<blockquote>
+<p>”Since the missing check was in the sequencer and not the prover this has no implication whatsoever on the correctness or security of Starknet. In theory, it could have created a situation that a transaction that appears to have passed will later be reverted (reorg)”</p>
+</blockquote>
+<p>the main risk was having transactions from <code>Cairo0</code> contracts execute on the sequencer and revert instead of being proved. Since the transaction would not pass the prover there is no risk of incorrect transaction being proved but the revert would impact user experience.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>As we’ve stated before, issues such as this one are always possible and likely in complex software and highlight the importance of having multiple teams paying attention to security, close collaboration between them, having simple codebases, and scrutinizing the interactions between components.</p>
+<p>Many thanks to Starkware for the notice and quick fix!</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

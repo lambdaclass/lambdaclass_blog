@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock %}
+
+{% block description %}{% if page.description %}{{ page.description }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=160) }}{% else %}{{ config.description }}{% endif %}{% endblock %}
+
+{% block content %}
+<article class="post-article">
+    <header class="post-header">
+        {% if page.extra.feature_image %}
+        <div class="post-hero-image">
+            <img src="{{ page.extra.feature_image }}" alt="{{ page.title }}">
+        </div>
+        {% endif %}
+
+        <div class="post-header-content">
+            {% if page.taxonomies.tags %}
+            <div class="post-categories">
+                {% for tag in page.taxonomies.tags | slice(end=2) %}
+                <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}" class="category-link">{{ tag }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <h1 class="post-title">{{ page.title }}</h1>
+
+            <div class="post-meta">
+                {% if page.extra.authors %}
+                <span class="post-authors">
+                    {% for author in page.extra.authors %}{{ author }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </span>
+                {% endif %}
+                <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+                {% if page.reading_time %}
+                <span class="reading-time">{{ page.reading_time }} min read</span>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="post-content prose">
+        {{ page.content | safe }}
+    </div>
+
+    <footer class="post-footer">
+        {% if page.taxonomies.tags %}
+        <div class="post-tags-footer">
+            <span class="tags-label">Topics:</span>
+            {% for tag in page.taxonomies.tags %}
+            <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}" class="tag">{{ tag }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <nav class="post-navigation">
+            {% if page.earlier %}
+            <a href="{{ page.earlier.permalink }}" class="nav-link prev">
+                <span class="nav-label">Previous Article</span>
+                <span class="nav-title">{{ page.earlier.title | truncate(length=50) }}</span>
+            </a>
+            {% endif %}
+            {% if page.later %}
+            <a href="{{ page.later.permalink }}" class="nav-link next">
+                <span class="nav-label">Next Article</span>
+                <span class="nav-title">{{ page.later.title | truncate(length=50) }}</span>
+            </a>
+            {% endif %}
+        </nav>
+    </footer>
+</article>
+{% endblock %}

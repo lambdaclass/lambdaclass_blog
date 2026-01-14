@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiscalar Multiplication: Strategies and Challenges - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Multiscalar Multiplication: Strategies and Challenges</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-01-09">January 09, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>Generating a zk-SNARK (zero-knowledge succinct non-interactive argument of knowledge), as the one Aleo uses, involves a lot of cryptographic calculations, almost all of which happen inside an elliptic curve over a finite field.</p>
+<h2 id="elliptic-curves">Elliptic Curves</h2>
+<p>The following is a short version of <a rel="noopener external" target="_blank" href="https://cryptographyinrustforhackers.com/chapter_2.html#elliptic-curves">this</a>.</p>
+<p>An elliptic curve point is a pair of numbers $(x,y)$ in a finite field (you can think of a finite field as $Z_p$, the integers modulo some huge prime number, though sometimes they’re more than that), which satisfy an equation of the form:</p>
+<p>$$<br />
+y^2 = x^3 + ax + b<br />
+$$</p>
+<p>for some $a$ and $b$ in the finite field.</p>
+<p>You can sum elliptic curve points, but not in the traditional way. Instead of doing</p>
+<p>$$<br />
+(x_1, y_1) + (x_2, y_2) = (x_1 + x_2, y_1 + y_2)<br />
+$$</p>
+<p>We do this:</p>
+<p>$$<br />
+(x_1, y_1) + (x_2, y_2) = (x_3, -y_3)<br />
+$$</p>
+<p>where</p>
+<p>$$<br />
+x_3 = s^2 - x_1 - x_2 \<br />
+y_3 = s(x_1 - x_3) - y_1 \<br />
+s = \frac{y_2 - y_1}{x_2 - x_1} x_3<br />
+$$</p>
+<p>There are two exceptions to this:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. When $(x_1, y_1) = (x_2, y_2)$</span></span>
+<span class="giallo-l"><span>    2. When $x_1 = x_2$ but $y_1 \neq y_2$. In this case, as no other solution exists, $y_1 = - y_2$.</span></span></code></pre>
+<p>In both 1. and 2. the calculation above is not defined (we would be dividing by zero), so what we do instead is:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. The sum of a point with itself is, as before, a point $(x_3, y_3)$, only in this case  </span></span></code></pre>
+<p>$$<br />
+x_3 = s^2 - 2 x_1 \<br />
+y_3 = (x_1 - x_3) - y_1 \<br />
+s = \dfrac{3 x_1^2 + a}{2 y_1}<br />
+$$<br />
+(Here, $a$ is the coefficient defining the curve equation above).
+2. In this case, the result of the sum is a unique point we arbitrarily add to the curve, called the <em>point at infinity</em> and noted $\mathcal{O}$. This point works as the zero for our sum, i.e.,<br />
+$$<br />
+\mathcal{O} + (x, y) = (x, y)<br />
+$$<br />
+for every $(x,y)$.</p>
+<h2 id="primitive-operations">Primitive operations</h2>
+<p>Elliptic curve cryptography ultimately relies on two primitive operations, point addition (adding two different points) and point doubling (adding a point to itself), which we call <code>ECADD</code> and <code>ECDBL</code>.</p>
+<p>We can apply the double-and-add algorithm if we try to add a point many times to itself. As already explained <a href="/what-every-developer-needs-to-know-about-elliptic-curves/">in one of our posts</a>, the idea is simple: if we want to calculate, say, $9P$ for some curve point $P$, instead of performing nine additions we can do</p>
+<p>$$<br />
+P + P = 2P \<br />
+2P + 2P = 4P \<br />
+4P + 4P = 8P \<br />
+4P + P = 9P<br />
+$$</p>
+<p>which is only four addition operations.</p>
+<p>When we have to add many different points $k_1P_1+k_2P_2+…+k_nP_n$, most techniques assume these primitives are given and focus on how to perform the scalar multiplications $k_i P_i$ and the additions, minimizing the amount of <code>ECADD</code>s and <code>ECDBL</code>s.</p>
+<h2 id="msm">MSM</h2>
+<p>The <em>Multi-Scalar Multiplication</em> problem consists of, given an elliptic curve, calculating</p>
+<p>$$<br />
+\sum_{i=1}^{n} k_i P_i<br />
+$$</p>
+<p>for some scalars (a.k.a. integers modulo a certain prime) $k_i$, some elliptic curve points $P_i = (x_i, y_i)$ and some $n$ (in Aleo’s challenge it is $2^{26}$).</p>
+<p>The sum operation here is the one discussed in the previous section. Similarly, $k_i P_i$ means “$P_i$ summed to itself $k_i$ times,” the sum once again being the one defined above.</p>
+<p>Around 80% of the time to produce a zk-SNARK proof is spent doing MSM, so optimizing it is crucial for performance.</p>
+<h3 id="bucketing-method">Bucketing method</h3>
+<p>We can break the MSM into smaller sums and reduce the number of operations by repeatedly using the windowing technique. If we want to compute each $k_iP_i$, we can break it into windows of size $c$<br />
+$$<br />
+k_iP_i=k_{i0}P_i+k_{i1}2^{c} P_i+k_{i2}2^{2c} P_i+…+k_{i,m-1}2^{c(m-1)} P_i<br />
+$$<br />
+Using this, we can rewrite the MSM problem as<br />
+$$<br />
+P=\sum_{i} k_iP_i=\sum_{i}\sum_{j} k_{ij}2^{cj}P_i<br />
+$$<br />
+We can now change the order of the summations,<br />
+$$<br />
+P=\sum_{i} k_iP_i=\sum_{j}2^{cj}\left(\sum_{i} k_{ij}P_i\right)=\sum_j 2^{cj} B_j<br />
+$$<br />
+In other words, we first divide the scalars into windows and then combine all the points in each window. Now we can focus on how to calculate each $B_j$ efficiently:<br />
+$$<br />
+B_j=\sum_{i} k_{ij}P_i=\sum_{\lambda=0}{2c-1} \lambda \sum_{u(\lambda)} P_u<br />
+$$<br />
+where the summation over $u(\lambda)$ is done only over points whose coefficient is $\lambda$. For example, if $c=3$ and we have $15$ points,<br />
+$$<br />
+B_1=4P_1+3P_2+5P_3+1P_4+4P_5+6P_7+6P_8+3P_{14}+5P_{15}<br />
+$$<br />
+We can split the summation by the coefficients $\lambda$, taking values from $1$ to $7$. For $\lambda=1$, $\sum_u P_u=P_4$ (because $P_4$ is the only one with coefficient $1$), for $\lambda=4$, $\sum_u P_u=P_1+P_5$, etc. We place all points with a common coefficient $\lambda$ into the $\ lambda$ bucket. Thus,<br />
+$$<br />
+B_j=\sum_\lambda \lambda S_{j\lambda}=S_{j1}+2S_{j2}+3S_{j3}+4S_{4j}+5S_{5j}+6S_{j6}+7S_{j7}<br />
+$$<br />
+We can calculate this with a minimum number of point additions using partial sums.<br />
+$T_{j1}=S_{j7}$<br />
+$T_{j2}=T_{j1}+S_{j6}$<br />
+$T_{j3}=T_{j2}+S_{j5}$<br />
+$T_{j4}=T_{j3}+S_{j4}$<br />
+$T_{j5}=T_{j4}+S_{j3}$<br />
+$T_{j6}=T_{j5}+S_{j2}$<br />
+$T_{j7}=T_{j6}+S_{j1}$<br />
+Each of these operations involves doing just one elliptic point addition. We can obtain the final result by summing these partial sums:<br />
+$$<br />
+B_j=\sum T_{jk}<br />
+$$</p>
+<p>We can improve the calculations by changing the expansion of the coefficients $k_i$. In binary representation, the Hamming weight is the number of non-zero bits. Ideally, we would like this weight to be as small as possible to reduce the number of additions (For example, 65537, which is $2^{16}+1$, is used as the public key for the RSA cryptosystem in many implementations. The square and multiply algorithm requires only two multiplications). The average Hamming weight in a binary representation is $1/2$; if we introduce a signed binary representation ($-1,0,1$), the average weight is reduced to $1/3$, with the consequent decrease in the number of operations (on average).</p>
+<h2 id="bls-12-377">BLS 12-377</h2>
+<p>The curve which Aleo uses is called BLS 12-377. The base field (finite field) has order $q$ (a 377-bit prime) and has an embedding degree of 12. Both the order of the elliptic curve group $G_1$, $r$, and finite field are highly 2-adic (that is, both $q$ and $r$ can be written as $2^\alpha r+1$, where $r$ is an odd number and $\alpha$ is greater than $40$). The orders $q$ and $r$ are related by the embedding degree: $r \mid q^{12}-1$. The equation for the elliptic curve is<br />
+$$<br />
+y2=x3+1<br />
+$$</p>
+<p>Additionally, we can build a second group $G_2$ over a quadratic field extension of $\mathbb{F}_q$; the equation of the curve is<br />
+$$<br />
+y2=x3+B<br />
+$$<br />
+where $B$ is a parameter. For more information on the curve’s parameters, see <a rel="noopener external" target="_blank" href="https://docs.rs/ark-bls12-377/latest/ark_bls12_377/">here</a>.</p>
+<p>BLS 12-377 is birrationally equivalent to <a rel="noopener external" target="_blank" href="https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-05#appendix-B">Montgomery and twisted Edwards’s curves</a>. This allows us to perform point addition and scalar multiplication faster by avoiding costly field inversions. In the case of Montgomery curves, it is possible to perform scalar multiplication in constant time, making the operation resistant to timing attacks.</p>
+<p>Implementations of the BLS 12-377 curve and the (birrationally equivalent) twisted Edwards curve are given in this <a rel="noopener external" target="_blank" href="https://github.com/arkworks-rs/curves">repository</a>.</p>
+<p>BLS 12-377 is one of the pairing-friendly elliptic curves; these have applications such as short digital signatures that are efficiently aggregatable, polynomial commitment schemes, and single-round multi-key exchanges.<br />
+The reason why we have two equations for the BLS curve and two groups is related to pairings. A pairing is a bilinear map: it takes two points, each from a group of prime order $r$. For technical reasons, these groups need to be different. As the original curve has only one group of order $r$, we need to extend the field to find other groups of order $r$. The embedding degree gives how much we have to extend the field to find those other groups. As a bonus, the extended field contains all the $r$-th roots of unity.</p>
+<h3 id="a-note-on-field-extensions">A note on Field Extensions</h3>
+<p>The embedding degree is also the degree of the field extension we need to use. Familiar examples of field extensions are the real numbers, $\mathbb{R}$, (extending the field of rational numbers $\mathbb{Q}$, which is a transcendental extension) and the complex numbers, \( \mathbb{C} \) (extending \( \mathbb{R} \)). The latter cannot be further extended since there are no irreducible polynomials in \( \mathbb{C} \) (we say that the complex numbers are algebraically closed).</p>
+<p>If we want to build a quadratic extension of \( \mathbb{F_{q}} \), \( \mathbb{F_{q^2}}\) we can think of it as a polynomial \( a_0+a_1x \), where \( a_0\) and \( a_1 \) are elements in \( \mathbb{F_q} \). The addition is straightforward since we add the independent and linear terms separately. For multiplication, given elements $a$ and $b$<br />
+\[ a\times b = a_0b_0 +(a_0b_1+a_1b_0)x+a_1b_1 x^2\]</p>
+<p>To avoid the problem of going outside linear polynomials, we can reduce the degree by using an irreducible polynomial, such as \( x^2+1 \) and setting \( x^2+1=0 \). If we replace the above equation,<br />
+\[ a\times b = a_0b_0 - a_1b_1 +(a_0b_1+a_1b_0)x\]<br />
+which resembles multiplication in complex numbers.</p>
+<p>The conditions for choosing the polynomial are:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. It must have the same degree as the extension field (quadratic in our case).</span></span>
+<span class="giallo-l"><span>    2. It must be irreducible in the field we are extending, meaning that we cannot factor it into smaller degree polynomials.</span></span></code></pre>
+<p>Arithmetic in \( \mathbb{F_{q^{12}}} \) is complicated and expensive. Luckily, we can perform a sextic twist so that the group \( G_2 \) is defined over \( \mathbb{F_{q^{2}}} \).</p>
+<p>In practice, when we want to build a field extension such as \( \mathbb{F_{q^{12}}} \), we can proceed by extending smaller fields in a sequential form: a tower of extensions (such as \( \mathbb{Q}\rightarrow \mathbb{R}\rightarrow \mathbb{C} \)).</p>
+<h2 id="faster-with-fft">Faster with FFT</h2>
+<p>The potential use for FFTs comes when implementing the primitives <code>ECADD</code> and <code>ECDBL</code>. We can do these operations in different coordinate systems. As stated <a href="/need-for-speed-elliptic-curves-chapter/">here</a>, projective coordinates are typically much faster because they avoid doing a finite field inversion, which is much more expensive than multiplications and additions.</p>
+<p>When using projective coordinates, the calculations are faster because we trade divisions for multiplications. This means there are a lot of multiplications to be done, which is why we need efficient methods to multiply integers, where Karatsuba’s, Toom’s, or FFT algorithms might become appealing since we are dealing with <a href="/weird-ways-to-multiply-really-fast-with-karatsuba-toom-cook-and-fourier/">multiplication of large integers</a>. The optimal algorithm will depend on the size of the integers.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

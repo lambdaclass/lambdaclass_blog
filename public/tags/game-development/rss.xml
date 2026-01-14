@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+      <title>LambdaClass Blog - Game Development</title>
+      <link>https://blog.lambdaclass.com</link>
+      <description>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</description>
+      <generator>Zola</generator>
+      <language>en</language>
+      <atom:link href="https://blog.lambdaclass.com/tags/game-development/rss.xml" rel="self" type="application/rss+xml"/>
+      <lastBuildDate>Thu, 20 Apr 2017 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>Gaming with Elixir: discovering new lands in the BEAM realm</title>
+          <pubDate>Thu, 20 Apr 2017 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.lambdaclass.com/posts/gaming-with-elixir-discovering-new-lands-in-the-beam-realm/</link>
+          <guid>https://blog.lambdaclass.com/posts/gaming-with-elixir-discovering-new-lands-in-the-beam-realm/</guid>
+          <description xml:base="https://blog.lambdaclass.com/posts/gaming-with-elixir-discovering-new-lands-in-the-beam-realm/">&lt;p&gt;In this opportunity I interviewed somebody I don’t normally interview: a client, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;chrisjimison&#x2F;&quot;&gt;Chris Jimison&lt;&#x2F;a&gt;, CTO of Merigo. One of my clients. After working for almost a year with Merigo, I appreciate and understand the differences between using a BEAM language to develop a typical REST JSON system and using it to develop a videogame backend. I am not aware of many companies using Elixir to develop backends. I have only watch a talk by Jamie Winsor called “&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;youtu.be&#x2F;_i6n-eWiVn4&quot;&gt;Building And Releasing A Massively Multiplayer Online Game”&lt;&#x2F;a&gt;. I hope to be able to interview Jamie in the following weeks.&lt;&#x2F;p&gt;
+&lt;p&gt;To sum up I did this interview because I wanted to share my experience of using Elixir for developing a different kind of beast. I am also writting a post about what I like and dislike about Elixir after developing in Erlang for quite a few years.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;em&gt;Discuss and vote at&lt;&#x2F;em&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;lobste.rs&#x2F;s&#x2F;f1wxuc&#x2F;gaming_with_elixir_discovering_new_lands&quot;&gt; &lt;em&gt;lobsters&lt;&#x2F;em&gt;&lt;&#x2F;a&gt; &lt;em&gt;,&lt;&#x2F;em&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.reddit.com&#x2F;r&#x2F;programming&#x2F;comments&#x2F;66hnpk&#x2F;gaming_with_elixir_discovering_new_lands_in_the&#x2F;&quot;&gt;&lt;em&gt;reddit&lt;&#x2F;em&gt;&lt;&#x2F;a&gt; &lt;em&gt;and&lt;&#x2F;em&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;news.ycombinator.com&#x2F;item?id=14156379&quot;&gt; &lt;em&gt;hn&lt;&#x2F;em&gt;&lt;&#x2F;a&gt; &lt;em&gt;.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-3HjK0CX5813XXtDwfKIhWw.jpeg&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Could you describe your experience in the software industry?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I started in the software industry about 15 years ago. My career has been focused in the game development industry, specializing in networking problems. This includes games that have a peer-to-peer deterministic game play model, all the way to big MMORPG titles. In the last 7 years I have been working on mobile titles where the game networking requirements are more of a hybrid of REST and MMORPG-style technologies. Some companies I have worked for in the past include EA, Sony R&amp;amp;D, NGMOCO and DeNA.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is&lt;&#x2F;strong&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;merigo.co&#x2F;&quot;&gt;&lt;strong&gt;Merigo&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt;&lt;strong&gt;?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;About 3 and a half years ago my cofounders and I decided we wanted to start our own company to help game developers be more successful in the market. One of the big issues that has come around in the last 4–5 years is single player games just don’t make that much money in the market place (outside of the occasional indie hit). As mobile game developers move into the “Online Gaming” space, the costs of creating these applications are increasing exponentially. When the iPhone 3G first launched (this was the first model that had the App Store) many game teams consisted of one or two engineers — a “large” game having 3–5 engineers. We are now seeing team sizes of anywhere between 10–20 and have even heard of some titles consisting of over 30 engineers. This means costs of titles are skyrocketing and the need to “fail fast” is more critical. “Fail fast” gets to the heart of game development. A game designer comes up with an idea they “think” will be fun. However you don’t truly know until you have it in your hands to play. Some ideas work, some don’t. With such a high development cost, many game teams must choose to implement a feature and hope that it works because they don’t have the budget to try a second or third time. Merigo wants teams spending more time “focusing on the fun” and less time worrying about how to make it all work.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is SDE?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The Merigo SDE (Server Development Environment) is a system that allows developers to build out their server logic quickly without having to worry about all the pain of how to scale out and manage their stack. We provide many common game services such as authentication, purchase verification, leaderboards, player persistence, etc. However the SDE is not a bunch of black box REST APIs. The SDE enables developers to write custom “scripts” in Elixir that can be loaded&#x2F;updated at runtime, allowing them to create custom APIs and behaviors needed for their application. Since we have provided the basic framework of how the scripts are managed and when they are called we can now “scale” this logic out across a distributed server cluster. Our main philosophy with the SDE is “servers are cheap, people are expensive”. With the SDE we wanted to provide a system that allows for fast development and rapid iteration with the knowledge that you can always spin up new servers to balance the load, even if your business logic is not optimized for high performance. Each team can then decide where they want to invest their time once the game goes “live.” They can decide where to best invest their time: building new features or optimizing their code to reduce their server costs. Basically turning development into a simple Return on Investment (ROI) equation.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What languages&#x2F;platforms did you consider or try before settling on BEAM&#x2F;Elixir?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Java, Scala, Go and for one crazy day I even debated just writing the whole stack in C++.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What made you choose the Erlang VM (BEAM) instead of the JVM?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I hate writing Java… The real reason we didn’t go with a JVM environment is tuning it is kind of a black art and something I have not done in years (since Java 1.4).&lt;&#x2F;p&gt;
+&lt;p&gt;Also, we had the following goals:&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;High level of fault tolerance&lt;br &#x2F;&gt;
+a. Because game teams write “scripts” we did not want them to be able to bring the node down because they wrote bad code&lt;br &#x2F;&gt;
+b. If the game server goes down this is VERY bad for game developers. Users will get mad quickly and just download a different game with a very slim chance they may come back&lt;br &#x2F;&gt;
+c. User Acquisition (UA) is expensive. To “buy” a user (this is done via Ads or Promotions, etc) you can spend up to $30 per person, and if your game server is crashed that money is gone.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;2. Easy to scale horizontally&lt;&#x2F;p&gt;
+&lt;p&gt;3. Easy to upgrade servers with hot patches without taking the system down&lt;&#x2F;p&gt;
+&lt;p&gt;With those three goals BEAM is one of the best tools for the job.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Lua is a language that is pretty common in the game development community. The Erlang VM has a Lua based language called Luerl. Why did you choose to implement Playground in Elixir instead of Luerl?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;We actually started with Luerl in early 2014 as our scripting language. The problem with Luerl at the time (I have not reviewed it in some years) was its basic architecture didn’t fit our needs. Luerl is designed for you to pass it a bunch of data, process that data in Lua, then get the results back. However if you don’t know what the Lua code will be doing you need to pass in ALL possible data in one big map (and this was pre-Erlang maps so it was a custom struct the Luerl lib created). This meant we had to spend a lot of time modifying the actual Luerl package to extend its basic APIs so the game logic could “ask” our Erlang code for needed data, etc. Around mid&#x2F;late 2014 Elixir had matured and we felt that the language was easy enough that most folks could pick up the basic syntax without a lot of work. In the end we are really happy that we moved off Luerl. Now our System &amp;lt;-&amp;gt; scripting environment has a near zero overhead (we don’t have to serialize&#x2F;deserialize struct, etc). In fact we liked Elixir so much we ended up porting all of our Erlang system to it and now we are pretty much an Elixir shop.&lt;&#x2F;p&gt;
+&lt;p&gt;Also Elixir made it easy to “Walk” the code AST where we can check it for operations we don’t allow. For example, when a team writes Elixir business logic we don’t allow them to use OTP, or even spawn processes, etc.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is the biggest difference between implementing a backend for a video game and a HTTP REST JSON api?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;It all boils down to two things: latency and state.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;State&lt;&#x2F;strong&gt;&lt;br &#x2F;&gt;
+Games are very state-full, and if you had to send all the data needed to finish a REST-based transaction your JSON would be HUGE both upstream and downstream. Games also tend to react to events that the user did not generate so bi-directional communication is a very strong requirement. For example: If player 1 attacks player 2, player 2 will need to be notified of this event and different actions may be triggered if player 2 is online or not. Also, this state may need to be presented to other players, so in the last example player 3 may see that players 1 and 2 are in combat so he&#x2F;she may jump in and help player 2.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Latency&lt;&#x2F;strong&gt;&lt;br &#x2F;&gt;
+For a typically ecommerce site a 500ms latency may be completely unnoticeable. However, in a game, 500 ms could be the difference between winning and losing. So we are constantly concerned with latency. This includes things like time spent serializing&#x2F;deserializing your communications, how much data you are sending up and down the wire, how long you spent accessing the DB, etc, etc.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What are the main difference between implementing actual games and game development tools?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;It is the same as developing any tools&#x2F;lib vs a product that goes directly to consumers. With tools you need to think about not just what the tool does but also you have to think about how others will use it. Does it have the flexibility to work in N different use cases, etc. With a game you know exactly how your product should behave and can quickly tell when things work or they don’t. With a tool it may work great with the designed use case, but some other creative engineer decided to repurpose it in a completely different way. As a tools&#x2F;lib developer your challenge is to have the flexibility to support both.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What was your experience using&lt;&#x2F;strong&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;basho&#x2F;riak_core&quot;&gt;&lt;strong&gt;Riak Core&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt;&lt;strong&gt;? What did you like and what did you not?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Riak Core is a very cool library but really you have to look at it from two angles.&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Do I buy into the whole Consistency Hashing thing?&lt;&#x2F;li&gt;
+&lt;li&gt;Do I want to implement my own solution for this?&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;About two years ago we said yes to the first question, however getting Riak Core to work in an elixir environment was just too painful so we rolled our own solution. It worked well and was actually a bit faster than Riak Core, however it was not nearly as robust and did not handle node failures and handoffs well. Recently the Phoenix and Basho got a Hex package that actually works in Elixir and we jumped at the chance to try it out. After some evaluation we decided that the little bit of performance gains we got from our system was outweighed by the expanded functionality that Riak Core provided.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Liked&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Very robust software that handles a lot of error cases for us.&lt;&#x2F;li&gt;
+&lt;li&gt;Built in gossip protocol&lt;&#x2F;li&gt;
+&lt;li&gt;Handles data handoffs when new nodes are brought online&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;strong&gt;Dislike&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Dependencies that don’t work because Basho bases all their libs&#x2F;tools on Erlang R15&lt;&#x2F;li&gt;
+&lt;li&gt;Very heavy weight&lt;&#x2F;li&gt;
+&lt;li&gt;Difficult to track down errors deep in the system code&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;strong&gt;Is there anything you miss from implementing actual videogames?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Working on videogames is a truly unique experience. Not only are you working with very smart engineers, you also get to work closely with Artists, Game Designers, Musicians, and sometimes even Actors. That is a very fun and exciting environment to be in.&lt;&#x2F;p&gt;
+</description>
+      </item>
+    </channel>
+</rss>

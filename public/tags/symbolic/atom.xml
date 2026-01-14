@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>LambdaClass Blog - Symbolic</title>
+    <subtitle>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://blog.lambdaclass.com/tags/symbolic/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2020-09-18T00:00:00+00:00</updated>
+    <id>https://blog.lambdaclass.com/tags/symbolic/atom.xml</id>
+    <entry xml:lang="en">
+        <title>SymJAX: symbolic CPU&#x2F;GPU&#x2F;TPU programming</title>
+        <published>2020-09-18T00:00:00+00:00</published>
+        <updated>2020-09-18T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/symjax-symbolic-cpu-gpu-tpu-programming/"/>
+        <id>https://blog.lambdaclass.com/posts/symjax-symbolic-cpu-gpu-tpu-programming/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/symjax-symbolic-cpu-gpu-tpu-programming/">&lt;h4 id=&quot;a-symbolic-programming-version-of-jax&quot;&gt;A symbolic programming version of JAX&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-U2wpT5qoWqSOwrgYtgLJ3w.png&quot; alt=&quot;&quot; &#x2F;&gt;SymJAX’s really cool logo&lt;&#x2F;p&gt;
+&lt;p&gt;As we try to have a deeper undestanding of the world we live in, we tend to add more and more complex relationships in the models we use to describe it, so we need to borrow a hand from computers to run them.&lt;&#x2F;p&gt;
+&lt;p&gt;Complex relationships often are represented in form of graphs and many learning algorithms require differentiation of some kind.&lt;&#x2F;p&gt;
+&lt;p&gt;We also don’t want to lose mathematical interpretability, so having a symbolic programming framework that allows us to represent these complex models in a familiar way, provided with a Theano-like user experience, would be a very interesting tool to have in our pocket.&lt;&#x2F;p&gt;
+&lt;p&gt;This is what SymJax has come to offer us. To know more about this, we interviewed &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;RandallBalestriero&quot;&gt;Randall Balestriero&lt;&#x2F;a&gt; the creator and sole contributor of the project so far.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-is-symjax&quot;&gt;What is SymJAX?&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;RandallBalestriero&#x2F;SymJAX&quot;&gt;SymJAX&lt;&#x2F;a&gt; is a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;networkx.github.io&#x2F;&quot;&gt;NetworkX&lt;&#x2F;a&gt; powered symbolic programming version of &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;google&#x2F;jax&quot;&gt;JAX&lt;&#x2F;a&gt; providing a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;Theano&#x2F;Theano&quot;&gt;Theano&lt;&#x2F;a&gt;-like user experience. In addition of simplifying graph input&#x2F;output, variable updates and providing graph utilities such as loading and saving, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;RandallBalestriero&#x2F;SymJAX&quot;&gt;SymJAX&lt;&#x2F;a&gt; features machine learning and deep learning utilities similar to &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;Lasagne&#x2F;Lasagne&quot;&gt;Lasagne&lt;&#x2F;a&gt; and &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.tensorflow.org&#x2F;&quot;&gt;Tensorflow1&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Illustrative example: Adam optimizer of a dummy loss&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;import symjax&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;import symjax.tensor as T&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;from symjax.nn.optimizers import Adam&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# we create a persistent variable to be optimized&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;z = T.Variable(3.0, dtype=”float32&amp;quot;, trainable=True)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# the optimization is about minimizing the following loss&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;loss = T.power(z — 1, 2, name=&amp;#39;loss&amp;#39;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# this loss is just a node in the graph, nothing is computed yet&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;print(loss) # Op(name=loss, fn=power, shape=(), dtype=float32, scope=&#x2F;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# we minimize it with Adam, we can omit to assign it to a variable since the&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# internal updates are automatically collected, 0.1 is the learning rate&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Adam(loss, 0.1)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# we create the function (XLA compiled graph) and define what are the inputs&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# (here none), the outputs and the persistent variable updates (from Adam)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;train = symjax.function(outputs=[loss, z], updates=symjax.get_updates())&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;# for illustrative purposes, we perform 200 steps and reset the graph after 100 steps&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;for i in range(200):&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  if (i + 1) % 100 == 0:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  # we can use any identifier to select what to reset, (&amp;#39;*&amp;#39; is the default)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  # if we want to only reset the variables create by Adam&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  # (the moving averages etc) one would use (for example)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  # symjax.reset_variables(&#x2F;AdamOptimizer*&amp;#39;)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  # in our case let reset all variables&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  symjax.reset_variables()&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  # the output of this function is the current loss and value of z, and when called it also&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  # internally perform the given updates computed from Adam&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  train()&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;For additional examples please see: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;symjax.readthedocs.io&#x2F;en&#x2F;latest&#x2F;auto_examples&#x2F;&quot;&gt;https:&#x2F;&#x2F;symjax.readthedocs.io&#x2F;en&#x2F;latest&#x2F;auto_examples&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;the-symjax-documentation-reads-the-number-of-libraries-topping-jax-tensorflow-torch-is-large-and-growing-by-the-day-what-symjax-offers-as-opposed-to-most-is-an-all-in-one-library-with-diverse-functionalities-what-s-the-main-issue-with-having-to-use-multiple-libraries-and-how-does-creating-a-single-library-solve-it&quot;&gt;The SymJAX documentation reads: “The number of libraries topping Jax&#x2F;Tensorflow&#x2F;Torch is large and growing by the day. What SymJAX offers as opposed to most is an all-in-one library with diverse functionalities”. What’s the main issue with having to use multiple libraries and how does creating a single library solve it?&lt;&#x2F;h4&gt;
+&lt;p&gt;There is absolutely nothing wrong with having complementary libraries that can be interconnected. In my opinion the current limitation of the mentioned libraries is the absence of inter-compatibility making it difficult to use features from one with another. This is different than say numpy and scipy who both complement each other seamlessly. In SymJAX, the JAX backend allows for any JAX library to be directly imported into SymJAX (as were C&#x2F;CUDA code easily imported into Theano). Second, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.tensorflow.org&#x2F;probability&#x2F;api_docs&#x2F;python&#x2F;tfp&#x2F;experimental&#x2F;substrates&#x2F;jax&quot;&gt;Tensorflow is increasingly leveraging a JAX backend&lt;&#x2F;a&gt;, this development will also allow to easily import those Tensorflow utilities into SymJAX. People interested in using a standard JAX&#x2F;Tensorflow library while benefiting from SymJAX utilities can do so easily. The other way around, any computational graph designed in SymJAX with SymJAX utilities can also be translated back into pure JAX, allowing JAX libraries to benefit from SymJAX. The target end result being that each library newly developed tool would directly benefit all cross-library users.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;the-documentation-states-that-one-of-the-goals-of-symjax-is-to-optimize-processes-how-does-the-library-enable-that-optimization-how-does-it-compare-to-other-technologies&quot;&gt;The documentation states that one of the goals of SymJAX is to optimize processes. How does the library enable that optimization? How does it compare to other technologies?&lt;&#x2F;h4&gt;
+&lt;p&gt;There are really two levels of (computational) optimization in SymJAX. First, SymJAX allows to define a computational graph which can be viewed as a computational roadmap based on inputs and operations producing some desired outputs (possibly involving some persistent graph variable updates). This user-defined computational roadmap is obtained without performing any actual computation yet. It is then compiled with XLA producing a sequence of computation kernels generated specifically for the given graph. This step allows to potentially merge multiple low-level operations into a single kernel and demonstrated performances gains for example &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.tensorflow.org&#x2F;xla&#x2F;&quot;&gt;in Tensorflow&lt;&#x2F;a&gt;. This step alone provides SymJAX with similar performances to Jax and XLA-Tensorflow, ceteris paribus.&lt;&#x2F;p&gt;
+&lt;p&gt;The second and most important feature of SymJAX is its graph canonicalization. This feature is the same as the one that was employed in the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;www.deeplearning.net&#x2F;software&#x2F;theano&#x2F;&quot;&gt;now-discontinued Theano library&lt;&#x2F;a&gt;. Graph canonicalization allows generic graph optimization such as replacing the following subgraph:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;log( exp(x) * exp(4 + x) )&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;by the much simpler, yet equivalent subgraph:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;2 * x + 4&amp;#39;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This type of graph simplification can be done on much more complex parts of the graphs such as replacing the sum of two Gaussian distributions by a single Gaussian with different mean and covariance; hence greatly reducing the computational burden of random sampling. This reduced graph is then XLA compiled further optimizing low-level operations. This feature allows for much broader optimization than present in XLA and in most current libraries as it requires &lt;em&gt;a priori&lt;&#x2F;em&gt; knowledge of the computational graph.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;does-symjax-support-all-state-of-art-neural-network-architectures&quot;&gt;Does SymJAX support all state-of-art neural network architectures?&lt;&#x2F;h4&gt;
+&lt;p&gt;SymJAX provides out-of-the-box some basic neural network layers implementations. The number of implemented layers increases at each release but can surely not follow the exponentially growing number of neural network flavours being designed by the deep learning community. However, the core of SymJAX provides all the standard operations featuring almost all numpy and scipy functions among many more. This allows anyone to implement their own layers and neural networks (as well as losses or any other bit of a deep learning pipelines) ensuring that any needed architecture can be implemented on-the-go.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-were-the-biggest-challenges-in-allowing-a-broad-hardware-support-gpus-tpus&quot;&gt;What were the biggest challenges in allowing a broad hardware support (GPUs, TPUs)?&lt;&#x2F;h4&gt;
+&lt;p&gt;One of the crucial benefit of leveraging JAX as the backend XLA interface is the ability to benefit from their latest hardware support. There was thus nothing additional needed in SymJAX to enable such broad support.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;is-there-support-for-dynamic-computation-graphs-a-la-pytorch-if-not-are-there-any-plans-for-it&quot;&gt;Is there support for dynamic computation graphs à la Pytorch? If not, are there any plans for it?&lt;&#x2F;h4&gt;
+&lt;p&gt;The computational graph in itself can be evaluated without XLA compilation allowing one to define a graph, evaluate it, and keep building it while evaluating it again (similar to session.run from Tensorflow 1). This would not give optimal performances but can be useful in some cases and would allow very general dynamic computation graphs. For best performances however the graph needs to be compiled effectively freezing its structure. However, we do allow for one dynamic aspect to persist after compilation: dynamic leading axis length (such as variable batch size). This allows, if needed, to have a compiled graph with the possibility to feed shape varying inputs. For now this is only possible on the leading axis but more general dynamic computation graphs will be considered in the future by allowing only the parts of the graph that will not vary dynamically to be compiled separately allowing for high-performance “hybrid” graphs to be evaluated.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;symjax-pays-homage-to-theano-in-many-aspects-what-s-different-from-theano-and-why-not-improve-theano-to-bring-it-up-to-date-instead-of-creating-a-new-library-from-scratch&quot;&gt;SymJAX pays homage to Theano in many aspects. What’s different from Theano and why not improve Theano to bring it up to date instead of creating a new library from scratch?&lt;&#x2F;h4&gt;
+&lt;p&gt;The minimalist version of SymJAX and Theano both make the user define a graph, compile it and then evaluate it. However, SymJAX offers various user-friendly features that greatly simplify its use as opposed to Theano such as&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;much simpler graph construction and monitoring with explicit shape and dtype of each node&lt;&#x2F;li&gt;
+&lt;li&gt;lazy (non compiled) partial graph evaluation (a la session.run or pytorch)&lt;&#x2F;li&gt;
+&lt;li&gt;the concept of scopes (a la Tensorflow) and node&#x2F;variable&#x2F;placeholder fetching based on their names and scopes&lt;&#x2F;li&gt;
+&lt;li&gt;utilities to save, load and reset variables and graphs&lt;&#x2F;li&gt;
+&lt;li&gt;various graph analysis tools from networkX that can be used to study the computational graph and provide in-depth structural analysis&lt;&#x2F;li&gt;
+&lt;li&gt;side utilities to allow deep learning pipelines to be built&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;The option of updating Theano was considered but would have forced to not only implement the above features (requiring some important changes in the Theano design) but would also force us to consistently keep working on the XLA interface&#x2F;compilation and on the support for the latest hardwares including not only new GPU releases but also novel hardwares like TPUs. By instead building upon Jax XLA interface, we directly benefit from the latest XLA support allowing us to focus instead on additional features and graph related utilities.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;theano-is-powerful-but-in-terms-of-popularity-it-lost-the-battle-to-the-more-high-level-tensorflow-what-is-the-user-you-have-in-mind-for-symjax-how-is-it-better-than-the-other-options&quot;&gt;Theano is powerful but in terms of popularity it lost the battle to the more high-level TensorFlow. What is the user you have in mind for SymJAX? How is it better than the other options?&lt;&#x2F;h4&gt;
+&lt;p&gt;As per the above points, I believe that Theano lost attraction due to its lack of user-friendly features making it too tedious to build a working pipeline as opposed to Tensorflow (or PyTorch) which allowed for a more flexible set-up thanks to features like automatically gathering trainable variables to be differentiated, automatically resetting all the graph variables without keeping track of them explicitly and so on. In addition Theano suffered from a very slow compilation step and often difficult GPU-support installation.&lt;&#x2F;p&gt;
+&lt;p&gt;However, none denies the benefits of Theano in term of its graph simplification abilities and its design. By combining the best of both libraries and incorporating additional JAX abilities, you obtain SymJAX which I believe will attract users from any background. In fact, one of the main effort in SymJAX is to make the symbolic programming paradigm extremely user-friendly allowing anyone to employ it with minimum burden while enjoying all the induced benefits.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;how-many-people-are-behind-this-project-are-you-looking-for-contributors&quot;&gt;How many people are behind this project? Are you looking for contributors?&lt;&#x2F;h4&gt;
+&lt;p&gt;I have been the sole contributor of this project up until recently when a geophysicist colleague stepped in. There has also been a rising interest from the PyMC developer team to see how fit would be SymJAX to replace the Theano backend they employed. This ongoing discussion also allowed for additional contributions to SymJAX. All contributions are welcome and anyone interested in getting involved more actively with this project should feel free to contact me!&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-is-symjax-s-current-status-and-plans-for-the-near-future-how-close-is-the-project-to-its-first-stable-release&quot;&gt;What is SymJAX’s current status and plans for the near future? How close is the project to its first stable release?&lt;&#x2F;h4&gt;
+&lt;p&gt;SymJAX has been unstable in its early months as many graph libraries were tested and various new features required drastic changes in the entire pipeline. We now are at a much more stable point where only a few remaining features are being tested and replaced (for example the graph visualization tool, the online data saving and visualization, and the graph canonicalization). But those changes are very localized in the library and do not break any other part of the library when changed. In its current state, SymJAX can already be used actively. In addition, the main remaining task is around documentation, and providing a rich Gallery of examples detailing all the functionalities of SymJAX. Once those changes are done, the first stable release will be published; a rough estimate would put us a few weeks away from it.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;for-our-readers-who-might-want-to-know-more-what-papers-articles-and-courses-do-you-recommend-doing-to-learn-about-symbolic-programming-and-deep-learning&quot;&gt;For our readers who might want to know more, what papers, articles and courses do you recommend doing to learn about symbolic programming and deep learning?&lt;&#x2F;h4&gt;
+&lt;p&gt;For a jump-start in deep learning, the Deep Learning book (&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.deeplearningbook.org&#x2F;&quot;&gt;https:&#x2F;&#x2F;www.deeplearningbook.org&#x2F;&lt;&#x2F;a&gt;) is complete and offers all the tricks of the trade for practitioners. For more in-depth understanding of deep networks there are way too many articles to cite so I will only refer to a few iconic ones in two topics that I particularly enjoy:&lt;&#x2F;p&gt;
+&lt;p&gt;Orbits, Groups, Invariants and Manifolds&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;yann.lecun.com&#x2F;exdb&#x2F;publis&#x2F;pdf&#x2F;simard-98.pdf&quot;&gt;http:&#x2F;&#x2F;yann.lecun.com&#x2F;exdb&#x2F;publis&#x2F;pdf&#x2F;simard-98.pdf&lt;&#x2F;a&gt; (Transformation Invariance in Pattern Recognition, Tangent Distance and Tangent Propagation)&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1602.07576.pdf&quot;&gt;https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1602.07576.pdf&lt;&#x2F;a&gt; (Group Equivariant Convolutional Networks)&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1203.1513.pdf&quot;&gt;https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1203.1513.pdf&lt;&#x2F;a&gt; (Invariant Scattering Convolution Networks)&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;ai.stanford.edu&#x2F;~ang&#x2F;papers&#x2F;nips09-MeasuringInvariancesDeepNetworks.pdf&quot;&gt;https:&#x2F;&#x2F;ai.stanford.edu&#x2F;~ang&#x2F;papers&#x2F;nips09-MeasuringInvariancesDeepNetworks.pdf&lt;&#x2F;a&gt; (Measuring Invariances in Deep Networks)&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Deep Generative Networks&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1701.00160.pdf&quot;&gt;https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1701.00160.pdf&lt;&#x2F;a&gt; (NIPS 2016 Tutorial:Generative Adversarial Networks)&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;pure.uva.nl&#x2F;ws&#x2F;files&#x2F;17891313&#x2F;Thesis.pdf&quot;&gt;https:&#x2F;&#x2F;pure.uva.nl&#x2F;ws&#x2F;files&#x2F;17891313&#x2F;Thesis.pdf&lt;&#x2F;a&gt; (Variational inference &amp;amp; deep learning)&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;blog.evjang.com&#x2F;2018&#x2F;01&#x2F;nf1.html&quot;&gt;https:&#x2F;&#x2F;blog.evjang.com&#x2F;2018&#x2F;01&#x2F;nf1.html&lt;&#x2F;a&gt; (Normalizing Flows Tutorial)&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+</content>
+        
+    </entry>
+</feed>

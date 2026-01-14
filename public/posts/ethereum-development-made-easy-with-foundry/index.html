@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum development made easy with Foundry - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Ethereum development made easy with Foundry</h1>
+        
+        <div class="page-meta">
+            <time datetime="2022-08-01">August 01, 2022</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p>As part of our trip to Devcon Amsterdam back in April, we attended the War Room Games Amsterdam competition, an Ethereum CTF where you “hacked” smart contracts to win points. The event was loads of fun, but we realized while playing that our main obstacle was not Ethereum/Solidity knowledge, but rather tooling. We knew how to hack most contracts, but struggled to do so because we lacked the right tools, relying a lot on manual Metamask or Remix interaction.</p>
+<p>This prompted us to write some <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/ethereum_war_game_tooling">basic REPL-style tool to develop, deploy and interact with smart contracts on chain</a> written in Elixir, a language we are very comfortable with. After writing its basic functionality in a weekend, we started looking for other existing tools not written in Javascript (the most well-known ones, <a rel="noopener external" target="_blank" href="https://trufflesuite.com/">Truffle</a> and <a rel="noopener external" target="_blank" href="https://hardhat.org/">Hardhat</a>, expect you to do everything in JS).</p>
+<p>Enter <a rel="noopener external" target="_blank" href="https://github.com/foundry-rs/foundry">Foundry</a>, an Ethereum toolkit written in Rust. Inspired by <a rel="noopener external" target="_blank" href="https://github.com/dapphub/dapptools">Dapp Tools</a>, it lets you write, run, test and deploy smart contracts, all in Solidity.</p>
+<h1 id="ethereum">Ethereum</h1>
+<p>Before diving into Foundry, a quick recap on Ethereum. As the leading example of blockchain’s second generation, Ethereum distinguishes itself most prominently from Bitcoin by running a full <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Virtual_machine">Virtual Machine</a> capable of (at least in theory) running any computation. This means that it is not just a public ledger for a virtual currency where users can pay each other, but also a global public computer, capable of trustlessly executing any code.</p>
+<p>Thus Ethereum transactions are not limited to <code>eth</code> exchanges, but can be any arbitrary logic, which allowed the creation of stablecoins, NFTs, DeFi or even <a rel="noopener external" target="_blank" href="https://zkga.me/">actual games</a>.</p>
+<p>For our purposes, you will need to setup an ethereum account, which you can do by downloading an Ethereum wallet like Metamask (the word “wallet” here is a bit of a misnomer, as it allows you to do more than just manage your money). Take note of your account’s private key (in Metamask, “Account details” -&gt; “Export Private Key”), as it is will be needed to send transactions to the network.</p>
+<p>NOTE: Treat this account you just created as a throwaway to play around. In a real scenario, you should never be copy pasting your private key around, as it is what makes your wallet yours.</p>
+<h1 id="foundry">Foundry</h1>
+<p>Let’s now dive into Foundry by going through an example. First, install it with</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>curl -L https://foundry.paradigm.xyz | bash</span></span>
+<span class="giallo-l"><span>foundryup</span></span></code></pre><h2 id="forge-and-cast">Forge and Cast</h2>
+<p>Foundry’s first and most important tool is <code>Forge</code>, a complete testing framework. Let’s write a very simple smart contract (taken from <a rel="noopener external" target="_blank" href="https://docs.soliditylang.org/en/v0.8.13/introduction-to-smart-contracts.html">here</a>) to see it in action.</p>
+<h2 id="creating-a-project">Creating a project</h2>
+<p>Create a new project with</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>forge init storage</span></span></code></pre>
+<p>This will create a <code>storage</code> directory with a bunch of files, the only one we care about for now is in <code>src/Contract.sol</code>. Rename that file <code>Storage.sol</code> and add the following code to it</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// SPDX-License-Identifier: UNLICENSED</span></span>
+<span class="giallo-l"><span>pragma solidity ^0.8.13;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>contract Storage {</span></span>
+<span class="giallo-l"><span>    uint256 number;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    function store(uint256 num) public {</span></span>
+<span class="giallo-l"><span>        number = num;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    function retrieve() public view returns (uint256){</span></span>
+<span class="giallo-l"><span>        return number;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The contract is self-explanatory: it stores a certain number with the <code>store(num)</code> method and returns it with <code>retrieve()</code>. Running</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>forge build</span></span></code></pre>
+<p>should tell you compilation was successful. We now have our contract compiled, but how do we run it? This is code that’s meant to be deployed on the ethereum blockchain, to be interacted with by users who send transactions. Ideally, the tests we perform should be as close as possible to this environment. One thing we can do is deploy it to a Testnet and call it from there.</p>
+<h2 id="deploying">Deploying</h2>
+<p>To deploy a contract to an ethereum network, we can use the <code>forge create</code> command. In our case, the easiest way to to interact with a testnet is (unfortunately) to use a provider like <a rel="noopener external" target="_blank" href="https://infura.io/">Infura</a> or <a rel="noopener external" target="_blank" href="https://www.alchemy.com/">Alchemy</a>. Just register with a free account and create a <code>Goerli</code> testnet application, which should give you an RPC URL to interact with said testnet that looks something like this</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>https://eth-goerli.g.alchemy.com/v2/&lt;API_KEY&gt;</span></span></code></pre>
+<p>Set the <code>ETH_RPC_URL</code> environment variable to this value to use it for all our interactions.</p>
+<p>The last thing we need is to fund our account to pay for the transactions we send. For this, look for a faucet like <a rel="noopener external" target="_blank" href="https://goerlifaucet.com/">this one</a> and request funds by pasting your address (faucets are a bit annoying in that they’re usually either very sketchy or require authentication). Having done all that, let’s deploy our <code>Storage</code> contract:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>forge create Storage --private-key &lt;your_private_key&gt;</span></span></code></pre>
+<p>If everything goes well, you should see something like</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>Deployer: &lt;your_address&gt;</span></span>
+<span class="giallo-l"><span>Deployed to: &lt;contract_address&gt;</span></span>
+<span class="giallo-l"><span>Transaction hash: &lt;transaction_hash&gt;</span></span></code></pre><h2 id="calling-our-contract">Calling our contract</h2>
+<p>To interact with our deployed contract, Foundry has a tool called <code>Cast</code>; it is a more mature CLI version of the elixir code we wrote mentioned at the beginning.</p>
+<p>We can call the <code>retrieve()</code> method by doing</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>cast call &lt;contract_address&gt; &quot;retrieve()&quot;</span></span></code></pre>
+<p>which should return</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>0x0000000000000000000000000000000000000000000000000000000000000000</span></span></code></pre>
+<p>Notice the result is in an awkward binary format; that’s because it’s <a rel="noopener external" target="_blank" href="https://docs.soliditylang.org/en/v0.8.13/abi-spec.html">ABI</a> encoded. If we also provide the return type of the method, <code>cast</code> will decode it for us:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>cast call &lt;contract_address&gt; &quot;retrieve()(uint256)&quot;</span></span>
+<span class="giallo-l"><span>0</span></span></code></pre>
+<p>To call the <code>store</code> method, we need to use <code>cast send</code> instead of <code>call</code>. This is because <code>retrieve</code> is a method that does not modify any blockchain state, it just reads it. On the other hand, <code>store</code> does modify state, which requires sending an actual <code>transaction</code> to our contract so that, when it gets included in a block, the <code>store</code> method is run and the state of our variable is updated and stored in the network.</p>
+<p>All that said, to run <code>store</code> we do</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>cast send &lt;contract-address&gt; --private-key &lt;your_private_key&gt; &quot;store(uint256)&quot; 5</span></span></code></pre>
+<p>which, after a while, should return a transacion receipt with all the info about the transaction, and the <code>number</code> variable should now be updated to be <code>5</code>. We can verify that by running again</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>cast call &lt;contract_address&gt; &quot;retrieve()(uint256)&quot;</span></span>
+<span class="giallo-l"><span>5</span></span></code></pre><h2 id="writing-tests">Writing tests</h2>
+<p>We just verified that our contract worked as expected, though it was a bit cumbersome; the problem with trying out smart contracts, as opposed to more traditional development environments, is that most of the code that matters has to go through a transaction on the blockchain. This is a very slow process, so while the above works, it quickly becomes annoying as the code becomes more complex code and starts interacting with other contracts.</p>
+<p>Forge allow us to write tests running in a simulated blockchain environment, with the ability to manipulate it to recreate any situation we want.</p>
+<p>To keep things simple, we will add a test to the same file we were using before, though typically tests go on separate files. At the bottom of <code>Storage.sol</code>, add:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>import &quot;forge-std/Test.sol&quot;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>contract StorageTest is Test {</span></span>
+<span class="giallo-l"><span>    Storage storageContract;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    function setUp() public {</span></span>
+<span class="giallo-l"><span>        storageContract = new Storage();</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    function testSetWorks() public {</span></span>
+<span class="giallo-l"><span>        assertEq(storageContract.retrieve(), 0);</span></span>
+<span class="giallo-l"><span>        storageContract.store(5);</span></span>
+<span class="giallo-l"><span>        assertEq(storageContract.retrieve(), 5);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Notice this is just another contract written in solidity, only we imported the <code>forge-std/Test.sol</code>, which contains all the test code and utilities, like assertions and logging.</p>
+<p>The <code>setUp</code> function runs before every test, and in this case just deploys a <code>Storage</code> contract so that we can call it. The test itself is in the <code>testSetWorks()</code> (test methods must start with the word <code>test</code>), and it does the same thing we did above, only in the blockchain environment provided by Forge.</p>
+<p>Running <code>forge test</code> should print the following</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>Running 1 test for src/Storage.sol:StorageTest</span></span>
+<span class="giallo-l"><span>[PASS] testSetWorks() (gas: 32478)</span></span>
+<span class="giallo-l"><span>Test result: ok. 1 passed; 0 failed; finished in 323.17µs</span></span></code></pre><h2 id="printing-and-events">Printing and events</h2>
+<p>A very common problem developers new to Ethereum run into is printing variables for debugging. Again, because our code is meant to be run on the Ethereum virtual machine on-chain, printing to standard output isn’t something baked into the language. Some people get around it by manually emitting <a rel="noopener external" target="_blank" href="https://ethereum.org/es/developers/tutorials/logging-events-smart-contracts/">Events</a>, but this is very cumbersome.</p>
+<p>The Forge Test contract gives us <code>console.log</code> methods to print out values when running tests. If we add a log statement to our test, like so</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>function testSetWorks() public {</span></span>
+<span class="giallo-l"><span>    assertEq(storageContract.retrieve(), 0);</span></span>
+<span class="giallo-l"><span>    storageContract.store(5);</span></span>
+<span class="giallo-l"><span>    uint256 result = storageContract.retrieve();</span></span>
+<span class="giallo-l"><span>    assertEq(result, 5);</span></span>
+<span class="giallo-l"><span>    console.log(result);</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>and run the tests again with a verbosity of two (<code>forge test -vv</code>) we should see</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>Running 1 test for src/Storage.sol:StorageTest</span></span>
+<span class="giallo-l"><span>[PASS] testSetWorks() (gas: 31774)</span></span>
+<span class="giallo-l"><span>Logs:</span></span>
+<span class="giallo-l"><span>  5</span></span></code></pre>
+<p>and our variable gets printed. Under the hood, what’s happening here is <code>console.log</code> emits actual ethereum events (the ones mentioned above) in Forge’s execution environment, which Forge are then captured and printed out.</p>
+<p>Note that we could have added calls to <code>console.log</code> to our regular non-test code, and we would have seen those logs when running tests as well.</p>
+<h2 id="traces-and-gas-estimation">Traces and gas estimation</h2>
+<p>In the last section we used the <code>-vv</code> flag when running tests to show logs, but the verbosity level can go up to five. Running <code>forge test -vvvvv</code> should return something like this:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>Traces:</span></span>
+<span class="giallo-l"><span>  [88926] StorageTest::setUp()</span></span>
+<span class="giallo-l"><span>    ├─ [34487] → new Storage@&quot;0xce71…c246&quot;</span></span>
+<span class="giallo-l"><span>    │   └─ ← 172 bytes of code</span></span>
+<span class="giallo-l"><span>    └─ ← ()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  [31774] StorageTest::testSetWorks()</span></span>
+<span class="giallo-l"><span>    ├─ [2246] Storage::retrieve() [staticcall]</span></span>
+<span class="giallo-l"><span>    │   └─ ← 0</span></span>
+<span class="giallo-l"><span>    ├─ [20212] Storage::store(5)</span></span>
+<span class="giallo-l"><span>    │   └─ ← ()</span></span>
+<span class="giallo-l"><span>    ├─ [246] Storage::retrieve() [staticcall]</span></span>
+<span class="giallo-l"><span>    │   └─ ← 5</span></span>
+<span class="giallo-l"><span>    ├─ [0] console::f5b1bba9(0000000000000000000000000000000000000000000000000000000000000005) [staticcall]</span></span>
+<span class="giallo-l"><span>    │   └─ ← ()</span></span>
+<span class="giallo-l"><span>    └─ ← ()</span></span></code></pre>
+<p>This shows the stack trace of every test, each function call also showing its associated <code>gas</code> cost. Recall <code>gas</code> in ethereum is a measure of the cost of execution of a certain operation; the higher it is the more computationally expensive a bunch of code is. Because <code>gas</code> is ultimately paid in real money, optimizing it becomes extremely important.</p>
+<p>In this case we can see that a call to <code>store</code> is an order of magnitude more expensive than <code>retrieve</code>, i.e., storing data is much more expensive than just reading it. Additionally, the second call to <code>retrieve</code> was 10x cheaper than the first one. This is no bug, the EVM reduces the cost of a storage read if the variable in question has already been read from (i.e. if the variable is <code>hot</code>).</p>
+<h2 id="closing-thoughts">Closing thoughts</h2>
+<p>Foundry has a lot more features including fuzz testing, forking from live networks, an array of cheatcodes, and the list goes on. For a deeper dive we highly recommend going directly to the <a rel="noopener external" target="_blank" href="https://book.getfoundry.sh/">Foundry book</a>, it is very easy to follow and has some thorough tutorials.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

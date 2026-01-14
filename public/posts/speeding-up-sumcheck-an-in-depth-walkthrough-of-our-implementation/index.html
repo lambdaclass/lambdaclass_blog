@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speeding up sumcheck for Ethereum&#x27;s Lean zkVM: an in-depth walkthrough of our implementation - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Speeding up sumcheck for Ethereum&#x27;s Lean zkVM: an in-depth walkthrough of our implementation</h1>
+        
+        <div class="page-meta">
+            <time datetime="2025-11-28">November 28, 2025</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>In this post, we’ll present an in-depth walkthrough of our implementation of the sumcheck optimizations proposed by Bagad, Dao, Domb, and Thaler (BDDT) in their <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2025/1117">paper</a>. In previous posts, we’ve explained the main theoretical ideas (see <a href="/optimizing-sumcheck/">part I</a> and <a href="/how-factoring-equality-polynomials-optimizes-sumcheck/">part II</a>). Here, we dive deep into the implementation details, showing exactly how we implemented <em>Algorithm 6</em> from that paper within the <a rel="noopener external" target="_blank" href="https://github.com/tcoratger/whir-p3">whir-p3</a> repository.</p>
+<p>This work was motivated by the Lean Ethereum team, which uses Whirlaway, a multilinear protocol that relies on Whir as its Polynomial Commitment Scheme (PCS). The team identified that the sumcheck protocol could benefit from existing optimizations (<a rel="noopener external" target="_blank" href="https://github.com/tcoratger/whir-p3/issues/280">see issue #280</a>). To address this, we stepped in to implement the BDDT optimizations in their codebase.</p>
+<p><strong>Disclaimer:</strong> The code snippets presented in this post correspond to the implementation merged in this <a rel="noopener external" target="_blank" href="https://github.com/tcoratger/whir-p3/pull/322">PR</a>. While the whir-p3 repository is under active and constant development, we have chosen to analyze this specific snapshot because it offers the highest didactic clarity. <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/whir-p3/tree/eec71d03a5ec81f30acc6d591f42f318941c6df5">This version</a> — which you can find in our repository fork — maintains a faithful one-to-one mapping with the theoretical concepts of the BDDT paper, making it the ideal reference for understanding the core logic before further engineering optimizations are applied.</p>
+<h2 id="i-the-core-idea-delaying-expensive-field-arithmetic">I. The Core Idea: Delaying Expensive Field Arithmetic</h2>
+<p>The naive sumcheck prover forces expensive extension field arithmetic too early. The goal of the BDDT optimizations is simple: <strong>delay the introduction of extension field operations as long as possible</strong>.</p>
+<h3 id="extension-field-computation">Extension Field Computation</h3>
+<p>In systems like Jolt (which motivated the paper) or Whir, the underlying computation (e.g., an execution trace) operates over small base field values—32-bit or 64-bit integers. However, cryptographic security requires the sumcheck protocol to use extension field random challenges. In our implementation, we work with base fields like <em>Baby Bear</em> (31-bit), <em>Koala Bear</em> , or <em>Goldilocks</em> (64-bit), along with their extensions (e.g., <code>BinomialExtensionField&lt;BabyBear, 4&gt;</code>).</p>
+<p>The performance gap between these operations is dramatic. The BDDT paper introduces a precise cost model:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **𝔰𝔰 (small-small)** : Multiplying two base field elements, e.g., `BabyBear * BabyBear`. This is the fastest—just a single base field multiplication.</span></span>
+<span class="giallo-l"><span>    * **𝔰𝔩 (small-large)** : Multiplying a base field element by an extension field element, e.g., `BabyBear * BinomialExtensionField&lt;BabyBear, 4&gt;` requires 4 base field multiplications (one per extension coefficient).</span></span>
+<span class="giallo-l"><span>    * **𝔩𝔩 (large-large)** : Multiplying two extension field elements, e.g., `BinomialExtensionField&lt;BabyBear, 4&gt; * BinomialExtensionField&lt;BabyBear, 4&gt;` is dramatically slower, requiring 16 base field multiplications plus additional operations—often an order of magnitude slower than 𝔰𝔰.</span></span></code></pre><h3 id="the-cost-problem">The Cost Problem</h3>
+<p>The naive (or classical) sumcheck prover (<em>Algorithm 1</em> in the paper) suffers from premature extension field propagation:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * **Round 1** : The prover computes sums of products of base field values—all cheap 𝔰𝔰 operations.</span></span>
+<span class="giallo-l"><span>    * **Round 2 onward** : The verifier sends a random challenge $r_1 \in \mathbb{F_{\text{ext}}}$, an extension field element. This forces all subsequent computations to use extension field arithmetic. From this point on, the prover must perform expensive 𝔩𝔩 operations for all remaining rounds.</span></span></code></pre>
+<p><strong>The key insight:</strong> Delay this transition as long as possible. It is better to perform more operations, but in the base field. That’s the whole idea.</p>
+<h2 id="ii-the-two-optimizations-svo-and-eq-poly">II. The Two Optimizations: SVO and Eq-Poly</h2>
+<p><em>Algorithm 6</em> synthesizes two complementary optimizations. Understanding each in isolation clarifies how they work together.</p>
+<h3 id="a-small-value-optimization-svo">A. Small Value Optimization (SVO)</h3>
+<p>The Small Value Optimization (<em>Algorithm 4</em>) is a computational strategy: <strong>to delay extension field operations</strong>.</p>
+<p>A naive approach (<em>Algorithm 3</em>) would expand the polynomial into $\mathcal{O}( 2^{ d \cdot \ell_0})$ terms to keep base field and extension field components separated. This is exponentially expensive and infeasible for practical values.</p>
+<p><strong>The SVO insight:</strong> Use <strong>Lagrange Interpolation</strong> instead of expansion. This is the same principle behind Toom-Cook multiplication. By treating the round polynomial as something to be interpolated (from a small number of evaluation points) rather than expanded (into exponentially many monomials), we reduce precomputation cost from $\mathcal{O} (2^{ d \cdot \ell_0})$ to $\mathcal{O}(( d + 1)^{ \ell_0})$.</p>
+<p>You can see <a href="/optimizing-sumcheck/">part I</a> of our series for the intuition behind this optimization.</p>
+<h3 id="b-eq-poly-optimization-algorithm-5">B. Eq-Poly Optimization (Algorithm 5)</h3>
+<p>The second optimization (<em>Algorithm 5</em>) addresses the specific case</p>
+<p>$$<br />
+g(X) = \mathrm{eq}(w, X)p(X).<br />
+$$</p>
+<p>It is based on Gruen’s optimization, and the idea is to reduce 𝔩𝔩 multiplications associated with the $\mathrm{eq}$ polynomial.</p>
+<p>Instead of summing over all remaining variables at once, the algorithm “splits the sum” into two halves.</p>
+<p>See <a href="/how-factoring-equality-polynomials-optimizes-sumcheck/">part II</a> of our series for the full explanation.</p>
+<h2 id="iii-the-protocol-architecture-two-phase-strategy">III. The Protocol Architecture: Two-Phase Strategy</h2>
+<p>Our implementation is essentially encapsulated within the function <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/whir-p3/blob/eec71d03a5ec81f30acc6d591f42f318941c6df5/src/sumcheck/sumcheck_single_svo.rs#L22"><code>from_base_evals_svo</code></a>, which is called by the prover to execute the sumcheck protocol following <em>Algorithm 6</em>. It combines both SVO and Eq-Poly optimization. In our implementation, we chose:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\ell_0 = 3$: We just do three SVO rounds since this optimization is efficient only for a few rounds, as we&#39;ll explain in detail later on.</span></span>
+<span class="giallo-l"><span>    * $d = 1$: We only accept one multilinear polynomial, instead of a product of polynomials as shown in the BDDT paper. This choice is due to the fact that in the use case that interests us (that is, in the context of Whir) we only have one polynomial.</span></span></code></pre>
+<p>Given the base field evaluations of the multilinear polynomial $p$ on the hypercube (<code>evals</code>) and an eq-poly constraint (<code>constraint</code>), it applies a certain number of sumcheck rounds (<code>folding_factor</code>), returning a new <code>SumcheckSingle</code> and the challenges used.</p>
+<p>It is important to point out that this implementation is designed for a <code>folding_factor</code> greater than 5 and a <code>constraint</code> containing only <strong>one equality statement</strong> , since we want to use Whir as a PCS.</p>
+<p>So, the goal of this function is to prove an equality constraint</p>
+<p>$$<br />
+\sigma = p(w),<br />
+$$</p>
+<p>where we can rewrite the evaluation as a sum:</p>
+<p>$$<br />
+p(w) = \sum_{x \in \{0, 1\}^\ell} \mathrm{eq}(w, x) p(x).<br />
+$$</p>
+<p>The core insight of this algorithm: <strong>use different strategies for different phases</strong>. Here’s the high-level structure:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>/// Run a Sumcheck prover following Algorithm 6.</span></span>
+<span class="giallo-l"><span>pub fn from_base_evals_svo&lt;Challenger&gt;(</span></span>
+<span class="giallo-l"><span>    evals: &amp;EvaluationsList&lt;F&gt;,</span></span>
+<span class="giallo-l"><span>    prover_state: &amp;mut ProverState&lt;F, EF, Challenger&gt;,</span></span>
+<span class="giallo-l"><span>    folding_factor: usize,</span></span>
+<span class="giallo-l"><span>    pow_bits: usize,</span></span>
+<span class="giallo-l"><span>    constraint: &amp;Constraint&lt;F, EF&gt;,</span></span>
+<span class="giallo-l"><span>) -&gt; (Self, MultilinearPoint&lt;EF&gt;) {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut challenges = Vec::with_capacity(folding_factor);</span></span>
+<span class="giallo-l"><span>    // Here we are assuming the equality statement has only one constraint.</span></span>
+<span class="giallo-l"><span>    let mut sum = constraint.eq_statement.evaluations[0];</span></span>
+<span class="giallo-l"><span>    let w = &amp;constraint.eq_statement.points[0];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Create the unified equality polynomial evaluator</span></span>
+<span class="giallo-l"><span>    let mut eq_poly = SumcheckEqState::&lt;_, NUM_SVO_ROUNDS&gt;::new(w);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // --- PHASE 1: SVO for first 3 rounds ---</span></span>
+<span class="giallo-l"><span>    let (r_1, r_2, r_3) = svo_three_rounds(prover_state, evals, w, &amp;mut sum, pow_bits);</span></span>
+<span class="giallo-l"><span>    challenges.extend([r_1, r_2, r_3]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // --- THE SWITCHOVER: Fold polynomial with the 3 challenges ---</span></span>
+<span class="giallo-l"><span>    // We fold to obtain p(r1, r2, r3, x).</span></span>
+<span class="giallo-l"><span>    let mut folded_evals = fold_evals_with_challenges(evals, &amp;challenges);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // --- PHASE 2: Algorithm 5 for remaining rounds ---</span></span>
+<span class="giallo-l"><span>    algorithm_5(prover_state, &amp;mut folded_evals, w, &amp;mut challenges, &amp;mut sum, pow_bits);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let challenge_point = MultilinearPoint::new(challenges);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Final weight: eq(w, r)</span></span>
+<span class="giallo-l"><span>    let weights = EvaluationsList::new(vec![w.eq_poly(&amp;challenge_point)]);</span></span>
+<span class="giallo-l"><span>    let sumcheck = Self::new(folded_evals, weights, sum);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    (sumcheck, challenge_point)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Let’s explain each phase in detail.</p>
+<h2 id="iv-phase-1-the-first-three-rounds">IV. Phase 1: The First Three Rounds</h2>
+<p>The first three sumcheck rounds are implemented by <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/whir-p3/blob/eec71d03a5ec81f30acc6d591f42f318941c6df5/src/sumcheck/sumcheck_small_value.rs#L220"><code>svo_three_rounds</code></a>. In each round $i$, the prover needs to:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Compute the univariate polynomial evaluations $S_i (0)$ and $S_i (\infty)$ (i.e., the leading coefficient).</span></span>
+<span class="giallo-l"><span>    * Add these evaluations to the prover state.</span></span>
+<span class="giallo-l"><span>    * Sample a new challenge $r_i$.</span></span>
+<span class="giallo-l"><span>    * Fold the polynomial $p$.</span></span>
+<span class="giallo-l"><span>    * Update the claimed sum $\sigma$.</span></span></code></pre>
+<p>The only heavy step is the first one. We want the prover to compute $S_i$ efficiently. That is where SVO comes into play.</p>
+<h3 id="factoring-the-univariate-round-polynomial">Factoring the Univariate Round Polynomial</h3>
+<p>Recall that the claimed sum we want to prove is:</p>
+<p>$$<br />
+\sigma = p(w) = \sum_{x \in \{0, 1\}^\ell} \mathrm{eq}(w, x) p(x).<br />
+$$</p>
+<p>Then, for each round $i$, the prover needs to compute the univariate round polynomial $S_i (u)$ where:</p>
+<p>$$<br />
+S_i(u) = \sum_{x \in \{0, 1\}^{ \ell - i}} \mathrm{eq} \bigl(w_{[1, i -1]} ; r_{[1, i - 1]}, u, x\bigr) \cdot p(r_{[1, i - 1]}, u, x).<br />
+$$</p>
+<p>Splitting the eq-poly, we can factorize $S_i$ in the following way, with $\ell$ the easy part and $t$ the hard part:</p>
+<p>$$<br />
+\begin{aligned}<br />
+S_i(u) &amp;= \ell_i(u) t_i(u), \newline<br />
+\ell_i(u) &amp;=<br />
+\mathrm{eq}\bigl(w_{[1,i - 1]} ; r_{[1,i - 1]}\bigr)<br />
+\mathrm{eq}(w_i; u), \newline<br />
+t_i(u) &amp;=<br />
+\sum_{x \in \{0,1 \}^{\ell - i}}<br />
+\mathrm{eq}\bigl(w_{[i+1,\ell]}; x\bigr)<br />
+p(r_{[1,i - 1]}, u, x).<br />
+\end{aligned}<br />
+$$</p>
+<p>where:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $\ell_i(u)$ is the **linear part** : it comes from the eq-poly portion for variables $1$ to $i$. This is a linear polynomial in $u$ and is easy to compute.</span></span>
+<span class="giallo-l"><span>    * $t_i(u)$ is the **heavy part** : it incorporates the sum over all remaining variables $x$ as well as the polynomial $p$. This is where all the complexity lives.</span></span></code></pre>
+<p>Note that computing $\ell_i (0)$ and $\ell_i(1)$ is essentially “free”, but computing $t_i(0)$ and $t_i(1)$ naively would require summing over exponentially many terms. That’s where <strong>accumulators</strong> come in.</p>
+<h3 id="accumulator-computation-procedure-9">Accumulator Computation (Procedure 9)</h3>
+<p>The “heavy part” $t_i (u)$ is where SVO (<em>Algorithm 4</em>) and Eq-Poly (<em>Algorithm 5</em>) combine. We apply the Toom-Cook insight by using Lagrange interpolation on the challenges $r_{[1, i - 1]}$ and the sum-splitting insight on the remaining variables $x$.</p>
+<p>This gives us the reformulation of $t_i(u)$ in terms of the precomputed accumulators $A_i(v, u)$:</p>
+<p>$$<br />
+t_i(u) =<br />
+\sum_{v \in \{0, 1\}^{i - 1}}<br />
+L_v(r_{[1, i - 1]}) \cdot<br />
+\underbrace{<br />
+\left(<br />
+\sum_{x_L} \mathrm{eq}(w_{[i + 1, \ell/2]}; x_L)<br />
+\sum_{x_R} \mathrm{eq}(w_{[\ell/2 + 1, \ell]}; x_R)<br />
+\cdot p(v, u, x_L, x_R)<br />
+\right)<br />
+}_{A_i(v, u)}<br />
+$$</p>
+<p>Here, $L_v$ is the Lagrange basis polynomial. This formula is the core of <em>Algorithm 6</em> ’s precomputation. The “how” of computing these $A_i(v,u)$ accumulators is <em>Procedure 9</em>.</p>
+<p>We can rewrite the inner part of the previous equation in the following way:</p>
+<p>$$<br />
+\begin{aligned}<br />
+A_i(v,u) =<br />
+\sum_{y \in {0,1}^{\ell_0 - i}}<br />
+\sum_{x_{\mathrm{out}} \in {0,1}^{\ell/2 - \ell_0}}<br />
+\mathrm{eq} \left(<br />
+\left( w_{[(i + 1):\ell_0]}, w_{[(\ell/2 + \ell_0+1):]} \right),<br />
+(y, x_{\mathrm{out}})<br />
+\right)<br />
+\cdot \newline<br />
+\sum_{x_{\mathrm{in}} \in \{0 , 1 \}^{ \ell/2 }}<br />
+\mathrm{eq} \left(<br />
+w_{[(\ell_0+1):(\ell_0+\ell/2)]}, x_{\mathrm{in}}<br />
+\right)<br />
+\cdot<br />
+p \left( v,u,y,, x_{\mathrm{in}}, x_{\mathrm{out}} \right)<br />
+\end{aligned}<br />
+$$</p>
+<p>In the paper, we can see that <em>Procedure 9</em> cleverly inverts the loops: instead of iterating by accumulator $A_i(v,u)$, it iterates over the data $(x_{\mathrm{out}}, x_{\mathrm{in}}, \beta)$ and “distributes” each result to the correct $A_i(v,u)$ bin. This is done in two stages:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. **Temporal Accumulation** ($\mathrm{tA}[\beta]$): For a fixed $x_{\mathrm{out}}$, the algorithm computes the entire inner sum for every prefix $\beta \in \\{0,1 \\}^{ \ell_0 }$. This loop contains the dominant 𝔰𝔩 operation: `e_in_value * poly_evals[index]`.</span></span></code></pre>
+<p>$$<br />
+\mathrm{tA}[\beta] =<br />
+\sum_{x_{\mathrm{in}} \in \{0,1\}^{ \ell/2}}<br />
+E_{\mathrm{in}}[x_{\mathrm{in}}] \cdot<br />
+p(\beta, x_{\mathrm{in}}, x_{\mathrm{out}})<br />
+$$</p>
+<p>$$<br />
+E_{\mathrm{in}}[x_{\mathrm{in}}]<br />
+=\mathrm{eq} \left(w_{[(\ell_0 + 1):(\ell_0 + \ell/2)]}, x_{\mathrm{in}}\right)<br />
+$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    2. **Distribution** : Once the $\mathrm{tA}$ vector is computed, the algorithm &quot;distributes&quot; these values to the correct final accumulators $A_i (v,u)$, multiplying them by their respective $E_{\mathrm{out}}$ weights.</span></span></code></pre>
+<p>Let’s dive into our implementation.</p>
+<p>First, we have an <code>Accumulators</code> struct where we store the values, along with a couple of basic methods to create, modify, and read them:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>#[derive(Debug, Clone, Eq, PartialEq)]</span></span>
+<span class="giallo-l"><span>pub struct Accumulators&lt;F: Field&gt; {</span></span>
+<span class="giallo-l"><span>    /// One accumulator vector per SVO round.</span></span>
+<span class="giallo-l"><span>    /// - `accumulators[0]` has 2^1 = 2 elements for A_0(u)</span></span>
+<span class="giallo-l"><span>    /// - `accumulators[1]` has 2^2 = 4 elements for A_1(v, u)</span></span>
+<span class="giallo-l"><span>    /// - `accumulators[2]` has 2^3 = 8 elements for A_2(v, u)</span></span>
+<span class="giallo-l"><span>    pub accumulators: [Vec&lt;F&gt;; NUM_SVO_ROUNDS],</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl&lt;F&gt; Accumulators&lt;F&gt;</span></span>
+<span class="giallo-l"><span>where</span></span>
+<span class="giallo-l"><span>    F: Field,</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    #[must_use]</span></span>
+<span class="giallo-l"><span>    pub fn new_empty() -&gt; Self {</span></span>
+<span class="giallo-l"><span>        Self {</span></span>
+<span class="giallo-l"><span>            // In round 0, we have 2 accumulators: A_0(u) with u in {0, 1}.</span></span>
+<span class="giallo-l"><span>            // In round 1, we have 4 accumulators: A_1(v, u) with v in {0, 1} and u in {0, 1}.</span></span>
+<span class="giallo-l"><span>            // In round 2, we have 8 accumulators: A_2(v, u) with v in {0, 1}^2 and u in {0, 1}.</span></span>
+<span class="giallo-l"><span>            // We won&#39;t need accumulators with any digit as infinity.</span></span>
+<span class="giallo-l"><span>            accumulators: [F::zero_vec(2), F::zero_vec(4), F::zero_vec(8)],</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Adds a value to a specific accumulator.</span></span>
+<span class="giallo-l"><span>    pub fn accumulate(&amp;mut self, round: usize, index: usize, value: F) {</span></span>
+<span class="giallo-l"><span>        self.accumulators[round][index] += value;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    /// Gets the slice of accumulators for a given round.</span></span>
+<span class="giallo-l"><span>    #[must_use]</span></span>
+<span class="giallo-l"><span>    pub fn get_accumulators_for_round(&amp;self, round: usize) -&gt; &amp;[F] {</span></span>
+<span class="giallo-l"><span>        &amp;self.accumulators[round]</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Notice that in the code we only compute the accumulators for $u \in \{0,1 \}$, even though initially, since $S(u)$ has degree 2, we should have three evaluations: at $0$, $1$, and at $\infty$. We’ll explain this later on.</p>
+<p>So let’s see how we adapt <em>Procedure 9</em> to our specific use case.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>/// Procedure 9. Page 37.</span></span>
+<span class="giallo-l"><span>/// We compute only the accumulators that we&#39;ll use, that is,</span></span>
+<span class="giallo-l"><span>/// A_i(v, u) for i in {0, 1, 2}, v in {0, 1}^{i}, and u in {0, 1}.</span></span>
+<span class="giallo-l"><span>fn compute_accumulators&lt;F: Field, EF: ExtensionField&lt;F&gt;&gt;(</span></span>
+<span class="giallo-l"><span>    poly: &amp;EvaluationsList&lt;F&gt;,</span></span>
+<span class="giallo-l"><span>    e_in: &amp;[EF],</span></span>
+<span class="giallo-l"><span>    e_out: &amp;[Vec&lt;EF&gt;; NUM_SVO_ROUNDS],</span></span>
+<span class="giallo-l"><span>) -&gt; Accumulators&lt;EF&gt; {</span></span>
+<span class="giallo-l"><span>    [...]</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The function receives as input the evaluations of $p(x)$, $E_{\mathrm{in}}$, and $E_{\mathrm{out}}$.</p>
+<p>We can see in the paper that these are computed as follows:</p>
+<p>$$<br />
+E_{\text{in}} :=\left(\mathrm{eq} \left(<br />
+w_{\left[\ell_0 + 1 : (\ell_0 + \ell/2)\right]}, x_{\text{in}}<br />
+\right) \right) \quad \text{with} \quad { x_{\text{in } } \in \{0,1 \}^{ \ell/2 }}<br />
+$$</p>
+<p>$$<br />
+E_{\text{out},i} := \left( \mathrm{eq} \left(<br />
+\left( w_{\left[(i+1):\ell_0\right]}, w_{\left[(\ell/2+\ell_0+1):\right]} \right),<br />
+(y, x_{\text{out}})<br />
+\right)<br />
+\right)\quad \text{with} \quad {(y, x_{ \text{out} }) \in \{0, 1\}^{ \ell_0 } \times \{0, 1 \}^{ \ell/2 - \ell_0 }}<br />
+$$</p>
+<p>These values depend only on our challenge $w$, so we can precompute them as follows:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>/// Precomputation needed for Procedure 9 (compute_accumulators).</span></span>
+<span class="giallo-l"><span>/// Compute the evaluations eq(w_{l0 + 1}, ..., w_{l0 + l/2} ; x) for all x in {0,1}^l/2</span></span>
+<span class="giallo-l"><span>fn precompute_e_in&lt;F: Field&gt;(w: &amp;MultilinearPoint&lt;F&gt;) -&gt; Vec&lt;F&gt; {</span></span>
+<span class="giallo-l"><span>    let half_l = w.num_variables() / 2;</span></span>
+<span class="giallo-l"><span>    let w_in = &amp;w.0[NUM_SVO_ROUNDS..NUM_SVO_ROUNDS + half_l];</span></span>
+<span class="giallo-l"><span>    eval_eq_in_hypercube(w_in)</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>/// Precomputation needed for Procedure 9 (compute_accumulators).</span></span>
+<span class="giallo-l"><span>/// Compute three E_out vectors, one per round i in {0, 1, 2}.</span></span>
+<span class="giallo-l"><span>/// For each i, E_out = eq(w_{i+1}, ..., l0, w_{l/2 + l0 + 1}, ..., w_l ; x)</span></span>
+<span class="giallo-l"><span>fn precompute_e_out&lt;F: Field&gt;(w: &amp;MultilinearPoint&lt;F&gt;) -&gt; [Vec&lt;F&gt;; NUM_SVO_ROUNDS] {</span></span>
+<span class="giallo-l"><span>    let half_l = w.num_variables() / 2;</span></span>
+<span class="giallo-l"><span>    let w_out_len = w.num_variables() - half_l - 1;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    std::array::from_fn(|round| {</span></span>
+<span class="giallo-l"><span>        let mut w_out = Vec::with_capacity(w_out_len);</span></span>
+<span class="giallo-l"><span>        w_out.extend_from_slice(&amp;w.0[round + 1..NUM_SVO_ROUNDS]);</span></span>
+<span class="giallo-l"><span>        w_out.extend_from_slice(&amp;w.0[half_l + NUM_SVO_ROUNDS..]);</span></span>
+<span class="giallo-l"><span>        eval_eq_in_hypercube(&amp;w_out)</span></span>
+<span class="giallo-l"><span>    })</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Once we have computed these values, we can return to our <code>compute_accumulators</code> function.</p>
+<p>The first thing we do is compute the number of variables in $x_{\mathrm{out}}$ as $\ell/2 - \ell_0$, where $\ell$ is the number of variables of $p(X)$ and $\ell_0$ is the number of SVO rounds, taking into account the case where $\ell$ is odd.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>[...]</span></span>
+<span class="giallo-l"><span>    let l = poly.num_variables();</span></span>
+<span class="giallo-l"><span>    let half_l = l / 2;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let x_out_num_vars = half_l - NUM_SVO_ROUNDS + (l % 2);</span></span>
+<span class="giallo-l"><span>    let x_num_vars = l - NUM_SVO_ROUNDS;</span></span>
+<span class="giallo-l"><span>    debug_assert_eq!(half_l + x_out_num_vars, x_num_vars);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let poly_evals = poly.as_slice();</span></span>
+<span class="giallo-l"><span>    [...]</span></span></code></pre>
+<p>Now we can run the outer loop, where for each value of $x_{\mathrm{out}}$ we will:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Initialize the temporary accumulators and compute the number of variables in $x_{\mathrm{in}}$:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>(0..1 &lt;&lt; x_out_num_vars)</span></span>
+<span class="giallo-l"><span>        .into_par_iter()</span></span>
+<span class="giallo-l"><span>        .map(|x_out| {</span></span>
+<span class="giallo-l"><span>            // Each thread will compute its own set of local accumulators.</span></span>
+<span class="giallo-l"><span>            // This avoids mutable state sharing and the need for locks.</span></span>
+<span class="giallo-l"><span>            let mut local_accumulators = Accumulators::&lt;EF&gt;::new_empty();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            let mut temp_accumulators = [EF::ZERO; 1 &lt;&lt; NUM_SVO_ROUNDS];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            let num_x_in = 1 &lt;&lt; half_l;</span></span>
+<span class="giallo-l"><span>        })</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    2. For each value of $x_{\mathrm{in}}$ we compute the $\mathrm{tA}$ values using:</span></span></code></pre>
+<p>$$<br />
+\mathrm{tA}(x_{\mathrm{out}}) =<br />
+\sum_{\beta \in \{0,1 \}^{3}}<br />
+E_{\mathrm{in}}[x_{\mathrm{in}}] \cdot p(\beta, x_{\mathrm{in}}, x_{\mathrm{out}})<br />
+$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>for (x_in, &amp;e_in_value) in e_in.iter().enumerate().take(num_x_in) {</span></span>
+<span class="giallo-l"><span>                // For each beta in {0,1}^3, we update tA(beta) += e_in[x_in] * p(beta, x_in, x_out)</span></span>
+<span class="giallo-l"><span>                #[allow(clippy::needless_range_loop)]</span></span>
+<span class="giallo-l"><span>                for i in 0..(1 &lt;&lt; NUM_SVO_ROUNDS) {</span></span>
+<span class="giallo-l"><span>                    let beta = i &lt;&lt; x_num_vars;</span></span>
+<span class="giallo-l"><span>                    let index = beta | (x_in &lt;&lt; x_out_num_vars) | x_out; // beta | x_in | x_out</span></span>
+<span class="giallo-l"><span>                    temp_accumulators[i] += e_in_value * poly_evals[index]; // += e_in[x_in] * p(beta, x_in, x_out)</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    3. Once we have all the temporary accumulators, we unpack them and collect all the $E_{\mathrm{out}}$ values we will need.</span></span></code></pre>
+<p>Remember that $E_{\mathrm{out}}$ depends only on $y$. So in the first round, $y$ has 2 variables, giving us 4 possible $E_{\mathrm{out}}$ values. In the second round, $y$ has 1 variable, so there are 2 possible $E_{\mathrm{out}}$ values. In the third round, it does not depend on $y$, so we have a single $E_{\mathrm{out}}$ value.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Destructure things since we will access them many times later</span></span>
+<span class="giallo-l"><span>    let [t0, t1, t2, t3, t4, t5, t6, t7] = temp_accumulators;</span></span>
+<span class="giallo-l"><span>    // Get E_out(y, x_out) for this x_out</span></span>
+<span class="giallo-l"><span>    // Round 0 (i=0) -&gt; y=(b1,b2) -&gt; 2 bits</span></span>
+<span class="giallo-l"><span>    let e0_0 = e_out[0][x_out]; // y=00</span></span>
+<span class="giallo-l"><span>    let e0_1 = e_out[0][(1 &lt;&lt; x_out_num_vars) | x_out]; // y=01</span></span>
+<span class="giallo-l"><span>    let e0_2 = e_out[0][(2 &lt;&lt; x_out_num_vars) | x_out]; // y=10</span></span>
+<span class="giallo-l"><span>    let e0_3 = e_out[0][(3 &lt;&lt; x_out_num_vars) | x_out]; // y=11</span></span>
+<span class="giallo-l"><span>    // Round 1 (i=1) -&gt; y=(b2) -&gt; 1 bit</span></span>
+<span class="giallo-l"><span>    let e1_0 = e_out[1][x_out]; // y=0</span></span>
+<span class="giallo-l"><span>    let e1_1 = e_out[1][(1 &lt;&lt; x_out_num_vars) | x_out]; // y=1</span></span>
+<span class="giallo-l"><span>    // Round 2 (i=2) -&gt; y=() -&gt; 0 bits</span></span>
+<span class="giallo-l"><span>    let e2 = e_out[2][x_out]; // y=()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    4. Once we have all these values, we can start adding them to the corresponding accumulators. In _Procedure 9_ , this is done by iterating over $(i, v, u, y) \in \mathrm{idx4}(\beta)$, but since we only need to compute 3 rounds and the values for $u = 0$ and $u = 1$, we can do it directly using the following sum:</span></span></code></pre>
+<p>$$<br />
+\sum_{\beta \in U_d^{\ell_0}}<br />
+\sum_{\substack{(i^\prime, v^\prime, u^\prime, y) \in \mathrm{idx4}(\beta) \ i^\prime = i, v^\prime = v, u^\prime = u}}<br />
+E_{\mathrm{out}, i^\prime}[y, x_{\mathrm{out}}] \cdot \mathrm{tA}[\beta]<br />
+$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Round 0 (i=0)</span></span>
+<span class="giallo-l"><span>     // A_0(u=0) = Σ_{y} E_out_0(y) * tA( (u=0, y), x_out )</span></span>
+<span class="giallo-l"><span>     local_accumulators.accumulate(0, 0, e0_0 * t0 + e0_1 * t1 + e0_2 * t2 + e0_3 * t3);</span></span>
+<span class="giallo-l"><span>     // A_0(u=1) = Σ_{y} E_out_0(y) * tA( (u=1, y), x_out )</span></span>
+<span class="giallo-l"><span>     local_accumulators.accumulate(0, 1, e0_0 * t4 + e0_1 * t5 + e0_2 * t6 + e0_3 * t7);</span></span>
+<span class="giallo-l"><span>     // Round 1 (i=1)</span></span>
+<span class="giallo-l"><span>     // A_1(v, u) = Σ_{y} E_out_1(y) * tA( (v, u, y), x_out )</span></span>
+<span class="giallo-l"><span>     // v=0, u=0</span></span>
+<span class="giallo-l"><span>     local_accumulators.accumulate(1, 0, e1_0 * t0 + e1_1 * t1);</span></span>
+<span class="giallo-l"><span>     // v=0, u=1</span></span>
+<span class="giallo-l"><span>     local_accumulators.accumulate(1, 1, e1_0 * t2 + e1_1 * t3);</span></span>
+<span class="giallo-l"><span>     // v=1, u=0</span></span>
+<span class="giallo-l"><span>     local_accumulators.accumulate(1, 2, e1_0 * t4 + e1_1 * t5);</span></span>
+<span class="giallo-l"><span>     // v=1, u=1</span></span>
+<span class="giallo-l"><span>     local_accumulators.accumulate(1, 3, e1_0 * t6 + e1_1 * t7);</span></span>
+<span class="giallo-l"><span>     // Round 2 (i=2)</span></span>
+<span class="giallo-l"><span>     // A_2(v, u) = E_out_2() * tA( (v, u), x_out )</span></span>
+<span class="giallo-l"><span>     #[allow(clippy::needless_range_loop)]</span></span>
+<span class="giallo-l"><span>     for i in 0..8 {</span></span>
+<span class="giallo-l"><span>          local_accumulators.accumulate(2, i, e2 * temp_accumulators[i]);</span></span>
+<span class="giallo-l"><span>          }</span></span></code></pre>
+<p>Finally, the only thing left is to perform the final sum over (x_{\mathrm{out}}).</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>.par_fold_reduce(</span></span>
+<span class="giallo-l"><span>            || Accumulators::&lt;EF&gt;::new_empty(),</span></span>
+<span class="giallo-l"><span>            |a, b| a + b,</span></span>
+<span class="giallo-l"><span>            |a, b| a + b,</span></span>
+<span class="giallo-l"><span>        )</span></span></code></pre><h2 id="v-phase-2-the-switchover-to-algorithm-5">V. Phase 2: The Switchover to Algorithm 5</h2>
+<p>The switchover strategy is critical. SVO is only cheaper for the first few rounds. That’s why after the first three rounds, we need to “apply” the challenges we’ve collected to the remaining polynomial evaluations. This process is formally known as <strong>folding</strong> or partial evaluation. We transform our original polynomial $p(x_1, \dots, x_\ell)$ into a smaller polynomial $p^{(3)}(x_4, \dots, x_\ell)$ by binding the first three variables:</p>
+<p>$$<br />
+p^{(3)} (x_4, \dots, x_\ell) =<br />
+\sum_{b \in \{0,1 \}^3} \mathrm{eq}\left((r_1, r_2, r_3), b\right) \cdot p(b, x_4, \dots, x_\ell)<br />
+$$</p>
+<p>The polynomial folding is done in the following line:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Fold to obtain p(r1, r2, r3, x)</span></span>
+<span class="giallo-l"><span>let mut folded_evals = fold_evals_with_challenges(evals, &amp;challenges); </span></span></code></pre>
+<p>This operation contracts our evaluation domain from $2^\ell$ down to $2^{\ell - 3}$. In our implementation the function <code>fold_evals_with_challenges</code> handles this folding operation in parallel.</p>
+<p>Since multilinear evaluations are stored in lexicographic order, fixing the first 3 variables conceptually slices the hypercube into $2^3 = 8$ large contiguous blocks. To compute the value for a point $i$ in the new, smaller domain, we need to gather the value at offset $i$ from each of these 8 blocks.</p>
+<p>The index logic <code>(j * num_remaining_evals) + i</code> allows us to jump to the correct block $j$ and access the specific element $i$, accumulating the weighted sum into the result.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn fold_evals_with_challenges&lt;F, EF&gt;(</span></span>
+<span class="giallo-l"><span>    evals: &amp;EvaluationsList&lt;F&gt;,</span></span>
+<span class="giallo-l"><span>    challenges: &amp;[EF],</span></span>
+<span class="giallo-l"><span>) -&gt; EvaluationsList&lt;EF&gt; {</span></span>
+<span class="giallo-l"><span>    let n = evals.num_vars();</span></span>
+<span class="giallo-l"><span>    let k = challenges.len(); // k = 3 in our case</span></span>
+<span class="giallo-l"><span>    // The size of the new, smaller hypercube (2^{l-3})</span></span>
+<span class="giallo-l"><span>    let num_remaining_evals = 1 &lt;&lt; (n - k); </span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // 1. Precompute weights eq(r, b) for all 8 prefixes b in {0,1}^3</span></span>
+<span class="giallo-l"><span>    let eq_evals: Vec&lt;EF&gt; = eval_eq_in_hypercube(challenges);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // 2. Parallel Fold</span></span>
+<span class="giallo-l"><span>    let folded_evals_flat: Vec&lt;EF&gt; = (0..num_remaining_evals)</span></span>
+<span class="giallo-l"><span>        .into_par_iter()</span></span>
+<span class="giallo-l"><span>        .map(|i| {</span></span>
+<span class="giallo-l"><span>             // For each point &#39;i&#39; in the destination domain, sum over the 8 source prefixes.</span></span>
+<span class="giallo-l"><span>            eq_evals</span></span>
+<span class="giallo-l"><span>                .iter()</span></span>
+<span class="giallo-l"><span>                .enumerate()</span></span>
+<span class="giallo-l"><span>                .fold(EF::ZERO, |acc, (j, &amp;eq_val)| {</span></span>
+<span class="giallo-l"><span>                    // Reconstruct the index: prefix (j) + suffix (i)</span></span>
+<span class="giallo-l"><span>                    let original_eval_index = (j * num_remaining_evals) + i;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>                    let p_b_x = evals.as_slice()[original_eval_index];</span></span>
+<span class="giallo-l"><span>                    acc + eq_val * p_b_x</span></span>
+<span class="giallo-l"><span>                })</span></span>
+<span class="giallo-l"><span>        })</span></span>
+<span class="giallo-l"><span>        .collect();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    EvaluationsList::new(folded_evals_flat)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h3 id="the-svo-to-standard-handover">The SVO-to-Standard Handover</h3>
+<p>Why do we stop SVO exactly here? The decision is dictated by the cost of field multiplications, as analyzed in the paper:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. **Before Folding ($\mathfrak{ss}$ Regime):** Our polynomial evaluations are in the base field (small). SVO exploits this by using efficient interpolation on small values, avoiding expensive extension field arithmetic.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    2. **The Folding Operation:** The folding operation itself is a linear combination involving the challenges $r_i$. Since $r_i \in \mathbb{F_{\text{ext}}}$, the output of the fold must be in the extension field.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    3. **After Folding ($\mathfrak{ll}$ Regime):** Once our evaluations are promoted to the extension field, the benefits of SVO evaporate. SVO introduces an overhead of $\mathcal{O} (d^2 )$ operations to save on multiplications.</span></span></code></pre>
+<p>After three rounds the folded multilinear polynomial is sufficiently small so that the standard linear-time prover (<em>Algorithm 5</em>) becomes more efficient than SVO. By switching immediately after the fold, we ensure we treat base field values with SVO and extension field values with the standard approach, maintaining optimal performance across the entire protocol execution.</p>
+<h3 id="algorithm-5">Algorithm 5</h3>
+<p>Once we have folded the polynomial, we proceed to use <em>Algorithm 5</em> to execute the remaining $\ell - \ell_0$ rounds. You’ll find our implementation in the function called <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/whir-p3/blob/eec71d03a5ec81f30acc6d591f42f318941c6df5/src/sumcheck/sumcheck_small_value.rs#L402"><code>algorithm_5</code></a>.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn algorithm_5&lt;Challenger, F: Field, EF: ExtensionField&lt;F&gt;&gt;(</span></span>
+<span class="giallo-l"><span>    prover_state: &amp;mut ProverState&lt;F, EF, Challenger&gt;,</span></span>
+<span class="giallo-l"><span>    poly: &amp;mut EvaluationsList&lt;EF&gt;,</span></span>
+<span class="giallo-l"><span>    w: &amp;MultilinearPoint&lt;EF&gt;,</span></span>
+<span class="giallo-l"><span>    challenges: &amp;mut Vec&lt;EF&gt;,</span></span>
+<span class="giallo-l"><span>    sum: &amp;mut EF,</span></span>
+<span class="giallo-l"><span>    pow_bits: usize,</span></span>
+<span class="giallo-l"><span>) where</span></span>
+<span class="giallo-l"><span>    Challenger: FieldChallenger&lt;F&gt; + GrindingChallenger&lt;Witness = F&gt;,</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    [...]</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>In each round $j$, the prover’s goal is the same as in the first three rounds. We need to:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Compute and send the univariate polynomial evaluations $S_j (u)$ for $u \in \\{0,\infty \\}$.</span></span>
+<span class="giallo-l"><span>    * Update variables for the next round.</span></span></code></pre>
+<p>To do so, we’ll continue using the factorization of $S_j$ in:</p>
+<p>$$<br />
+S_j(u) = \ell_j(u) \cdot t_j(u)<br />
+$$</p>
+<p>where, recall,</p>
+<p>$$<br />
+\begin{align}<br />
+\ell_j (u) &amp;= \mathrm{eq}(w_{[1, j - 1]} ; r_{[1, j - 1]}) \cdot \mathrm{eq}(w_j; u) \newline<br />
+t_j (u) &amp;= \sum_{x \in \{0, 1\}^{\ell - j}} \mathrm{eq}(w_{[j + 1, \ell]}; x)\cdot p(r_{[1, j - 1]}, u, x)<br />
+\end{align}<br />
+$$</p>
+<p>However, to compute $t_j$ we won’t use SVO and accumulators, as we did before. Instead, we’ll simply split its eq-poly into two halves, taking advantage of the fact that one part can be precomputed, thus avoiding recomputation in each round.</p>
+<p>Let’s break down the function <code>algorithm_5</code> step by step. Before the round loop you’ll see this code snippet:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let num_vars = w.num_variables();</span></span>
+<span class="giallo-l"><span>let half_l = num_vars / 2;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Precompute eq_R = eq(w_{l/2+1..l}, x_R)</span></span>
+<span class="giallo-l"><span>let eq_r = eval_eq_in_hypercube(&amp;w.0[half_l..]);</span></span>
+<span class="giallo-l"><span>let num_vars_x_r = eq_r.len().ilog2() as usize;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// The number of variables of x_R is: l/2 if l is even and l/2 + 1 if l is odd.</span></span>
+<span class="giallo-l"><span>debug_assert_eq!(num_vars_x_r, num_vars - half_l);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// start_round should be NUM_SVO_ROUNDS.</span></span>
+<span class="giallo-l"><span>let start_round = challenges.len();</span></span>
+<span class="giallo-l"><span>challenges.reserve(num_vars - start_round);</span></span></code></pre>
+<p>Here we define several parameters, such as the total number of variables $(\ell)$ and the round where we currently are $(\ell_0)$. But, most importantly, we precompute the right (or final) half of the eq-poly:</p>
+<p>$$<br />
+\mathrm{eq_R} = \mathrm{eq} (w_{\ell/2 + 1}, \ldots, w_\ell; x_{ \ell/2 + 1}, \ldots, x_\ell).<br />
+$$</p>
+<p>After that, we start the loop. In each round $j$ we need to compute $t_j(0)$ and $t_j(1)$. To do so, we consider two cases: on one hand, the first rounds until round $\ell/2 - 1$, and on the other hand, the last rounds starting at round $\ell/2$.</p>
+<p><em>Disclaimer:</em> You’ll see that in the code the loop starts at $i = \ell_0$, but the first round that should be computed is $\ell_0 + 1$. That’s why we have the variable <code>round = i + 1</code> in the code. Here in the post, to simplify the notation we call $j =$ <code>round</code>.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Compute the remaining rounds, from l_0 + 1 to the end.</span></span>
+<span class="giallo-l"><span>for i in start_round..num_vars {</span></span>
+<span class="giallo-l"><span>    // `i` is the 0-indexed variable number, so `round = i + 1`.</span></span>
+<span class="giallo-l"><span>    let round = i + 1;</span></span>
+<span class="giallo-l"><span>    let num_vars_poly_current = poly.num_variables();</span></span>
+<span class="giallo-l"><span>    let poly_slice = poly.as_slice();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    [...]</span></span></code></pre><h4 id="first-half-rounds">First Half Rounds</h4>
+<p>For the cases where $j &lt; \frac{\ell}{2}$, we use the function <code>compute_t_evals_first_half</code> to obtain $t_j(0)$ and $t_j(1)$ in parallel. These values are computed using the following sum-splitting:</p>
+<p>$$<br />
+\begin{align}<br />
+t(0) &amp;=<br />
+\sum_{x_R} \mathrm{eq}(w_{[\ell/2 + 1, \ell]}, x_R)<br />
+\sum_{x_L} \mathrm{eq}(w_{[j + 1, \ell/2]}, x_L) \cdot<br />
+p(r_{[1,j - 1]}, 0, x_L, x_R) \newline<br />
+t(1) &amp;=<br />
+\sum_{x_R} \mathrm{eq}(w_{[\ell/2 + 1, \ell]}, x_R)<br />
+\sum_{x_L} \mathrm{eq}(w_{[j+1, \ell/2]}, x_L) \cdot<br />
+p(r_{[1,j - 1]}, 1, x_L, x_R)<br />
+\end{align}<br />
+$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Compute t(u) for u in {0, 1}.</span></span>
+<span class="giallo-l"><span>let t_evals: [EF; 2] = if round &lt;= half_l {</span></span>
+<span class="giallo-l"><span>    // Case i+1 &lt;= l/2: Compute eq_L = eq(w_{i+2..l/2}, x_L)</span></span>
+<span class="giallo-l"><span>    let eq_l = eval_eq_in_hypercube(&amp;w.0[round..half_l]);</span></span>
+<span class="giallo-l"><span>    let (t_0, t_1) = join(</span></span>
+<span class="giallo-l"><span>        || compute_t_evals_first_half(&amp;eq_l, &amp;eq_r, poly_slice, num_vars_x_r, 0),</span></span>
+<span class="giallo-l"><span>        || {</span></span>
+<span class="giallo-l"><span>            compute_t_evals_first_half(</span></span>
+<span class="giallo-l"><span>                &amp;eq_l,</span></span>
+<span class="giallo-l"><span>                &amp;eq_r,</span></span>
+<span class="giallo-l"><span>                poly_slice,</span></span>
+<span class="giallo-l"><span>                num_vars_x_r,</span></span>
+<span class="giallo-l"><span>                1 &lt;&lt; (num_vars_poly_current - 1), // offset for u=1</span></span>
+<span class="giallo-l"><span>            )</span></span>
+<span class="giallo-l"><span>        },</span></span>
+<span class="giallo-l"><span>    );</span></span>
+<span class="giallo-l"><span>    (t_0, t_1).into()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    [...]</span></span></code></pre><h4 id="second-half-rounds">Second Half Rounds</h4>
+<p>Similarly, in the case $j \geq \frac{\ell}{2}$, we compute $t_j(0)$ and $t_j(1)$ using <code>compute_t_evals_second_half</code>. Note that since $j \geq \frac{\ell}{2}$, we don’t have the sum involving the $\mathrm{eq_L}$ polynomial. So:</p>
+<p>$$<br />
+\begin{align}<br />
+t(0) &amp;= \sum_x \mathrm{eq}(w_{[j + 1, \ell]}, x) \cdot p(r_{[1,j - 1]}, 0, x) \newline<br />
+t(1) &amp;= \sum_x \mathrm{eq}(w_{[j + 1, \ell]}, x) \cdot p(r_{[1,j - 1]}, 1, x)<br />
+\end{align}<br />
+$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>} else {</span></span>
+<span class="giallo-l"><span>    // Case i+1 &gt; l/2: Compute eq_tail = eq(w_{i+2..l}, x_tail)</span></span>
+<span class="giallo-l"><span>    let eq_tail = eval_eq_in_hypercube(&amp;w.0[round..]);</span></span>
+<span class="giallo-l"><span>    let half_size = 1 &lt;&lt; (num_vars_poly_current - 1);</span></span>
+<span class="giallo-l"><span>    let (t_0, t_1) = join(</span></span>
+<span class="giallo-l"><span>        || compute_t_evals_second_half(&amp;eq_tail, &amp;poly_slice[..half_size]),</span></span>
+<span class="giallo-l"><span>        || compute_t_evals_second_half(&amp;eq_tail, &amp;poly_slice[half_size..]),</span></span>
+<span class="giallo-l"><span>    );</span></span>
+<span class="giallo-l"><span>    (t_0, t_1).into()</span></span>
+<span class="giallo-l"><span>};</span></span></code></pre><h4 id="send-sample-and-update">Send, Sample and Update</h4>
+<p>Once we have $t_j(0)$ and $t_j(1)$, we compute $\ell_j(0)$ and $\ell_j(1)$ and get:</p>
+<p>$$<br />
+\begin{aligned}<br />
+S_j(0) &amp;= \ell_j(0) \cdot t_j(0) \newline<br />
+S_j(\infty) &amp;= \bigl(\ell_j(1) - \ell_j(0)\bigr) \cdot \left(t_j (1) - t_j(0)\right)<br />
+\end{aligned}<br />
+$$</p>
+<p>Then we add these evaluations to the prover state and sample an extension field element $r_j$. After that, we fold the polynomial and obtain:</p>
+<p>$$<br />
+p(r_1, \ldots, r_j, x_{j+1}, \ldots, x_\ell).<br />
+$$</p>
+<p>Finally, we update the claimed sum:</p>
+<p>$$<br />
+\sigma_{j+1} = S_j (r_j).<br />
+$$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Compute S_i(u) = t_i(u) * l_i(u) for u in {0, inf}:</span></span>
+<span class="giallo-l"><span>let linear_evals = compute_linear_function(&amp;w.0[..round], challenges);</span></span>
+<span class="giallo-l"><span>let [s_0, s_inf] = get_evals_from_l_and_t(&amp;linear_evals, &amp;t_evals);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Send S_i(u) to the verifier.</span></span>
+<span class="giallo-l"><span>prover_state.add_extension_scalars(&amp;[s_0, s_inf]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>prover_state.pow_grinding(pow_bits);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Receive the challenge r_i from the verifier.</span></span>
+<span class="giallo-l"><span>let r_i: EF = prover_state.sample();</span></span>
+<span class="giallo-l"><span>challenges.push(r_i);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Fold and update the poly.</span></span>
+<span class="giallo-l"><span>poly.compress_svo(r_i);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Update claimed sum</span></span>
+<span class="giallo-l"><span>let eval_1 = *sum - s_0;</span></span>
+<span class="giallo-l"><span>*sum = s_inf * r_i.square() + (eval_1 - s_0 - s_inf) * r_i + s_0;</span></span></code></pre><h2 id="vi-communication-optimization">VI. Communication Optimization</h2>
+<p>Independent of the prover computation (SVO), we also optimize the communication. In a standard sumcheck, the prover sends three field elements per round (since the polynomial that needs to be sent has degree 2). However, we only send two, reducing the proof size.</p>
+<p>The trick is that the verifier can derive the third value. For any round $i$, the prover sends:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * $S_i (0)$ — the evaluation at zero.</span></span>
+<span class="giallo-l"><span>    * $S_i (\infty)$ — the leading coefficient.</span></span></code></pre>
+<p>The verifier, who knows the claimed sum $\sigma_i = S_{i - 1} (r_{i - 1})$ from the previous round, derives the third evaluation:</p>
+<p>$$<br />
+S_i(1) = \sigma_i - S_i(0)<br />
+$$</p>
+<p>This holds due to the sum constraint $S_i (0) + S_i (1) = \sigma_i$.</p>
+<p>You can find this implemented for the prover in both <code>svo_three_rounds</code> and <code>algorithm_5</code> functions. For example, for the first round you’ll see:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Prover side</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// [...]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Round 1</span></span>
+<span class="giallo-l"><span>prover_state.add_extension_scalars(&amp;[s_0, s_inf]); // Send 2 values.</span></span>
+<span class="giallo-l"><span>let r_1: EF = prover_state.sample(); // Sample a random challenge.</span></span>
+<span class="giallo-l"><span>let s_1 = *sum - s_0; // Derive 3rd value. </span></span>
+<span class="giallo-l"><span>*sum = s_inf * r_1.square() + (s_1 - s_0 - s_inf) * r_1 + s_0; // Update sum.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// [...]</span></span></code></pre>
+<p>The verifier’s job is simpler: it reads the proof, derives missing values, and verifies consistency. You can find the implementation in <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/whir-p3/blob/eec71d03a5ec81f30acc6d591f42f318941c6df5/src/whir/verifier/sumcheck.rs#L144"><code>verify_sumcheck_round_svo</code></a>:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Verifier Side</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// [...]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>for _ in 0..rounds {</span></span>
+<span class="giallo-l"><span>    // Extract the first and third evaluations of the sumcheck polynomial</span></span>
+<span class="giallo-l"><span>    // and derive the second evaluation from the latest sum.</span></span>
+<span class="giallo-l"><span>    let c0 = verifier_state.next_extension_scalar()?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let c1 = *claimed_sum - c0;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let c2 = verifier_state.next_extension_scalar()?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // PoW interaction (grinding resistance)</span></span>
+<span class="giallo-l"><span>    verifier_state.check_pow_grinding(pow_bits)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Sample the next verifier folding randomness rᵢ.</span></span>
+<span class="giallo-l"><span>    let rand: EF = verifier_state.sample();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Update sum.</span></span>
+<span class="giallo-l"><span>    *claimed_sum = c2 * rand.square() + (c1 - c0 - c2) * rand + c0;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    randomness.push(rand);</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// [...]</span></span></code></pre>
+<p>The verifier never computes accumulators or evaluates polynomials directly. It only reads two field elements from the proof and derives the third value. This is significantly more efficient than the classical sumcheck verifier, which needs to read three elements and verify the sum constraint explicitly.</p>
+<h2 id="vii-conclusion">VII. Conclusion</h2>
+<p>In this post we present a complete implementation in Rust of <em>Algorithm 6</em> from the BDDT paper, bringing together both optimization techniques (SVO and Eq-Poly) into a working prover.</p>
+<p>As a bonus, we also reduce the proof size by sending only two field elements per round, exploiting the sum constraint to let the verifier derive the missing value.</p>
+<p>These optimizations are now part of <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/whir-p3">our whir-p3 fork</a> and have been <a rel="noopener external" target="_blank" href="https://github.com/tcoratger/whir-p3/pull/322">merged into the original repository</a>.</p>
+<h2 id="references">References</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * [Small Value Optimization Paper](https://eprint.iacr.org/2025/1117)</span></span>
+<span class="giallo-l"><span>    * [Optimizing Sumcheck (Part I)](/optimizing-sumcheck/)</span></span>
+<span class="giallo-l"><span>    * [How factoring equality polynomials optimizes sumcheck (Part II)](/how-factoring-equality-polynomials-optimizes-sumcheck/)</span></span>
+<span class="giallo-l"><span>    * [Whirlaway: Multilinear STARKs using WHIR](/whirlaway-multilinear-starks-using-whir-as-polynomial-commitment-scheme/)</span></span>
+<span class="giallo-l"><span>    * [whir-p3 Repository](https://github.com/tcoratger/whir-p3)</span></span>
+<span class="giallo-l"><span>    * [Our fork of whir-p3 Repository](https://github.com/lambdaclass/whir-p3)</span></span></code></pre>
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>
