@@ -232,7 +232,7 @@ The attack is described in Section V of [Weak Fiat-Shamir Attacks on Modern Proo
 
 Here is a summary of the attack:
 
-![](https://hackmd.io/_uploads/B10en9A93.png)
+![](/images/external/B10en9A93.png)
 
 Instead of taking random polynomials (steps (1) to (7)), the current solution takes a valid proof for the pair `x=0`, `y=2` and uses it to forge a `y` for `x=1` that's compatible with the original proof.
     

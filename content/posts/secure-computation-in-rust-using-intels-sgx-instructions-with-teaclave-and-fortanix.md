@@ -54,11 +54,11 @@ Some important aspects:
   * Entering the enclave via function calls, jumps or stack/register manipulation is not possible. To do so you have to use a specific CPU instruction which also does some safety checks ([E]call, [O]call).
   * **Enclave's memory is encrypted** , and the key used changes on every power cycle. It's stored within the CPU and is not accessible.
 
-![](https://i.imgur.com/Lb332Bp.png)Source: Microsoft Azure Confidential Computing [Documentation](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-computing-enclaves)
+![](/images/external/Lb332Bp.png)Source: Microsoft Azure Confidential Computing [Documentation](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-computing-enclaves)
 
 **Warning** : if you are considering developing an SGX application, we'd highly suggest [checking your CPU](https://github.com/ayeks/SGX-hardware#desktop-cpus-affected-by-the-product-change-notification-from-2015) and whether it has SGX support. Intel's C++ SDK has some simulation capabilities (as we'll see later), but those aren't fully fleshed out. We managed to run in a Macbook Pro some sample projects using Teclave's simulation mode... but at what cost? So, only if you like stepping on Legos for fun try running SGX in your M1.
 
-![](https://i.imgur.com/hqeSchG.png)
+![](/images/external/hqeSchG.png)
 
 ## SGX Rust Development
 
@@ -66,7 +66,7 @@ The Intel SGX's SDK is implemented on C++, so usually you'll implement your appl
 As a starting point Intel gives a [couple of code examples](https://github.com/intel/linux-sgx/tree/master/SampleCode) for different implementations.  
 But, are there any developers worth their salt that want to develop a solid blockchain project in those languages when you've got the hip and cool option that is Rust? (in fact, yes) _We don't look forward to that._
 
-![](https://i.imgur.com/Whhj2XE.png) Recreation of what the Rust SDK developers may have thought
+![](/images/external/Whhj2XE.png) Recreation of what the Rust SDK developers may have thought
 
 Since our source code is already written in Rust we looked for crates that allow us an easy and seamless integration of our code with the SGX enclaves.  
 We found 2 alternatives for this, which use different approaches. Both are open source:
@@ -78,7 +78,7 @@ We found 2 alternatives for this, which use different approaches. Both are open 
 
 It wraps the Intel SGX's SDK. You can check their [GitHub repo](https://github.com/apache/incubator-teaclave-sgx-sdk).
 
-![](https://i.imgur.com/Bd8I1r5.png)Source: [https://www.trentonsystems.com/blog/what-is-intel-sgx](https://www.trentonsystems.com/blog/what-is-intel-sgx)
+![](/images/external/Bd8I1r5.png)Source: [https://www.trentonsystems.com/blog/what-is-intel-sgx](https://www.trentonsystems.com/blog/what-is-intel-sgx)
 
 With Teaclave SDK you will split your application into two:  
 \- Trusted, also called the _enclave_.  
@@ -86,11 +86,11 @@ With Teaclave SDK you will split your application into two:
 
 Remember, under the hood you're still using Intel SDK library.
 
-![](https://i.imgur.com/ixchGF6.png)Source: [https://www.infoq.com/presentations/intel-sgx-enclave/](https://www.infoq.com/presentations/intel-sgx-enclave/)
+![](/images/external/ixchGF6.png)Source: [https://www.infoq.com/presentations/intel-sgx-enclave/](https://www.infoq.com/presentations/intel-sgx-enclave/)
 
 The Untrusted code is in charge of initializing and shutting down the enclave, and you have to define an interface for the app and the enclave to communicate with each other. During compilation, those interfaces get transformed into [E]calls and [O]calls. In the end you would end up with something like this:
 
-![](https://i.imgur.com/rzWrjSw.png)Source: Slide from Yu Ding's [talk](https://www.infoq.com/presentations/intel-sgx-enclave/) at infoq about Intel SGX enclaves on Rust
+![](/images/external/rzWrjSw.png)Source: Slide from Yu Ding's [talk](https://www.infoq.com/presentations/intel-sgx-enclave/) at infoq about Intel SGX enclaves on Rust
 
 But as the saying goes, not everything that shines is gold. The enclave will run under `#[no_std]`, so keep in mind that your favorite crates might not be supported. However, the maintainers have been porting and developing a bunch of useful crates to work with and of course you can also port the ones you want as well. Among them there's the `libc`, the `std` (or part of it), synchronization primitives (e.g. `SgxMutex`, `SgxRWLock`) and more. However, there is not support for async Rust yet.
 
@@ -109,7 +109,7 @@ Fortanix EDP is developed by a company named _Fortanix_. From their website we r
 
 They came up with a different solution to running Rust code on Intel enclaves.
 
-![](https://i.imgur.com/M5pt0Zd.png)Source: Fortanix EDP [architecture documentation](https://edp.fortanix.com/docs/concepts/architecture/)
+![](/images/external/M5pt0Zd.png)Source: Fortanix EDP [architecture documentation](https://edp.fortanix.com/docs/concepts/architecture/)
 
 First, instead of building an _app_ and an _enclave_ Fortanix EDP helps you build only the enclave and the way of communicating between the app and the enclave is up to you.
 
@@ -138,7 +138,7 @@ We'll be omitting some details, so if you're interested in getting them we sugge
 
 The project structure is:
 
-![](https://i.imgur.com/mm0n8rE.png)Example of project structure using Teaclave
+![](/images/external/mm0n8rE.png)Example of project structure using Teaclave
 
 Notice that we have the `app/` and the `enclave/` directories. First let's see the app's code:
     
@@ -261,7 +261,7 @@ As Fortanix's documentation says:
 
 Let's see how can we accomplish our hello world using Fortanix EDP. Our final project looks like this:
 
-![](https://i.imgur.com/8Wh6Nk4.png)Example of a project structure using Fortanix
+![](/images/external/8Wh6Nk4.png)Example of a project structure using Fortanix
 
 Let's look at what the `main.rs` has to offer:
 
@@ -290,7 +290,7 @@ And that's the only setup we needed (besides the Rust code).
 
 Pretty much like good ol' Rust code right? In fact, we're able to compile it without the Fortanix runner and have it running.
 
-![](https://i.imgur.com/GPPD8IR.png)
+![](/images/external/GPPD8IR.png)
 
 This only constitutes the enclave, but an easy way to test it is by making the TCP request, so it should be enough to run the following command:
     
@@ -309,7 +309,7 @@ Also, Fortanix is mostly written using Rust code, while Teaclave has another 80K
 
 In terms of community activity we ran a comparison of both thru [github-statistics](https://vesoft-inc.github.io/github-statistics/).
 
-![](https://i.imgur.com/bejTcAq.png)Comparison between Fortanix and Teaclave repos stats
+![](/images/external/bejTcAq.png)Comparison between Fortanix and Teaclave repos stats
 
 Teaclave seems to have more traction based on the amount of stars and forks. Nevertheless, during 2021 there is a clear increase of the activity in the Fortanix's EDP repository. So it seems like Teaclave is more widely used but it's development has stagnated somewhat while Fortanix is taking the lead, a dynamic that has been reinforced since attaining [Rust tier 2 in january on 2019](https://users.rust-lang.org/t/sgx-target-is-now-a-rust-tier-2-platform/24779).
 
@@ -324,7 +324,7 @@ Teaclave seems to have more traction based on the amount of stars and forks. Nev
   * ❌ Uses Intel's libs, and they're supposed to be the experts on that. This might not be a bad thing by itself, but you could think of this as adding an extra dependency with a centralized entity such as Intel. Which is why in a decentralized environment might not be ideal (debatable).
   * ❌ Integrating SGX to an existing system using this SDK is a bit tedious, since you need to restructure your application, use some Makefiles to handle linking the enclave with the application, declaring the interface connecting your applications in a separate `.edl` file with its own syntax and more.
 
-![](https://i.imgur.com/vMOMK15.png)Enclave folder using Teaclave vs Fortanix
+![](/images/external/vMOMK15.png)Enclave folder using Teaclave vs Fortanix
 
 ### Fortanix
 

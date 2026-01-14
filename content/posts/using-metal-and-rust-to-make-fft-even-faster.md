@@ -52,7 +52,7 @@ For each type of command that we want to run on the GPU using Metal, we use a de
 
 It is important to inform Metal when we have finished encoding all the commands, so that it can push all the created buffers to the queue. We can summarize all these new structures and how they communicate with the following diagram:
 
-![](https://i.imgur.com/YOBNdIJ.png)
+![](/images/external/YOBNdIJ.png)
 
 To better understand how all these structures work together, it is helpful to see some basic examples.
 
@@ -230,7 +230,7 @@ Since the entire algorithm is based on dividing the problem into two, it's essen
 
 That is a lot of information so let's see a basic overview of these ideas:
 
-![](https://i.imgur.com/AZqXeDk.png)
+![](/images/external/AZqXeDk.png)
 
 ### Working with finite fields
 

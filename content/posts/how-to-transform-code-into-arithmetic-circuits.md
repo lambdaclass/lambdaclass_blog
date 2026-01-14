@@ -28,10 +28,10 @@ We don't want to write down the circuit corresponding to a program every time we
 
 An arithmetic circuit is a directed acyclic graph involving the multiplication and addition of numbers. We can think of it as evaluating some polynomial over those numbers. For example, the following circuit expresses the calculation of the following polynomial, \\( p(x) = x^3 + x^2 + 1 \\)
 
-![](https://i.imgur.com/ruVa3AS.jpg)  
+![](/images/external/ruVa3AS.jpg)  
 We can also have circuits taking different values and representing a multivariate polynomial, such as \\( p(x_1,x_2) = x_1 x_2 + x_1 + x_2^2\\).
 
-![](https://i.imgur.com/Ky9wLuo.jpg)
+![](/images/external/Ky9wLuo.jpg)
 
 Arithmetic circuits can also be expressed as rank one constraint system, such that there is a one-to-one correspondence between them.
 
@@ -41,7 +41,7 @@ we can introduce an additional variable (the multiplicative inverse of \\( b \\)
 \\(x\times b=1 \\)  
 \\(a\times x=c \\)  
 The first condition ensures that \\( x \\) is \\( b^{-1} \\), and the second performs the calculation we wanted. The arithmetic circuit would look like  
-![](https://i.imgur.com/TrjZGXD.jpg)  
+![](/images/external/TrjZGXD.jpg)  
 We could have also worked this by remembering that the multiplicative inverse of an integer (using modular arithmetic) is \\( b^{-1 } = b^{p-2} \\) . However, this leads to a more complex circuit since we would have to evaluate, in general, a large power, which needs many multiplication gates, even if done efficiently (of the order of \\( \log(p) \\)). Therefore, when trying to express a non-native operation over arithmetic circuits, we must think about the most efficient way.
 
 ## R1CS
@@ -77,14 +77,14 @@ The native elements for arithmetic circuits are the [field elements](/math-survi
 Boolean variables also face similar problems. In ordinary circuits, a boolean is directly associated with one bit, and operations between bits have been optimized for performance. If we want to represent a boolean variable, which takes as values only 0 and 1, we have to add constraints to enforce these values. One simple way to ensure this is by having the variable \\( b \\) satisfy the following equation  
 \\( b(1-b)=0\\)  
 The arithmetic circuit associated with this equation is shown below and displays three gates: two multiplications and one addition.  
-![](https://i.imgur.com/qGxf87H.jpg)
+![](/images/external/qGxf87H.jpg)
 
 If we want to calculate \\( c= \neg b \\), we need to know how to represent NOT in circuit form first. The following equation can represent this  
 \\[ c=1-b \\]  
 The circuit representation is,  
-![](https://i.imgur.com/CeoYeMi.jpg)  
+![](/images/external/CeoYeMi.jpg)  
 If we do a naïve pasting of both circuits, we get  
-![](https://i.imgur.com/4z3zqbU.jpg)  
+![](/images/external/4z3zqbU.jpg)  
 We see that there are a lot of repeated elements (such as \\(1, -1, -b\\). In a later stage, we could optimize the circuit not to introduce redundant elements or computations, as these only increase the proving time.
 
 Suppose we want to represent an integer \\( k \\) in its bit representation (say `u16`). In that case, we have 16 bits, \\( b_k \\), each of which has the same circuit (meaning we have 32 multiplication and 16 addition gates), plus additional checks showing the following:  

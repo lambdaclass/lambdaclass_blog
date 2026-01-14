@@ -66,7 +66,7 @@ $$\sum_{j=0}^{\lceil \lambda/s \rceil-1}2^{sj}G_j.$$
 
 In pseudocode (extracted from [this paper](https://eprint.iacr.org/2022/1321.pdf)):
 
-![](https://i.imgur.com/vXGaugg.png)
+![](/images/external/vXGaugg.png)
 
 ## Base algorithm
 
@@ -129,7 +129,7 @@ Finally compute step 3 as in Pippenger.
 
 In pseudocode:
 
-![](https://i.imgur.com/meWCE2d.png)![](https://i.imgur.com/TdZi4gO.png)
+![](/images/external/meWCE2d.png)![](/images/external/TdZi4gO.png)
 
 ### Parallelization strategy from the implementation
 

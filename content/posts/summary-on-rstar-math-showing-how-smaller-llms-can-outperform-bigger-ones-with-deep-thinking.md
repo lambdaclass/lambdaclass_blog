@@ -170,7 +170,7 @@ Since SLM have weaker capabilities, the authors used four rounds of MCTS deep th
 
 After four rounds of self-evolution, rStar-Math significantly improved the math reasoning abilities of SLMs. For instance, on the MATH benchmark, it enhanced Qwen2.5-Math-7B's performance from 58.8% to 90.0% and Phi3-mini-3.8B's from 41.4% to 86.4%, surpassing OpenAI's o1-preview model. Additionally, on the USA Math Olympiad (AIME), rStar-Math solved an average of 53.3% of problems, ranking among the top 20% of high school math students. The following graphs compare the performance of rStar-math in different benchmarks with other LLMs based on the number of rollouts.
 
-![image](https://hackmd.io/_uploads/SyLxqMdP1x.png)
+![image](/images/external/SyLxqMdP1x.png)
 
 ## Summary
 

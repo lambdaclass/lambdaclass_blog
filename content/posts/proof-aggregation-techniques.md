@@ -26,7 +26,7 @@ SNARKs/STARKs let us check the validity of any NP statement in a time- and memor
 
 How does recursion work? The prover proves that he verified a proof $\pi$ corresponding to some computation with public input $u$. The image below shows the flow for recursion.
 
-![rec](https://hackmd.io/_uploads/SkeEGSDap.png)
+![rec](/images/external/SkeEGSDap.png)
 
 The prover takes the public input, the witness, and the program and generates the proof $\pi$ attesting to the validity of the computation. The prover then takes the proof $\pi$ and original circuit as witnesses, the public input, and the verification circuit (the operations the verifier would have to do to check the statement) and obtains a new proof $\pi^\prime$, showing that the prover knows the proof $\pi$ which fulfills the verification circuit with the given input. The verifier can check the proof $\pi^\prime$, which shows that the verification done by the prover is valid, which in turn implies the correctness of the first computation. In the case of STARKs, if the trace for the verification operation is shorter than the trace for the original program, proof size and verification time are reduced (since they depend on the trace length, $n$).
 
@@ -34,11 +34,11 @@ We can also use two different provers. For example, we can prove the first progr
 
 We can also use the same structure and prove the verification of several proofs.
 
-![0proofs](https://hackmd.io/_uploads/H1sLvrwp6.png)
+![0proofs](/images/external/H1sLvrwp6.png)
 
 One problem we face is that even though the proof size is reduced, the public input increases linearly. We can solve this by providing a hash/commitment to all the public input and passing it as part of the witness. During the verification, we have to check that the hash of the public input in the witness corresponds to the hash/commitment of the public input. Proof recursion can be handled more efficiently by building a tree structure, increasing the degree of parallelization.
 
-![0trees](https://hackmd.io/_uploads/Bye7stwpa.png)
+![0trees](/images/external/Bye7stwpa.png)
 
 Proof recursion is used in several projects to reduce proof size and make verification cheaper, such as [Starknet](https://medium.com/starkware/recursive-starks-78f8dd401025), [Polygon ZKEVM](https://polygon.technology/blog/the-go-fast-machine-adding-recursion-to-polygon-zkevm), and [zkSync](https://blog.matter-labs.io/zksync-v1-1-reddit-edition-recursion-up-to-3-000-tps-subscriptions-and-more-fea668b5b0ff).
 
@@ -48,13 +48,13 @@ Even though proof recursion has many advantages, it adds workload to the prover.
 
 We have the problem that coordinates for the curve $E$ live in $F_p$, but the scalar field is $F_r$. If we can find a curve $E^\prime$ defined over $F_r$ and scalar field $F_p$, then we could check proofs over $E$ using $E^\prime$. Pairs of curves with these characteristics are called a cycle of curves. Fortunately, some curves of the form $y^2 = x^3 + b$ satisfy the conditions. Pallas and Vesta curves (known together as Pasta curves) form a cycle and are used in [Mina's Pickles](https://docs.minaprotocol.com/zkapps/o1js/recursion) and [Halo 2](https://github.com/zcash/halo2/tree/main). We covered some of the basics of Pickles in our [previous post](/mina-to-ethereum-bridge/). Pickles uses two accumulators (each using a different curve) and defers some checks to the next step. This way, it can avoid expensive verifications and efficiently deliver incrementally verifiable computation.
 
-![0cycles](https://hackmd.io/_uploads/S1JbEKDpp.png)
+![0cycles](/images/external/S1JbEKDpp.png)
 
 ## Folding and accumulation schemes
 
 One of the drawbacks of full recursion is that we need to prove the whole verification, which can be very expensive. For example, in recursive STARKs, we must compute all the hashes and verify all algebraic operations to get to a new proof. Folding schemes provide an alternative to full verification by combining several instances and accumulating them. [Nova](https://eprint.iacr.org/2021/370.pdf) introduced a folding scheme for R1CS. The key idea is that if we have two solutions $(u_1 , w_1 )$ and $(u_2 , w_2 )$ for R1CS, we can combine them into a single claim $(u , w)$ for a committed relaxed-R1CS (a generalization of R1CS).
 
-![0folding](https://hackmd.io/_uploads/SJhStYv66.png)
+![0folding](/images/external/SJhStYv66.png)
 
 We can then generate a proof for the unified claim, which amounts to the validity of all instances.
 

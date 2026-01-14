@@ -64,7 +64,7 @@ In the example, we can see an example of a differential fuzzer. This fuzzer is c
 
 First, we have the imports that include the implementations we want to compare in our fuzzer. Then we have the function that´s going to run the fuzzer, in this case, is the `fuzz_target!()` function. This function supplies us with a randomly generated input, in this case, the variable `data`. With the previous `data` generated, we run the piece of code that we want to test. In cases like the one in the example code used by `libflate,` we need to adjust the random `data` to be received by the code in the first instance. As the last step we do the differential magic, that is, we compare the result returned by the different implementations.
 
-![](https://i.imgur.com/DzicizT.png)
+![](/images/external/DzicizT.png)
 
 In this case, as we can see in the image when we run the fuzzer, it finds a crash because one of the implementations returns a valid result and the other one an error.
 

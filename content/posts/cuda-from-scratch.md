@@ -35,7 +35,7 @@ Depending on our algorithms, warps can be ignored, or be used to further optimiz
 
 At the moment of this post, each warp has 32 threads, and each block has 1024 threads or 32 warps.
 
-![](https://i.imgur.com/1dc0TeK.png)
+![](/images/external/1dc0TeK.png)
 
 ### Physical processing units and memory
 
@@ -55,7 +55,7 @@ Finally, we have **Global Memory**. This memory is the one we see in the specifi
 
 As tends to happen with hardware, operations become more expensive as we move to larger memories.
 
-![ ](https://i.imgur.com/gr4u7ru.png)  
+![ ](/images/external/gr4u7ru.png)  
 _image from[Cuda Refresher - Nvidia blog](https://developer.nvidia.com/blog/cuda-refresher-cuda-programming-model/)_
 
 *_Nvidia has also released a new kind of cores, called Tensor Cores, for their Tensor Cores GPUs. These cores can run a small matrix multiplication of floating points in mixed precision as a native operation to further optimize machine learning algorithms_

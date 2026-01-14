@@ -58,11 +58,11 @@ The CLI output looks like this:
       1 (10.00%) high mild
     
 
-![](https://c.tenor.com/HOlMUg8b9gMAAAAM/slowpoke-slow.gif)Graphic depiction of our results
+![](/images/external/slowpoke-slow.gif)Graphic depiction of our results
 
 Here is what we first saw when we ran `cargo bench`. We have information about the mean time, some other measurements, and the outliers encountered among the runs.
 
-![](https://i.imgur.com/KTm8I6O.png)[HTML report example of our function](https://htmlpreview.github.io/?https://github.com/lambdaclass/how_to_benchmark_blogpost/blob/main/report/first_report_example.html)
+![](/images/external/KTm8I6O.png)[HTML report example of our function](https://htmlpreview.github.io/?https://github.com/lambdaclass/how_to_benchmark_blogpost/blob/main/report/first_report_example.html)
 
 Here we have an example of the HTML report that we also obtained when we used `cargo bench`. You can find this report on `target/criterion/report/index.html`.
 
@@ -85,11 +85,11 @@ Thankfully Rust has a crate called [`flamegraph`](https://github.com/flamegraph-
 In this flamegraph, you can see all the function calls and how much time consumes in the whole process, including calls from the Rust standard library.  
 FlameGraph in specific looks a little bit like this:
 
-![](https://i.imgur.com/PvYguTf.png)[Flamegraph of our function](https://raw.githubusercontent.com/lambdaclass/how_to_benchmark_blogpost/d87e73586735fd10bd8e814cb9e54b9160f30713/first_flamegraph_example.svg)
+![](/images/external/PvYguTf.png)[Flamegraph of our function](/images/external/first_flamegraph_example.svg)
 
 I know, right?
 
-![](https://cdn.kapwing.com/collections/calculating-meme-template-047hp.jpg)
+![](/images/external/calculating-meme-template-047hp.jpg)
 
 ## Analyzing flamegraph results
 
@@ -103,7 +103,7 @@ So now we have information about the bottlenecks! We only have to look at the ca
 
 ## Gotta go fast!
 
-![](https://i.pinimg.com/originals/f6/4c/a7/f64ca7d4beb9865d2ed5145d120f0c56.gif)
+![](/images/external/f64ca7d4beb9865d2ed5145d120f0c56.gif)
 
 Now we have some information to speed up our function. The first thing that we thought of was to integrate [Rayon](https://github.com/rayon-rs/rayon) into this part. Rayon is a Rust library to make sequential computations into parallel. We started with that.
 
@@ -119,7 +119,7 @@ When we do a change the first thing that we want to check is if the time it's be
 
 So here we have the Command-line output with a new line. That **change** line shows us the improvement or regression compared to the last benchmark and we see that is 70% better so we have the happy case. Let's take a look at the new reports.
 
-![](https://i.imgur.com/4pFWn55.png)[HTML comparison report with our new implementation](https://htmlpreview.github.io/?https://github.com/lambdaclass/how_to_benchmark_blogpost/blob/main/report/comparison_report_example.html)
+![](/images/external/4pFWn55.png)[HTML comparison report with our new implementation](https://htmlpreview.github.io/?https://github.com/lambdaclass/how_to_benchmark_blogpost/blob/main/report/comparison_report_example.html)
 
 Here we have the new graph. Criterion automatically merged the last two plots and did one with the comparison. It's easy for us to show these new results.
 

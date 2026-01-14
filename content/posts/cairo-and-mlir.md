@@ -24,7 +24,7 @@ If you're familiar with one of these topics, bear with us; I promise it's worth 
 Put on your seatbelts.  
 3, 2, 1...
 
-![](https://i.imgur.com/BDuDQ6c.jpg)
+![](/images/external/BDuDQ6c.jpg)
 
 ## Intro beat
 
@@ -63,7 +63,7 @@ New hardware was designed, and LLVM was again used to target these new tensor pr
 
 As a result, Tensorflow has several compiler components embedded in it, made by different vendors: Google has XLA, NVIDIA has TensorRT, and Intel has NGraph, all of which integrate with the TensorFlow optimizer and code generator and are very hardware specific, but do not share common infrastructure.
 
-![Figure 1 from the paper "MLIR:  A Compiler Infrastructure for the End of Moore’s Law"](https://i.imgur.com/eRktk4K.jpg)
+![Figure 1 from the paper "MLIR:  A Compiler Infrastructure for the End of Moore’s Law"](/images/external/eRktk4K.jpg)
 
 ### Back to languages
 
@@ -72,7 +72,7 @@ LLVM enabled Clang and new languages such as Rust, Julia, and Swift.
 Something these projects share in common is that they have found that many language implementation problems are best modeled at higher abstraction levels and implemented their intermediate representations to solve domain-specific problems, like language/library-specific optimizations, flow-sensitive type checking (e.g., for linear types), and to improve the implementation of the lowering process.  
 Swift has SIL, Rust has MIR, and so on.
 
-![Figure 2 from the paper "MLIR:  A Compiler Infrastructure for the End of Moore’s Law"](https://i.imgur.com/5UG47By.jpg)
+![Figure 2 from the paper "MLIR:  A Compiler Infrastructure for the End of Moore’s Law"](/images/external/5UG47By.jpg)
 
 In other words, people started to realize that the complexity of the software stack above the low-level IR was very high since software reuse was low and quality was so variable.
 
@@ -80,7 +80,7 @@ After twenty years of expanding hardware targets and changing problem spaces, LL
 
 ## What (is MLIR?)
 
-![](https://i.imgur.com/KKNOAlx.jpg)
+![](/images/external/KKNOAlx.jpg)
 
 Out of this came [MLIR](https://mlir.llvm.org/) (Multi-Level Intermediate Representation), a project started by Chris Lattner et al. to build a common infrastructure to support all these different subsystems and to learn from the mistakes made and lessons learned in the development of LLVM.
 
@@ -146,7 +146,7 @@ As [Lei Zhang](https://www.lei.chat/posts/compilers-and-irs-llvm-ir-spirv-and-ml
 
 The UNIX way!
 
-![](https://i.imgur.com/HNaqpaU.jpg)
+![](/images/external/HNaqpaU.jpg)
 
 Other benefits include:
 
@@ -664,7 +664,7 @@ We would like to salute and thank the team and community behind LLVM and MLIR, a
 Foundational technologies are rare, difficult to develop, and require great insight and vision to come to terms with.  
 These stones feel like the base on which great things will rest.
 
-![](https://i.imgur.com/iT9Qv1X.jpg)
+![](/images/external/iT9Qv1X.jpg)
 
 ## References and Resources
 

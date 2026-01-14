@@ -64,7 +64,7 @@ We can see that double-spending can be solved without total ordering, as [explai
 
 The following picture, taken from [this post](https://pod.network/how-it-works) shows the difference between total ordering and Pod:
 
-![pod](https://hackmd.io/_uploads/BJ9kfMYYyx.png)
+![pod](/images/external/BJ9kfMYYyx.png)
 
 We can see that in some logs, transaction 4 could happen before transaction 3, but all lie within a prescribed range.
 

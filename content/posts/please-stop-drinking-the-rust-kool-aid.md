@@ -42,7 +42,7 @@ In a long-living program, many memory leaks can lead to a denial of service beca
 
 Rust has some tools for error handling, encoding the error value in the _Result_ enum. There are no _exceptions_ like in other languages. On the other side, Rust has the concept of panicking.
 
-![](https://i.imgur.com/kgwvbvw.png)
+![](/images/external/kgwvbvw.png)
 
 Panics terminate the running program.
 

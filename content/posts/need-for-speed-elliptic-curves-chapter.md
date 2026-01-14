@@ -14,10 +14,10 @@ tags = ["elliptic curves"]
 ## Introduction
 
 Elliptic curves (EC) have gained widespread acceptance as tools for cryptography. They offer several advantages over other methods, such as RSA, providing equal levels of security with shorter keys (for example, 228-bit keys in EC cryptography are as good as 2300-bit RSA keys). This represents an advantage, since more and more cryptography is done on smart-phones, which are less powerful than computers. These are curves defined by the equation $y^2 = x^3 + ax + b$ over some [field](https://en.wikipedia.org/wiki/Field_\(mathematics\)) (for example, the real numbers). Their shape depends on $a$ and $b$, but they look more or less like the following picture:  
-![An elliptic curve over the real numbers](https://i.imgur.com/rk6M8y0.jpg)
+![An elliptic curve over the real numbers](/images/external/rk6M8y0.jpg)
 
 In cryptography, we are not interested in curves defined over the real numbers. We work with them over some finite field $\mathcal{F_p}$ (that is, a set with a finite number of elements, such as $53$, $101$ o $2^{255}-19$), because that gives us a mathematical structure (a [finite group](https://en.wikipedia.org/wiki/Finite_group)) which is very convenient. The curve looks like scattered points with no clear pattern over a finite field:  
-![](https://i.imgur.com/sQDajke.jpg)
+![](/images/external/sQDajke.jpg)
 
 Elliptic curves play a role in key exchange when connecting via SSH to a server or to prove ownership in bitcoin. They also appear when performing digital signatures, generating random numbers (though there have been some problems) and they are useful even to factor numbers ([Lenstra's algorithm](https://en.wikipedia.org/wiki/Lenstra_elliptic-curve_factorization)). For example, in the elliptic curve digital signature algorithm (ECDSA) you have these steps (don't worry if you do not understand all the terms now, we will cover them one by one afterwards):
 
@@ -54,7 +54,7 @@ If you are one of those not willing to pay the cost of finding inverses and savi
 
 We can save ourselves from costly inversions if we move from our nice 2 dimensional space to a 3 dimensional space. This was introduced by Moebius and helps us also to represent the point at infinity properly. We can map our points from our elliptic curve $(x,y)$ to points in projective space $(X,Y,Z)$ as $(x,y) \rightarrow (X=x,Y=y,Z=1)$ and $\mathcal{O} \rightarrow (0,1,0)$. We can go back using the transformation $(X,Y,Z) \rightarrow (x=X/Z,y=Y/Z)$, except for the point at infinity, where it is ill-defined. We can visualize this process with the following picture, where we take three points from an elliptic curve and transform them to 3-d.
 
-![](https://i.imgur.com/zmlMAg9.jpg)
+![](/images/external/zmlMAg9.jpg)
 
 We can think of this as transforming our 2-d points to lines passing through the origin in 3-d space. For example, the point $(x_1,y_1)$ in 2-d transforms to the line $(\mu x_1,\mu y_1, \mu)$ with $\mu$ an element in the field. Thus, two points $P_1=(X_1,Y_1,Z_1)$ and $P_2=(X_2,Y_2,Z_2)$ are the same in 2-d (more precisely, are congruent) if we can find $\eta$ such that $(\eta X_1,\eta Y_1,\eta Z_1)=(X_2,Y_2,Z_2)$. These lines do not contain the origin $(0,0,0)$. It is usual to write points is projective space as $(X:Y:Z)$, instead of $(X,Y,Z)$. In our picture, the point A (yellow) gets mapped to the point D (red above it). All the points that lie on the same straight line passing through the origin and D (pink dashed) are considered equivalent to D. Similarly, point B (blue) is mapped to point F (light blue) and all the ponts over the light green dotted line (except the origin) are equivalent to F. When we add points in this space, the components $(X,Y,Z)$ will change, but we can go back to the point belonging to the curve by just retracing our steps to $Z=1$ along the line that passes through the origin. Why go all this length? We will shortly see that we avoid inversions at each addition step and do just one at the time of finding the point in 2-d (for example, when we need to find $r=x_1$ in ECDSA). Of course, if we have to do $P=2g$ we didn't gain anything, but if we have to perform $P=kg$ with $k$ in the order of 256 bits, we saved many costly inversions.
 

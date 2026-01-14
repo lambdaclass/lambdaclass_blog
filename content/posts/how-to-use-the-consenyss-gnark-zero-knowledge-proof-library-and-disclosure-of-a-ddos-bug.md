@@ -36,7 +36,7 @@ In the following sections we're going to explain and show some example usage of 
 
 ## (Always look on) the bright side
 
-![](https://i.imgur.com/Xs1ASoT.png)
+![](/images/external/Xs1ASoT.png)
 
 ### High-level API
 
@@ -72,7 +72,7 @@ After you have your circuit structure built you need to define the circuits beha
 
 ## (Join) the dark side
 
-![](https://i.imgur.com/P4W3s57.png)
+![](/images/external/P4W3s57.png)
 
 ### Low-level API
 

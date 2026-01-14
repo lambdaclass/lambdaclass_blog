@@ -42,7 +42,7 @@ book | heavy
   
 Our toy trie would look something like this:
 
-![image](https://hackmd.io/_uploads/HyXnHtvzgl.png)
+![image](/images/external/HyXnHtvzgl.png)
 
 To look up the value of the key "cake":
 
@@ -155,14 +155,14 @@ This should output:
     
 
 The resulting MPT should look like this:  
-![image](https://hackmd.io/_uploads/BJ7XSE1mex.png)
+![image](/images/external/BJ7XSE1mex.png)
 
         2. Add the second key-value pair: `(0x616b6c65, 0x02)`. Since this key shares the first 7 digits with the previous one, we proceed in the following way:
 
            * **Build one leaf for each key:** In each leaf, the array's first element should be the remaining path, but since the two keys share every digit except the last one, the remaining path is empty. So, we should just write there the flag `20` indicating that we are in a leaf node and that the path has an even amount of digits (zero digits). After that, encode the arrays in RLP and hash the RLP encodings, as we did in the step 1.
            * **Build a branch node:** Create a 17-item array. Write the hash of the first key's leaf node at index $4$ and the hash of the second key's leaf node at index $5$. Encode the array in RLP and hash the encoding.
            * **Build the extension and root node:** Create a two item array that contains the shared prefix as first element and the hash of the previous built branch node as second element. Since the shared prefix has an odd number of digits, add the flag `1` to it. Encode the array in RLP and hash the encoding.  
-![image](https://hackmd.io/_uploads/BJaRZEJQll.png)
+![image](/images/external/BJaRZEJQll.png)
         3. Add the key-value pair `(0x616b6c78, 0x03)`:
 
            * **Add a leaf node:** Notice that in this case, since the new key shares with the previous ones all the digits except the last two, the array's first item will have just one digit as remaining path and the flag `3` indicating that it is a leaf node with an odd amount of path digits.
@@ -170,10 +170,10 @@ The resulting MPT should look like this:
            * **Add an extension node:** The root will be another extension node. Its array should contain the shared prefix as first element and the hash of the recently added branch node as second element. Since the share prefix has an even number of digits, add the flag `00` to it.
 
 The current trie should look lik this:  
-![image](https://hackmd.io/_uploads/HJrfJHJXee.png)
+![image](/images/external/HJrfJHJXee.png)
 
         4. Add the last two key-value pairs continuing in this way, following the same steps as we did for the previous keys. When you're done, you should have the following MPT:  
-![image](https://hackmd.io/_uploads/Skc3rByXee.png)
+![image](/images/external/Skc3rByXee.png)
 
 ## Trie Proof
 

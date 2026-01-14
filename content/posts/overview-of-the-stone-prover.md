@@ -96,7 +96,7 @@ There are two implementations of this: the Fibonacci AIR and the Cairo AIR (`Cpu
 
 The flag `-generate_annotations` can be enabled when the main prover is executed. This logs the interactions between the prover and the verifier and can help debug and address compatibility issues. The annotations are added to the output JSON file of the proof.
 
-![](https://hackmd.io/_uploads/r15g0-BAn.png)
+![](/images/external/r15g0-BAn.png)
 
 ### Hash functions
 

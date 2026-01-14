@@ -26,7 +26,7 @@ In Reth, the staged sync pipeline executes queued stages serially. An external c
 
 The [reth docs](https://github.com/paradigmxyz/reth/blob/main/crates/stages/src/pipeline/mod.rs#L28) for the pipeline have an excellent diagram detailing how the stages work.
 
-![](https://i.imgur.com/yMGxizE.png)
+![](/images/external/yMGxizE.png)
 
 Of course, nothing is written in stone, and may change as possible improvements are detected and implemented, and as the project takes on it’s own direction.
 

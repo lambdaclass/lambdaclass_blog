@@ -35,7 +35,7 @@ Let’s begin by describing the computation we wish to prove. We must express th
         * All values are elements of $\mathbb{F_{p}}$
 
 > Let's build a circuit that meets these conditions:  
->  ![circuit_gkr](https://hackmd.io/_uploads/ByBJecQFkl.png)  
+>  ![circuit_gkr](/images/external/ByBJecQFkl.png)  
 >  Figure 1: Diagram of the arithmetic circuit used in the GKR protocol example.
 > 
 > This circuit models a program that has 2 inputs and two outputs, and we work over the field $\mathbb{F_{23}}$.
@@ -100,7 +100,7 @@ $$W_i: \\{0,1\\}^{ k_i } \to \mathbb{F_{p}}$$
 
 to be the function that maps a node’s position to its actual value, let $\tilde W_i(x)$ be its multilinear extension.
 
-> ![Screenshot 2025-02-07 at 5.09.49 PM](https://hackmd.io/_uploads/B1M6_kEtkx.png)
+> ![Screenshot 2025-02-07 at 5.09.49 PM](/images/external/B1M6_kEtkx.png)
 
 With this notation, the verifier’s task can be seen as checking that
 
@@ -139,7 +139,7 @@ The function $\text{Add}_i$ is defined to be 1 when $x = (a,b,c)$ corresponds to
 Just like with $\tilde D(x)$, we will need to create the multilinear extension: $\widetilde{\text{Add}}_i(x)$.
 
 > In our circuit:  
->  ![Screenshot 2025-02-07 at 5.15.38 PM](https://hackmd.io/_uploads/SyIm5y4F1x.png)  
+>  ![Screenshot 2025-02-07 at 5.15.38 PM](/images/external/SyIm5y4F1x.png)  
 >  The output addition node is at position: $$a = (1)$$  
 >  And is connected to nodes: $$b: (1,0) \ \ c: (1,1)$$  
 >  Since this is the only addition node, we define the function:  
