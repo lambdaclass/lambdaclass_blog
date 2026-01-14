@@ -1,0 +1,34 @@
+# Zola configuration for LambdaClass Blog
+# Documentation: https://www.getzola.org/documentation/getting-started/configuration/
+
+base_url = "https://blog.lambdaclass.com"
+title = "LambdaClass Blog"
+description = "Technical blog by LambdaClass"
+
+# Compilation settings
+compile_sass = true
+build_search_index = true
+generate_feeds = true
+feed_filenames = ["rss.xml", "atom.xml"]
+
+# Markdown settings
+[markdown]
+highlight_code = true
+highlight_theme = "base16-ocean-dark"
+smart_punctuation = true
+
+# Taxonomies
+[[taxonomies]]
+name = "tags"
+feed = true
+paginate_by = 20
+
+# Search settings
+[search]
+include_title = true
+include_description = true
+include_content = true
+
+# Extra configuration
+[extra]
+# Add any custom variables here
