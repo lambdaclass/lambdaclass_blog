@@ -5,7 +5,7 @@ slug = "clojerl-an-implementation-of-the-clojure-language-that-runs-on-the-beam"
 description = "An interview with its creator, Juan Facorro."
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.39.00---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.39.00---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]

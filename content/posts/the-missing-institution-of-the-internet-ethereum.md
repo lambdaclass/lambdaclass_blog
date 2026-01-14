@@ -4,7 +4,7 @@ date = 2025-12-02
 slug = "the-missing-institution-of-the-internet-ethereum"
 
 [extra]
-feature_image = "/content/images/2025/12/152f1c30-8926-43b9-b5aa-6d4017aa3178.jpeg"
+feature_image = "/images/2025/12/152f1c30-8926-43b9-b5aa-6d4017aa3178.jpeg"
 authors = ["LambdaClass"]
 +++
 

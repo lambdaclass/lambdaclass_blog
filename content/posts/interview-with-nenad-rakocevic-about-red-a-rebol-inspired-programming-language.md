@@ -5,7 +5,7 @@ slug = "interview-with-nenad-rakocevic-about-red-a-rebol-inspired-programming-la
 description = "After our last interview with Brian McKenna for This is not a Monad tutorial we interviewed Nenad Rakocevic, creator of the Red programming…"
 
 [extra]
-feature_image = "/content/images/2025/12/Copy_after_Jan_van_Huchtenburgh_-Haarlem_1647-Amsterdam_1733-_-_The_Battle_of_Malplaquet-_1709_-_RCIN_404898_-_Royal_Collection.jpg"
+feature_image = "/images/2025/12/Copy_after_Jan_van_Huchtenburgh_-Haarlem_1647-Amsterdam_1733-_-_The_Battle_of_Malplaquet-_1709_-_RCIN_404898_-_Royal_Collection.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,13 +14,13 @@ tags = ["Programming", "Programming Languages"]
 
 After our [last interview with Brian McKenna](https://medium.com/this-is-not-a-monad-tutorial/interview-with-brian-mckenna-about-roy-purescript-haskell-idris-and-dependent-types-63bb1289ea3d) for [This is not a Monad tutorial](https://medium.com/this-is-not-a-monad-tutorial) we interviewed [Nenad Rakocevic](https://github.com/dockimbel), creator of the [Red](http://www.red-lang.org/) programming language.
 
-![](/content/images/max/2000/1-C0sMUPxpbBs40YIBX848jQ.jpeg)
+![](/images/max/2000/1-C0sMUPxpbBs40YIBX848jQ.jpeg)
 
 From my completely subjective point of view Red and Rebol are quite strange creatures! But don’t get me wrong, that doesn’t mean something bad. For example, I am not aware of many high-level languages which features an embedded DSL for general-purpose low-level programming or that have 50 native types. You should check it out, you might find some interesting ideas inside Red development.
 
 **Please tell us a little bit about Red’s inception. Why was it created?**
 
-![](/content/images/max/2000/1-869fRKUVs2sTdVDYrqblMQ.png)
+![](/images/max/2000/1-869fRKUVs2sTdVDYrqblMQ.png)
 
 I started programming micro-computers, an Amiga in my case, in my teens. I have now been programming for more than 30 years. After my early experiences, I was unhappy with existing programming languages and tools. This was mostly because I found them not productive or friendly enough for my taste. So, when I stumbled across the Rebol language, in 1999, it was an eye-opener on what was wrong with so called “modern” computing practice. (Nowadays it’s even worse). Fighting complexity on all software fronts became the logical course of action.
 

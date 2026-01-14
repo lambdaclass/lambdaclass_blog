@@ -5,11 +5,11 @@ slug = "become-an-erlang-cowboy-and-tame-the-wild-wild-web-part-i"
 description = "Erlang: From zero to coding a commenting system"
 
 [extra]
-feature_image = "/content/images/2025/12/Alexander_cuts_the_Gordian_Knot.jpg"
+feature_image = "/images/2025/12/Alexander_cuts_the_Gordian_Knot.jpg"
 authors = ["LambdaClass"]
 +++
 
-![](/content/images/2025/12/1-kQjlW-vovZA1YmfxPHC5YQ.jpeg)
+![](/images/2025/12/1-kQjlW-vovZA1YmfxPHC5YQ.jpeg)
 
 #### Erlang: From zero to coding a commenting system
 
@@ -52,7 +52,7 @@ Programming languages have a defined set of goals. Most of them put **performanc
 
 > **Java** is designed to enable development of portable, **high-performance applications** for the widest range of computing platforms possible. — <https://www.java.com/en/about/>
 
-![](/content/images/max/2000/1-EPh-KvfabwINW5psttwbig.png)
+![](/images/max/2000/1-EPh-KvfabwINW5psttwbig.png)
 
 > **Haskell** is an advanced purely-functional programming language. An open-source product of more than twenty years of cutting-edge research, **it allows rapid development of robust, concise, correct software**. With strong support for integration with other languages, built-in concurrency and parallelism, debuggers, profilers, rich libraries and an active community, Haskell makes it easier to produce flexible, maintainable, high-quality software. — <http://www.haskell.org/haskellwiki/Haskell>
 
@@ -63,7 +63,7 @@ Programming languages have a defined set of goals. Most of them put **performanc
 
 > The only reliable plan is to design for performance. Performance doesn’t mean speed; that’s taking the metaphor too literally. Speed counts, but a programming language is first of all a tool for thinking in. We want thinking in **Arc** to**feel like driving a 911.** — <http://www.paulgraham.com/design.html>
 
-![](/content/images/max/2000/1-ezjVLCDsv-Qur7C2BvhnsQ.jpeg)****1973 Porsche  911E****
+![](/images/max/2000/1-ezjVLCDsv-Qur7C2BvhnsQ.jpeg)****1973 Porsche  911E****
 
 > The **Go** programming language is an open source project to **make programmers more productive**. Go is **expressive, concise, clean, and efficient**. Its concurrency mechanisms make it**easy to write programs that get the most out of multicore and networked machines** , while its novel type system enables**** flexible and modular program construction. Go compiles quickly to machine code yet has the convenience of garbage collection and the power of run-time reflection. It’s a **fast, statically typed, compiled language that feels like a dynamically typed, interpreted language**. — <http://golang.org/doc/>
 
@@ -73,7 +73,7 @@ Let’s see what Erlang has to say about itself:
 
 Erlang seems to be the ugly duckling compared to other programming languages since it doesn’t describe itself as being fast, clean or expressive.
 
-![](/content/images/max/2000/1-qV-Mz3gUxyM1Ug0XANoZgg.jpeg)
+![](/images/max/2000/1-qV-Mz3gUxyM1Ug0XANoZgg.jpeg)
 
 Erlang was created for building fault-tolerant systems. This is natural since Erlang’s roots are in the telecommunication world. Most important design choices of the language were taken to fulfill this requirement. However this does not mean it is not clean or expressive. Let’s take a closer look.
 
@@ -247,7 +247,7 @@ Now let’s store the result:
     
     2> {ok, "302", Headers, Body} = ibrowse:send_req("http://www.google.com/", [], get).
 
-![](/content/images/max/2000/1-9mLW7UAh0eDj2ljx5GfCJw.jpeg)Pattern, pattern, pattern matching everything!!!
+![](/images/max/2000/1-9mLW7UAh0eDj2ljx5GfCJw.jpeg)Pattern, pattern, pattern matching everything!!!
 
 We sent a get request to google, got an answer. ‘ok _’_ is an atom, and _“302"_ a string. They are not assigned, since they are not variables. So why did we use the equal sign to assign them? Well because in Erlang the equal sign is not exactly the same as assignment. Since Erlang supports the pattern matching mechanism, the equal sign is used as a match operator. It tries to find equivalence between the two sides, and then binds values to unbound variables, thus assigning them a value.
 
@@ -302,7 +302,7 @@ You might think we are using complicated words for showing off. But as you will 
 
 Functions in functional programming languages are first class citizens. This means that they are not discriminated. They can be assigned to variables, passed as arguments to other functions and returned as values from other functions. Say no to racism. Treat functions as any other type!
 
-![](/content/images/max/2000/1-FLmbrG6z0Pt25nbfeG775g.jpeg)
+![](/images/max/2000/1-FLmbrG6z0Pt25nbfeG775g.jpeg)
     
     
     6> F = fun(X, Y, Operation) -> Operation(X,Y) end.
@@ -479,7 +479,7 @@ We register the process created by spawn(Echofun3) under the name echo_process.
     Process with PID <0.37.0> has died
     die
 
-![](/content/images/max/2000/1-wysu8drrpca_-GPtNsoYNQ.gif)killing a process thanks to message passing
+![](/images/max/2000/1-wysu8drrpca_-GPtNsoYNQ.gif)killing a process thanks to message passing
     
     
     35> echo_process ! test.
@@ -551,7 +551,7 @@ And we get this ouput printed out:
      I got a new task: "Add cover to TPS report"
     ---
 
-![](/content/images/max/2000/1-1MQrMONE3YjecZdrkdOhTg.jpeg)
+![](/images/max/2000/1-1MQrMONE3YjecZdrkdOhTg.jpeg)
 
 The Dev process could be running in one server in the US, the PM process in an Europe based server and the Client, my shell, could be running on my computer here in Buenos Aires, Argentina. In another language this would require a really big code change. When using Erlang this only requires adding a few lines of code. Technically, we would have to register the processes globally and set up some kind of vpn so that the virtual machines see themselves as if on a local network. The point is that erlang has distribution built in, and getting to the point where systems run on clusters is not difficult.
 
@@ -561,7 +561,7 @@ For the following posts we leave error detection and supervision of processes, a
 
 You might be asking yourself why would you want to create processes and send messages between them? Sooner rather than later in relative big project you will need to parallelize some code for example a call to a third party api that is taking too much time for example. That is why you will need to use a concurrency construct. In most programming languages threads, processes or any construct related to concurrency or parallelism is something you rarely use. In most universities it is something you will learn only after your first programming courses. You might have used a ThreadPool in Java or even a pthread in C. But it is not something you generally use or do as often as defining a class, instantiating an object, calling a function or writing a conditional statement. Even if this is changing and we now have really interesting libraries, frameworks and toolkits like Akka for the Java world, Concurrent-Ruby or Celluloid for Ruby or even languages as Clojure that already set a pretty high bar, truth be told concurrency is not the cornerstone of most languages. In Erlang you will use them as frequently as you use an if construct in C, because they are cheap and great for designing your systems.
 
-![](/content/images/max/2000/1-o61yZIq3SpkTDPn-pzAJTA.gif)Message passing
+![](/images/max/2000/1-o61yZIq3SpkTDPn-pzAJTA.gif)Message passing
 
 Up to now we have only played with processes so that you can see how easy it is to use concurrency based primitives in Erlang since you do not require external library support like in most languages. You will see some of its real uses in the nexts posts. I must add that pattern matching plays an essential role too, and it is very well integrated with the the rest because it makes it very easy to select what to do based on the message received.
 
@@ -569,4 +569,4 @@ To sum up thanks to message passing, pattern matching, light processes you can a
 
 Stay tuned, we will work on some real stuff next week: comments and threads, http endpoints of our commenting system!
 
-![](/content/images/max/2000/1-1LLFcr72yLfiLfFloQHaeg.jpeg)This is me after my first hour playing with Erlang!
+![](/images/max/2000/1-1LLFcr72yLfiLfFloQHaeg.jpeg)This is me after my first hour playing with Erlang!

@@ -4,7 +4,7 @@ date = 2023-12-27
 slug = "lambdaworks-as-a-drop-in-replacement-for-winterfell"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_The_Landing_Place_-_Art_Institute_of_Chicago_-_1787-88.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_The_Landing_Place_-_Art_Institute_of_Chicago_-_1787-88.jpg"
 authors = ["LambdaClass"]
 +++
 

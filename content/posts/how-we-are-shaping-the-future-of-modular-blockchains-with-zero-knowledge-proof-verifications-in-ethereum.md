@@ -4,7 +4,7 @@ date = 2023-03-07
 slug = "how-we-are-shaping-the-future-of-modular-blockchains-with-zero-knowledge-proof-verifications-in-ethereum"
 
 [extra]
-feature_image = "/content/images/2025/12/Peter_Paul_Rubens_-_Battle_of_the_Amazons.jpg"
+feature_image = "/images/2025/12/Peter_Paul_Rubens_-_Battle_of_the_Amazons.jpg"
 authors = ["LambdaClass"]
 +++
 

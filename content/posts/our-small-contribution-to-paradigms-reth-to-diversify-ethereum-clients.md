@@ -4,7 +4,7 @@ date = 2023-03-06
 slug = "our-small-contribution-to-paradigms-reth-to-diversify-ethereum-clients"
 
 [extra]
-feature_image = "/content/images/2025/12/Peter_Paul_Rubens_-_Hercules_as_Heroic_Virtue_Overcoming_Discord_-cropped-.jpg"
+feature_image = "/images/2025/12/Peter_Paul_Rubens_-_Hercules_as_Heroic_Virtue_Overcoming_Discord_-cropped-.jpg"
 authors = ["LambdaClass"]
 +++
 

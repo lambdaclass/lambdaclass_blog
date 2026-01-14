@@ -5,14 +5,14 @@ slug = "verifiable-encryption-using-zero-knowledge-proofs"
 description = "Encryption is transforming messages into random-looking texts to ensure confidentiality between two parties.\n\nWhat is our objective here? We want to generate proof allowing us to verify an encryption algorithm, ensuring it does what it was designed for. "
 
 [extra]
-feature_image = "/content/images/2025/12/Zonaro_GatesofConst.jpg"
+feature_image = "/images/2025/12/Zonaro_GatesofConst.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["zero knowledge proofs", "Computer Science"]
 +++
 
-![download-1](/content/images/2023/01/download-1.jpeg)
+![download-1](/images/2023/01/download-1.jpeg)
 
 ## Scope
 

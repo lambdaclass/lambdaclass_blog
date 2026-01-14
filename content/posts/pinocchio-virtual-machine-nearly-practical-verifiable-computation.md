@@ -4,7 +4,7 @@ date = 2023-01-13
 slug = "pinocchio-virtual-machine-nearly-practical-verifiable-computation"
 
 [extra]
-feature_image = "/content/images/2025/12/Wilhelm_von_Kobell_-_Cattle_Market_before_a_Large_City_on_a_Lake-_1820_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Wilhelm_von_Kobell_-_Cattle_Market_before_a_Large_City_on_a_Lake-_1820_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -39,7 +39,7 @@ By the way, we are not discussing here how to convert the programs to circuits. 
 
 Throughout this post, let's consider a variant of the example circuit from the paper as a running example. The circuit is the following:
 
-![imagen](/content/images/2023/01/imagen.png)
+![imagen](/images/2023/01/imagen.png)
 
 The little squares on the top represent the input values. Choosing input values determines the output values of all the other gates. Executing the circuit means choosing some values for the input gates and filling out the rest of the values corresponding to the output of the multiplication gates. If you are wondering why we are only labeling the output of the multiplication gates, that's normal. The answer is: it's enough to do it this way. We'll come back to this in a moment.
 
@@ -47,17 +47,17 @@ For example, suppose we are working in $\mathbb F_{p}$, for some large prime $p$
 
 Here the input values are $2$ and $3$. The output is $30$. The unique intermediate value is $6$.
 
-![imagen-2](/content/images/2023/01/imagen-2.png)
+![imagen-2](/images/2023/01/imagen-2.png)
 
 Another evaluation is the following: the input values are $6$ and $4$, the output value is $240$, and the intermediate value is $24$.
 
-![imagen-3](/content/images/2023/01/imagen-3.png)
+![imagen-3](/images/2023/01/imagen-3.png)
 
 #### Equations that satisfy circuit execution instances
 
 Let's name the input values  $c_1, c_2$, the ouput value $c_3$ and the intermediate one $c_4$.
 
-![imagen-5](/content/images/2023/01/imagen-5.png)
+![imagen-5](/images/2023/01/imagen-5.png)
 
 Here is a simple but important observation. It doesn't matter which input values we choose, the resulting values will satisfy the following system of equations:  
 $c_1c_2 = c_4$  

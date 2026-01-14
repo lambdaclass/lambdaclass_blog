@@ -4,7 +4,7 @@ date = 2024-03-25
 slug = "proof-aggregation-techniques"
 
 [extra]
-feature_image = "/content/images/2025/12/Charlemagne-_empereur_d-Occident-_rec--oit_la_soumission_de_Wittekind-_785-_por_Ary_Scheffer.jpg"
+feature_image = "/images/2025/12/Charlemagne-_empereur_d-Occident-_rec--oit_la_soumission_de_Wittekind-_785-_por_Ary_Scheffer.jpg"
 authors = ["LambdaClass"]
 +++
 

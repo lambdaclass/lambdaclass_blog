@@ -4,7 +4,7 @@ date = 2025-06-06
 slug = "our-succinct-explanation-of-jagged-polynomial-commitments"
 
 [extra]
-feature_image = "/content/images/2025/12/La_ronda_de_noche-_por_Rembrandt_van_Rijn.jpg"
+feature_image = "/images/2025/12/La_ronda_de_noche-_por_Rembrandt_van_Rijn.jpg"
 authors = ["LambdaClass"]
 +++
 

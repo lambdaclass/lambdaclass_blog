@@ -5,7 +5,7 @@ slug = "holiday-ping-how-we-implemented-our-first-open-source-app-with-erlang-an
 description = "After almost ten years of working as a developer for different companies, two years ago I started my own company LambdaClass. I did so…"
 
 [extra]
-feature_image = "/content/images/2025/12/After_the_Battle_of_Grunwald_-_Alfons_Mucha.jpg"
+feature_image = "/images/2025/12/After_the_Battle_of_Grunwald_-_Alfons_Mucha.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -18,7 +18,7 @@ That is why today it is a very special day for me. We take a break from regular 
 
 _Discuss and vote at_[ _lobsters_](https://lobste.rs/s/mgefw9/holiday_ping_how_we_implemented_our_first) _,_[_reddit_](https://www.reddit.com/r/programming/comments/7cweat/holiday_ping_how_we_implemented_our_first_open/) _and_[ _hn_](https://news.ycombinator.com/item?id=15695955) _._
 
-![](/content/images/max/2000/1-9ngymzWNwkPMhZ9u7uZ_XA.png)
+![](/images/max/2000/1-9ngymzWNwkPMhZ9u7uZ_XA.png)
 
 #### **Background**
 
@@ -144,7 +144,7 @@ To manage authorization of the API, we went with Bearer tokens based on previous
 
 Regarding the token format, I initially went with [JWT](https://jwt.io/) without giving it much thought, because that’s what I’ve seen most commonly used to authorize web apps accessing a REST backend. My coworkers, who haven’t heard about it before, [were suspicious](https://github.com/lambdaclass/holiday_ping/issues/20), which I understand, because it totally sounds like:
 
-![](/content/images/max/2000/0-LmkSEubDQc5xYFKb.jpeg)
+![](/images/max/2000/0-LmkSEubDQc5xYFKb.jpeg)
 
 And we’re [not very fond of JSON](https://medium.com/@jlouis666/two-technologies-which-are-bad-for-you-160311ad6b24#13fd). So I digged up a little bit more to make sure the decision made sense. There are [several](http://cryto.net/~joepie91/blog/2016/06/13/stop-using-jwt-for-sessions/) [articles](https://kev.inburke.com/kevin/things-to-use-instead-of-jwt/) expressing concerns about using JWT, although most of them don’t apply to our use case. Assuming we want to stick to Bearer tokens, the alternative to JWT would be to [just store a random string in the database](https://auth0.com/blog/ten-things-you-should-know-about-tokens-and-cookies/#token-oauth), associated with the user, and check that value on every request. A quick comparison between the two options:
 

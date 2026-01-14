@@ -4,7 +4,7 @@ date = 2025-05-06
 slug = "lambdas-new-strategic-partnership-with-nous-research-decentralized-artificial-intelligence"
 
 [extra]
-feature_image = "/content/images/2025/12/Psyche-Waterhouse.jpg"
+feature_image = "/images/2025/12/Psyche-Waterhouse.jpg"
 authors = ["LambdaClass"]
 +++
 

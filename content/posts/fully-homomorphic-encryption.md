@@ -5,7 +5,7 @@ slug = "fully-homomorphic-encryption"
 description = "Fully homomorphic encryption (FHE) is a powerful cryptographic primitive which allows us parties to compute with encrypted data, without the need of decrypting it first. "
 
 [extra]
-feature_image = "/content/images/2025/12/Weeks_Edwin_Lord_A_Court_in_The_Alhambra_in_the_Time_of_the_Moors.jpg"
+feature_image = "/images/2025/12/Weeks_Edwin_Lord_A_Court_in_The_Alhambra_in_the_Time_of_the_Moors.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

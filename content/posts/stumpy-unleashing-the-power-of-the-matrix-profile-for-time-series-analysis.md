@@ -5,7 +5,7 @@ slug = "stumpy-unleashing-the-power-of-the-matrix-profile-for-time-series-analys
 description = "An interview with Stumpy creator Sean Law"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.52.03---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.52.03---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Stumpy", "Time Series", "Data Science", "Python", "Data Mining"]
 
 #### An interview with Stumpy creator Sean Law
 
-![](/content/images/max/2000/1-4Y5wJGqZM2AxKb7fmT9-og.png)Source: [Stumpy documentation](https://stumpy.readthedocs.io/en/latest/Tutorial_Time_Series_Chains.html)
+![](/images/max/2000/1-4Y5wJGqZM2AxKb7fmT9-og.png)Source: [Stumpy documentation](https://stumpy.readthedocs.io/en/latest/Tutorial_Time_Series_Chains.html)
 
 In the mid-20th century, the Information Age started. Every day an astonishing amount of data is created and analyzing it in an efficient way requires computational tools that combine novel and clever approaches that benefit from cutting edge technology.
 
@@ -24,7 +24,7 @@ Stumpy is a library for analyzing time series, that tries to address the problem
 
 * * *
 
-![](/content/images/max/2000/1-NWV2vLKBciK49BAVfzvN4Q.png)
+![](/images/max/2000/1-NWV2vLKBciK49BAVfzvN4Q.png)
 
 #### What is STUMPY? What are the goals of the project?
 
@@ -68,7 +68,7 @@ In the context of time series, “semantic segmentation” is “the division of
 
 In general, sampling rate is quite important but it is often independent of the analysis method. If you have a conserved pattern that spans a full minute (i.e., it is a unique shape that is captured within 60 data points spaced one second apart) but you only collect a single aggregate data point once every hour, then it is impossible for any method to discover this pattern. Conversely, if you collect a data point once every microsecond then you might run out of storage space or lack the ability to analyze this large data set after 5 years. Unfortunately, in either case, having the best algorithms and the fastest hardware will not help you fix poor sampling. Or, as they say, “garbage in, garbage out”.
 
-![](/content/images/max/2000/1--71VCPSQe2aIyw49RucHCQ.png)Source: [Stumpy documentation](https://stumpy.readthedocs.io/en/latest/Tutorial_Time_Series_Chains.html)
+![](/images/max/2000/1--71VCPSQe2aIyw49RucHCQ.png)Source: [Stumpy documentation](https://stumpy.readthedocs.io/en/latest/Tutorial_Time_Series_Chains.html)
 
 #### STUMPED is the distributed version of STUMP and it is implemented using Dask. Why have you chosen Dask over other solutions to implement STUMPED?
 

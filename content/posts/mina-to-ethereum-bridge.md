@@ -4,7 +4,7 @@ date = 2024-02-05
 slug = "mina-to-ethereum-bridge"
 
 [extra]
-feature_image = "/content/images/2025/12/The-Death-of-Socrates-Jacques-Louis-David-.jpg"
+feature_image = "/images/2025/12/The-Death-of-Socrates-Jacques-Louis-David-.jpg"
 authors = ["LambdaClass"]
 +++
 

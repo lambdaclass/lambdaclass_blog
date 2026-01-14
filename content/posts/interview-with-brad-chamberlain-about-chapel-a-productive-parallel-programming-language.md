@@ -5,7 +5,7 @@ slug = "interview-with-brad-chamberlain-about-chapel-a-productive-parallel-progr
 description = "As you might know, I am a big fan of concurrency, parallelism and distribution but I know almost nothing about high performance computing…"
 
 [extra]
-feature_image = "/content/images/2025/12/Va--clav_Broz--i--k_-_Tu_felix_Austria_nube_-_2768a-b_-_Kunsthistorisches_Museum.jpg"
+feature_image = "/images/2025/12/Va--clav_Broz--i--k_-_Tu_felix_Austria_nube_-_2768a-b_-_Kunsthistorisches_Museum.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ As you might know, I am a big fan of concurrency, parallelism and distribution b
 
 * * *
 
-![](/content/images/max/2000/1-Vbk8JH0pBz1gSHSbxV799A.png)
+![](/images/max/2000/1-Vbk8JH0pBz1gSHSbxV799A.png)
 
 **What problems does Chapel solve? Who is the ideal user of Chapel?**
 
@@ -73,7 +73,7 @@ As an illustration of Chapel’s advantages, consider the STREAM Triad benchmark
 
 In contrast, doing the same thing in C + MPI + OpenMP results in computation like the following, due to the SPMD programming model as well as the lower-level notations (MPI-oriented code is in red, OpenMP in blue):
 
-![](/content/images/max/2000/0-7A817ub0TK9QWgLW.png)
+![](/images/max/2000/0-7A817ub0TK9QWgLW.png)
 
 **Performance-wise, how does Chapel compare to languages like C, C++, Go, Rust?**
 
@@ -81,7 +81,7 @@ Today, Chapel programs tend to perform competitively with hand-coded C and C++. 
 
 Since we care about code clarity, we tend to graph the Computer Language Benchmark Game results on scatter plots showing normalized execution times versus code compactness (as a proxy metric for clarity). In such views, Chapel tends to fall in a very unique position, being competitive in speed with the fastest languages while also nearly as compact as scripting languages. The following two plots illustrate this (the right graph zooms in on the fastest entries for readability):
 
-![](/content/images/max/2000/0-5HKm6tfdrqfXiXWP.png)![](/content/images/max/2000/0-YHDLOnTtFepJmsUV.png)
+![](/images/max/2000/0-5HKm6tfdrqfXiXWP.png)![](/images/max/2000/0-YHDLOnTtFepJmsUV.png)
 
 **Why did you implement Chapel using LLVM?**
 

@@ -4,7 +4,7 @@ date = 2023-04-14
 slug = "do-you-want-quality-code-learn-how-to-use-differential-fuzzers"
 
 [extra]
-feature_image = "/content/images/2025/12/-Hercules_and_Achelous-_by_Cornelis_Cornelisz._van_Haarlem-_1590.jpg"
+feature_image = "/images/2025/12/-Hercules_and_Achelous-_by_Cornelis_Cornelisz._van_Haarlem-_1590.jpg"
 authors = ["LambdaClass"]
 +++
 

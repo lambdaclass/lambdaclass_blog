@@ -4,7 +4,7 @@ date = 2022-08-26
 slug = "how-to-create-your-own-crappy-rsa-as-a-software-developer"
 
 [extra]
-feature_image = "/content/images/2025/12/Entrada_de_Roger_de_Flor_en_Constantinopla_-Palacio_del_Senado_de_Espan--a-.jpg"
+feature_image = "/images/2025/12/Entrada_de_Roger_de_Flor_en_Constantinopla_-Palacio_del_Senado_de_Espan--a-.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

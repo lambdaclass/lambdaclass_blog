@@ -4,7 +4,7 @@ date = 2025-06-23
 slug = "diving-deep-into-binius-m3-arithmetization-using-merkle-tree"
 
 [extra]
-feature_image = "/content/images/2025/12/Joshua_Commanding_the_Sun_to_Stand_Still_upon_Gibeon_-1816-_John_Martin_-_NGA_2004.64.1.jpg"
+feature_image = "/images/2025/12/Joshua_Commanding_the_Sun_to_Stand_Still_upon_Gibeon_-1816-_John_Martin_-_NGA_2004.64.1.jpg"
 authors = ["LambdaClass"]
 +++
 

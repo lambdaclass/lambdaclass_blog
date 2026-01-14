@@ -5,7 +5,7 @@ slug = "d-day-invasion-with-mlfe-ml-landing-in-the-erlang-world"
 description = "Time has passed since our last interview for This is not a Monad Tutorial. OpenBSD released its 6.0 version after 20 years of continues…"
 
 [extra]
-feature_image = "/content/images/2025/12/Po_bitve--_na_Vi--tkove--.jpg"
+feature_image = "/images/2025/12/Po_bitve--_na_Vi--tkove--.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -18,7 +18,7 @@ Going back to our endogamic tech world, I interviewed [Jeremy Pierre](http://noi
 
 If you have any more questions please let me know via [lobsters](https://lobste.rs/s/vw8zb2/d_day_invasion_with_mlfe_ml_landing_erlang), [reddit programming](https://www.reddit.com/r/programming/comments/5d2ooi/dday_invasion_with_mlfe_ml_landing_in_the_erlang/) or [hn](https://news.ycombinator.com/item?id=12958099). Au revoir.
 
-![](/content/images/max/2000/1-VHoeeRQqosE3Woi37aHFeA.jpeg)2016 MLFE
+![](/images/max/2000/1-VHoeeRQqosE3Woi37aHFeA.jpeg)2016 MLFE
 
 **What is MLFE?**
 

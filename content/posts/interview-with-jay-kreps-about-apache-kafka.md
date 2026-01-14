@@ -5,14 +5,14 @@ slug = "interview-with-jay-kreps-about-apache-kafka"
 description = "This time we interviewed Jay Kreps, one of the creators of Apache Kafka. Kafka is an open source messaging system with a few design choices…"
 
 [extra]
-feature_image = "/content/images/2025/12/William_Bouguereau_-_Dante_and_Virgile_-_Google_Art_Project_2.jpg"
+feature_image = "/images/2025/12/William_Bouguereau_-_Dante_and_Virgile_-_Google_Art_Project_2.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Development", "Big Data", "Analytics"]
 +++
 
-![](/content/images/max/2000/1-lRRJqrarJFi5TPtnBm_8hA.jpeg)
+![](/images/max/2000/1-lRRJqrarJFi5TPtnBm_8hA.jpeg)
 
 This time we interviewed [Jay Kreps](https://twitter.com/jaykreps), one of the creators of Apache Kafka. Kafka is an open source messaging system with a few design choices that make it particulary useful for high throughput and low latency scenarios.
 
@@ -41,7 +41,7 @@ There are a few things that are different about Kafka:
 
 A message or record in Kafka is just a key-value pair, where the key and value are some string of bytes.
 
-![](/content/images/max/2000/0-4N-FW2mHbx6AsraV.png)
+![](/images/max/2000/0-4N-FW2mHbx6AsraV.png)
 
 Kafka provides the abstraction of a “topic” which is split into one or more partitions (usually many) and spread over a cluster of nodes. A topic is a kind of feed of records. Applications publish records into a topic, and the record’s key determines the partition within that topic that the record goes to. Each partition is replicated on multiple machines for fault-tolerance.
 
@@ -103,7 +103,7 @@ The best thing is that these days there are hundreds of open source distributed 
 
 As I mentioned in the introduction to the interview, I highly recomend that you read the following three links about Kafka, its design and uses:
 
-[The Log: What every software engineer should know about real-time data's unifying abstractionI joined LinkedIn about six years ago at a particularly interesting time. We were just beginning to run up against the…engineering.linkedin.com![](/content/images/fit/c/160/160/0-EKXwv5gzf95qmyw9.jpeg)](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)[Putting Apache Kafka To Use: A Practical Guide to Building a Stream Data Platform (Part 1)These days you hear a lot about "stream processing", "event data", and "real-time", often related to technologies like…www.confluent.io![](/content/images/fit/c/160/160/0-wDG3xKC21IQ4qaC7.png)](http://www.confluent.io/blog/stream-data-platform-1/)[Putting Apache Kafka To Use: A Practical Guide to Building a Stream Data Platform (Part 2)This is the second part of our guide on streaming data and Apache Kafka. In part one I talked about the uses for real…www.confluent.io![](/content/images/fit/c/160/160/0-D5SxPsgpumFDy5py.png)](http://www.confluent.io/blog/stream-data-platform-2/)[Apache KafkaKafka is a distributed, partitioned, replicated commit log service. It provides the functionality of a messaging system…kafka.apache.org![](/content/images/fit/c/160/160/0-5a9GIkEZZHsR80Z0.png)](https://kafka.apache.org/documentation.html#design)
+[The Log: What every software engineer should know about real-time data's unifying abstractionI joined LinkedIn about six years ago at a particularly interesting time. We were just beginning to run up against the…engineering.linkedin.com![](/images/fit/c/160/160/0-EKXwv5gzf95qmyw9.jpeg)](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)[Putting Apache Kafka To Use: A Practical Guide to Building a Stream Data Platform (Part 1)These days you hear a lot about "stream processing", "event data", and "real-time", often related to technologies like…www.confluent.io![](/images/fit/c/160/160/0-wDG3xKC21IQ4qaC7.png)](http://www.confluent.io/blog/stream-data-platform-1/)[Putting Apache Kafka To Use: A Practical Guide to Building a Stream Data Platform (Part 2)This is the second part of our guide on streaming data and Apache Kafka. In part one I talked about the uses for real…www.confluent.io![](/images/fit/c/160/160/0-D5SxPsgpumFDy5py.png)](http://www.confluent.io/blog/stream-data-platform-2/)[Apache KafkaKafka is a distributed, partitioned, replicated commit log service. It provides the functionality of a messaging system…kafka.apache.org![](/images/fit/c/160/160/0-5a9GIkEZZHsR80Z0.png)](https://kafka.apache.org/documentation.html#design)
 
 Jay also gave a few excellent talks about Kafka that explain why it was created and what are its uses:
 

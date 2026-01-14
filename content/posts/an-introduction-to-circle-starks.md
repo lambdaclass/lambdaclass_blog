@@ -4,7 +4,7 @@ date = 2024-07-25
 slug = "an-introduction-to-circle-starks"
 
 [extra]
-feature_image = "/content/images/2025/12/Raphae--l_au_Vatican_-Louvre_INV_8365-.jpg"
+feature_image = "/images/2025/12/Raphae--l_au_Vatican_-Louvre_INV_8365-.jpg"
 authors = ["LambdaClass"]
 +++
 

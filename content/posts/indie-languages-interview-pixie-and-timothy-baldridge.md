@@ -5,17 +5,17 @@ slug = "indie-languages-interview-pixie-and-timothy-baldridge"
 description = "We interviewed Timothy Baldridge, creator of Pixie, a small fast, native lisp with magical powers. We hope you try it out!"
 
 [extra]
-feature_image = "/content/images/2025/12/Nicolas_Poussin_-_The_Victory_of_Joshua_over_Amorites_-_Pushkin_museum.jpg"
+feature_image = "/images/2025/12/Nicolas_Poussin_-_The_Victory_of_Joshua_over_Amorites_-_Pushkin_museum.jpg"
 authors = ["LambdaClass"]
 +++
 
 We interviewed [Timothy Baldridge](https://twitter.com/timbaldridge), creator of [Pixie](https://github.com/pixie-lang/pixie), a small fast, native lisp with _magical_ powers. We hope you try it out!
 
-![](/content/images/max/2000/1-jYqNf1VQpmxhv7WwkPm1Ag.jpeg)“In modern use, Pixie can be synonymous with fairies or sprites”
+![](/images/max/2000/1-jYqNf1VQpmxhv7WwkPm1Ag.jpeg)“In modern use, Pixie can be synonymous with fairies or sprites”
 
 **Please tell us a little bit about Pixie’s inception and the road to the current status.**
 
-![](/content/images/max/2000/1-s4cstPwICRsq-gb1zJ261Q.jpeg) Timothy Baldridge
+![](/images/max/2000/1-s4cstPwICRsq-gb1zJ261Q.jpeg) Timothy Baldridge
 
 I've been a language hacker for years, and have played around with RPython (PyPy’s tool-chain) for some time. I've always had it in the back of my head that a lisp on RPython would be a good project. But it seems like this time it’s really taken off.
 

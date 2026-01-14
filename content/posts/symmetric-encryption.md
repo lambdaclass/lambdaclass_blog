@@ -4,7 +4,7 @@ date = 2023-01-17
 slug = "symmetric-encryption"
 
 [extra]
-feature_image = "/content/images/2025/12/Sandys-_Frederick_-_Morgan_le_Fay.jpeg"
+feature_image = "/images/2025/12/Sandys-_Frederick_-_Morgan_le_Fay.jpeg"
 authors = ["LambdaClass"]
 
 [taxonomies]

@@ -5,7 +5,7 @@ slug = "interview-with-jesper-louis-andersen-about-erlang-haskell-ocaml-go-idris
 description = "In this occasion we interviewed Jesper Louis Andersen, a type theorist with lot of practical knowledge and experience. His blog (you should…"
 
 [extra]
-feature_image = "/content/images/2025/12/Jeanne_d-Arc_-_Panthe--on_III.jpg"
+feature_image = "/images/2025/12/Jeanne_d-Arc_-_Panthe--on_III.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ tags = ["Functional Programming", "Ocaml", "Erlang"]
 
 In this occasion we interviewed Jesper Louis Andersen, a type theorist with lot of practical knowledge and experience. His [blog](https://medium.com/@jlouis666) (you should also check his old [blog](http://jlouisramblings.blogspot.com/), you will find a lot of good things over there) and code (specially things like [safetyvalve](https://github.com/jlouis/safetyvalve) and [fuse](https://github.com/jlouis/fuse)) have been a big inspiration to me. That is why I published the interview in two parts: I had too many questions for him. I hope you enjoy reading his answers as much as I did.
 
-![](/content/images/max/2000/1-mIrYVuSZtaYe3WJkRwUqwQ.jpeg)
+![](/images/max/2000/1-mIrYVuSZtaYe3WJkRwUqwQ.jpeg)
 
   
 I published part II of the interview. [Check it out!](https://medium.com/this-is-not-a-monad-tutorial/interview-with-jesper-louis-andersen-about-erlang-haskell-ocaml-go-idris-the-jvm-software-and-5628fe591295)
@@ -29,7 +29,7 @@ I published part II of the interview. [Check it out!](https://medium.com/this-is
 
 **Modern comfortable programming language #java:**
 
-![](/content/images/max/2000/0-Ee-kDajNT561ZgOd.jpeg)
+![](/images/max/2000/0-Ee-kDajNT561ZgOd.jpeg)
 
 **Why is it so? Why this is not the case in most OOP languages?**
 

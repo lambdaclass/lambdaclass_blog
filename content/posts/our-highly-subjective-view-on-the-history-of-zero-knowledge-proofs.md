@@ -4,7 +4,7 @@ date = 2024-02-17
 slug = "our-highly-subjective-view-on-the-history-of-zero-knowledge-proofs"
 
 [extra]
-feature_image = "/content/images/2025/12/La_bataille_d-Austerlitz._2_decembre_1805_-Franc--ois_Ge--rard-.jpg"
+feature_image = "/images/2025/12/La_bataille_d-Austerlitz._2_decembre_1805_-Franc--ois_Ge--rard-.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

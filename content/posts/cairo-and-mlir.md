@@ -4,7 +4,7 @@ date = 2023-05-03
 slug = "cairo-and-mlir"
 
 [extra]
-feature_image = "/content/images/2025/12/The-mysterious-wedding-in-Pistoia--1894-.jpg"
+feature_image = "/images/2025/12/The-mysterious-wedding-in-Pistoia--1894-.jpg"
 authors = ["LambdaClass"]
 +++
 

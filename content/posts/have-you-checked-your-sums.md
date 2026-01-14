@@ -4,7 +4,7 @@ date = 2023-10-26
 slug = "have-you-checked-your-sums"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_View_of_Ripetta_-_WGA19603.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_View_of_Ripetta_-_WGA19603.jpg"
 authors = ["LambdaClass"]
 +++
 

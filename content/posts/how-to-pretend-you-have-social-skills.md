@@ -5,14 +5,14 @@ slug = "how-to-pretend-you-have-social-skills"
 description = "This time I decided to do something uncommon. I have asked Martina Cantaro, a psychologist that works for our company Lambdaclass, to write…"
 
 [extra]
-feature_image = "/content/images/2025/12/Va--clavBROZ--I--K-Defenestrace.jpg"
+feature_image = "/images/2025/12/Va--clavBROZ--I--K-Defenestrace.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Programming", "Soft Skills"]
 +++
 
-![](/content/images/max/2000/1-Zn-cHY_cpFVxmhkIAwhYzw.png)A software company from another dimension
+![](/images/max/2000/1-Zn-cHY_cpFVxmhkIAwhYzw.png)A software company from another dimension
 
 This time I decided to do something uncommon. I have asked Martina Cantaro, a psychologist that works for our company [Lambdaclass,](http://lambdaclass.com/) to write about the work she is doing training young developers. I hope you find it useful.
 
@@ -61,7 +61,7 @@ Of course, if the company works with Erlang and you fervently praise Cobol, the 
 
 So, young developers. of the world, don’t fret. If you feel paralyzed when an interviewer asks you how you see yourself in five years, remember she doesn’t want you to read the future, she wants to learn about your motivation and goals. The same thing goes for your favorite programming language. However also have in mind that the person that is interviewing you might lack social skills too! You can’t entirely control the output of the interview.
 
-![](/content/images/max/2000/0-tb0bOX6gqdjieBZE.png)
+![](/images/max/2000/0-tb0bOX6gqdjieBZE.png)
 
 **Communication**
 

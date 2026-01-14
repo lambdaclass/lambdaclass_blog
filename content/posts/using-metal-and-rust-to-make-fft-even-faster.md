@@ -4,7 +4,7 @@ date = 2023-03-17
 slug = "using-metal-and-rust-to-make-fft-even-faster"
 
 [extra]
-feature_image = "/content/images/2025/12/David_Teniers_the_Younger_-_Archduke_Leopold_William_in_his_Gallery_at_Brussels_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/David_Teniers_the_Younger_-_Archduke_Leopold_William_in_his_Gallery_at_Brussels_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 +++
 

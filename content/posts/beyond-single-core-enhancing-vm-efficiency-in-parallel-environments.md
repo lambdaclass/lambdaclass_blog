@@ -4,7 +4,7 @@ date = 2024-03-22
 slug = "beyond-single-core-enhancing-vm-efficiency-in-parallel-environments"
 
 [extra]
-feature_image = "/content/images/2025/12/Entre--e_de_HENRI_IV_dans_Paris_le_22_mars_1594.jpg"
+feature_image = "/images/2025/12/Entre--e_de_HENRI_IV_dans_Paris_le_22_mars_1594.jpg"
 authors = ["LambdaClass"]
 +++
 

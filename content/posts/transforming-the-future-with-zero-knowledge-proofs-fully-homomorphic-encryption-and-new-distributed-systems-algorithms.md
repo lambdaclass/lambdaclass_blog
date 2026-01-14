@@ -4,7 +4,7 @@ date = 2023-04-13
 slug = "transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms"
 
 [extra]
-feature_image = "/content/images/2023/04/Jan_Matejko-_Bitwa_pod_Grunwaldem--2-.jpg"
+feature_image = "/images/2023/04/Jan_Matejko-_Bitwa_pod_Grunwaldem--2-.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

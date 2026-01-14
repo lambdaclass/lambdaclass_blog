@@ -5,7 +5,7 @@ slug = "lam-an-actor-model-vm-for-webassembly-and-native"
 description = "An interview with its creator, Leandro Ostera"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.43.57---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.43.57---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Actor Model", "Vm", "Webassembly", "Erlang", "Beam"]
 
 An interview with its creator, Leandro Ostera.
 
-![](/content/images/max/2000/1-ZA5-hKa-yYGz8FX-kmZh9g.png)Source: [https://abstractmachines.dev/](https://abstractmachines.dev/)
+![](/images/max/2000/1-ZA5-hKa-yYGz8FX-kmZh9g.png)Source: [https://abstractmachines.dev/](https://abstractmachines.dev/)
 
 Here, at NAMT, we are in love with the Actor Model.  
 Within this paradigm, the basic units of computation are called actors. There is no shared state between them, instead, they interact via message passing. This has the advantage that actors become trivial to paralellize (in Erlang, an actor is called a _process_) and errors became easier to handle.
@@ -111,4 +111,4 @@ Virtual Machines by Iain D. Craig, and Formal Development of a Network-Centric R
 
 Some books that have had a massive impact in how I think and communicate have (unsurprisingly) nothing to do with computers. Like Umberto Eco’s “6 Walks in the Fictional Woods” (focused on how to create narratives and rhetoric) or Mandelbrot’s “The (Mis)Behavior of Markets” (a historical account of how fractal geometry describes better the financial markets). Nonetheless, they’ve helped shape the way I think and I’ve come out a better programmer.
 
-![](/content/images/max/2000/0-nPPWbd4-7dJavk5P.gif)
+![](/images/max/2000/0-nPPWbd4-7dJavk5P.gif)

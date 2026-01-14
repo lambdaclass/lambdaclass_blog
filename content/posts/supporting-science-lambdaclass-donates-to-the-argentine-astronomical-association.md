@@ -4,7 +4,7 @@ date = 2025-05-29
 slug = "supporting-science-lambdaclass-donates-to-the-argentine-astronomical-association"
 
 [extra]
-feature_image = "/content/images/2025/12/An_Algerian_Lady_Hawking.jpg"
+feature_image = "/images/2025/12/An_Algerian_Lady_Hawking.jpg"
 authors = ["LambdaClass"]
 +++
 

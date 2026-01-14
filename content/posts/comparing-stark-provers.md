@@ -4,7 +4,7 @@ date = 2024-01-12
 slug = "comparing-stark-provers"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_1773_-_Finding_of_the_Laocoon.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_1773_-_Finding_of_the_Laocoon.jpg"
 authors = ["LambdaClass"]
 +++
 

@@ -5,7 +5,7 @@ slug = "simulations-are-about-to-get-way-way-faster-with-juliasim"
 description = "JuliaSim is a cloud-based simulation platform built on top of the Julia open source stack, including SciML and ModelingToolkit"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.37.29---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.37.29---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]

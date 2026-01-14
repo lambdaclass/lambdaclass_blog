@@ -4,7 +4,7 @@ date = 2024-01-30
 slug = "happy-birthday-lambdaworks"
 
 [extra]
-feature_image = "/content/images/2025/12/Retour_de_Napoleon_d-_Isle_d-Elbe-_by_Charles_de_Steuben.jpg"
+feature_image = "/images/2025/12/Retour_de_Napoleon_d-_Isle_d-Elbe-_by_Charles_de_Steuben.jpg"
 authors = ["LambdaClass"]
 +++
 

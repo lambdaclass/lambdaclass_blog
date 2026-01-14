@@ -4,7 +4,7 @@ date = 2024-01-05
 slug = "binius-part-2"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_L-E--cole_de_chirurgie_en_construction_-cropped-.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_L-E--cole_de_chirurgie_en_construction_-cropped-.jpg"
 authors = ["LambdaClass"]
 +++
 

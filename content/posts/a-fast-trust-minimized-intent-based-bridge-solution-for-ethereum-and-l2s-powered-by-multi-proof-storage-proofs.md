@@ -5,7 +5,7 @@ slug = "a-fast-trust-minimized-intent-based-bridge-solution-for-ethereum-and-l2s
 description = "Bridges are generally insecure and economically inefficient. We propose a bridge design that is simple, modular, and utilizes multi-storage proofs and the native messaging system between Ethereum and Layer 2 networks (L2s) as a fallback mechanism."
 
 [extra]
-feature_image = "/content/images/2025/12/F0087_Louvre_Gellee_port_au_soleil_couchant-_INV4715_rwk.jpg"
+feature_image = "/images/2025/12/F0087_Louvre_Gellee_port_au_soleil_couchant-_INV4715_rwk.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -29,7 +29,7 @@ b. The transfer function of the PaymentRegistry contract in Ethereum pays the to
         4. A storage proof is generated, containing evidence of a transfer from the market maker's Ethereum account to the user-specified address in Ethereum.
         5. Ethereum PaymentRegistry storage information is used as part of a storage proof.
         6. L2 Escrow contract verifies the storage proof of the PaymentRegistry contract in Ethereum and pays the MM with the initial tokens locked by the user.
-![](/content/images/2024/01/image.png)
+![](/images/2024/01/image.png)
 
 The same design can be expanded to be used to bridge tokens from an L2 to another L2. The same design can include multi-proof storage proofs instead of using only one. We also have implemented a fallback mechanism using the native message mechanism between Ethereum and L2s in case the storage proof providers are offline.
 

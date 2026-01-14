@@ -4,7 +4,7 @@ date = 2023-02-03
 slug = "open-source-aleo-vm-implemented-with-arkworks-and-blockchain-implemented-with-tendermint"
 
 [extra]
-feature_image = "/content/images/2025/12/Ani--bal_vencedor_que_por_primera_vez_mira_Italia_desde_los_Alpes_-_Francisco_Goya.jpg"
+feature_image = "/images/2025/12/Ani--bal_vencedor_que_por_primera_vez_mira_Italia_desde_los_Alpes_-_Francisco_Goya.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

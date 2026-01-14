@@ -4,7 +4,7 @@ date = 2024-01-11
 slug = "sparkling-water-bootcamp"
 
 [extra]
-feature_image = "/content/images/2025/12/The-Trojan-Women-Setting-Fire-to-Their-Fleet-Claude-Lorrain--Claude-Gelle--e-.jpg"
+feature_image = "/images/2025/12/The-Trojan-Women-Setting-Fire-to-Their-Fleet-Claude-Lorrain--Claude-Gelle--e-.jpg"
 authors = ["LambdaClass"]
 +++
 

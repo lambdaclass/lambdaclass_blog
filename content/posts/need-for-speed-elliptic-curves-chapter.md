@@ -4,7 +4,7 @@ date = 2022-08-12
 slug = "need-for-speed-elliptic-curves-chapter"
 
 [extra]
-feature_image = "/content/images/2025/12/Foundation_of_the_Ottoman_Empire.jpg"
+feature_image = "/images/2025/12/Foundation_of_the_Ottoman_Empire.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

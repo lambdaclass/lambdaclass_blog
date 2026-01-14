@@ -4,7 +4,7 @@ date = 2023-01-23
 slug = "cuda-from-scratch"
 
 [extra]
-feature_image = "/content/images/2025/12/Antoine_Caron_-_Augustus_and_the_Sibyl_-_WGA4276.jpg"
+feature_image = "/images/2025/12/Antoine_Caron_-_Augustus_and_the_Sibyl_-_WGA4276.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

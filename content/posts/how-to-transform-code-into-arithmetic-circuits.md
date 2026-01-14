@@ -4,7 +4,7 @@ date = 2023-01-14
 slug = "how-to-transform-code-into-arithmetic-circuits"
 
 [extra]
-feature_image = "/content/images/2025/12/WATERHOUSE_-_Ulises_y_las_Sirenas_-National_Gallery_of_Victoria-_Melbourne-_1891._O--leo_sobre_lienzo-_100.6_x_202_cm-.jpg"
+feature_image = "/images/2025/12/WATERHOUSE_-_Ulises_y_las_Sirenas_-National_Gallery_of_Victoria-_Melbourne-_1891._O--leo_sobre_lienzo-_100.6_x_202_cm-.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

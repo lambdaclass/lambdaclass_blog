@@ -4,7 +4,7 @@ date = 2023-07-30
 slug = "first-lambda-ingo-zk-ctf-zk-challenges-using-lambdaworks"
 
 [extra]
-feature_image = "/content/images/2025/12/The-Sculpture-Gallery-of-the-Felix-Meritis-Society.jpg"
+feature_image = "/images/2025/12/The-Sculpture-Gallery-of-the-Felix-Meritis-Society.jpg"
 authors = ["LambdaClass"]
 +++
 

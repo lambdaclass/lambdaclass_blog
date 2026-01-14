@@ -5,7 +5,7 @@ slug = "a-brief-introduction-to-the-beauty-of-information-theory"
 description = "Or how to be a hardcore Guess Who gamer"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-19-at-12.10.48---PM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-19-at-12.10.48---PM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -36,31 +36,31 @@ This is the problem Claude Shannon tackled in his 1948 paper _A Mathematical The
 
 More precisely, let’s say a channel has a probability _p_ of transmitting a bit correctly, and a corresponding probability of 1 —  _p_ of sending the wrong bit, Shannon proved that the optimum rate of transmission is:
 
-![](/content/images/max/2000/1-kCNAUFlhWJv1kUzKatqINA.png)![](/content/images/max/2000/1-TgCse1znfuWYULYwXeo4Aw.png)
+![](/images/max/2000/1-kCNAUFlhWJv1kUzKatqINA.png)![](/images/max/2000/1-TgCse1znfuWYULYwXeo4Aw.png)
 
 The plot is symmetrical around _p = 0.5_ , with maxima at _p = 0_ and _p = 1_. The case of _p = 0_ is interesting, the channel has perfect noise: it flips all the bits in the original message. But if we know that, then the message is trivially deciphered, we just flip them back.
 
 The formula is commonly stated in terms of [information entropy](https://en.wikipedia.org/wiki/Entropy_%28information_theory%29), a measure Shannon devised that can be interpreted as the level of ‘uncertainty’ or ‘surprise’ associated with the channel.
 
-![](/content/images/max/2000/1-fCyO-nZidJEiOqwqDGWJ3g.png)![](/content/images/max/2000/1-s0z3MUCTtJvh_AsvxGg72g.png)
+![](/images/max/2000/1-fCyO-nZidJEiOqwqDGWJ3g.png)![](/images/max/2000/1-s0z3MUCTtJvh_AsvxGg72g.png)
 
 We can see that the entropy has a maximum at 1 when _p_ = ½, and minima at 0 for _p =_ 0 and _p =_ 1.
 
 More generally, given a random message _M_ that can take _n_ different values with probability _pᵢ_ for _i =_ 1,…,_n_ , we define the entropy of the message as:
 
-![](/content/images/max/2000/1-ezweLprVK1INseQwDCN2yg.png)
+![](/images/max/2000/1-ezweLprVK1INseQwDCN2yg.png)
 
 #### Guess Who example
 
 Let’s take a different approach. Suppose you are playing _Guess Who_ , the game where you ask yes/no questions about the appearance of your opponent’s character in order to single him or her out among a set of characters. You ask yourself: what order should I ask the questions in to maximise the probability of winning? Intutively, you try to ask first about features most of the characters have.
 
-![](/content/images/max/2000/1-TkW9quvg52IBgM06fM-7IA.jpeg)Hardcore Guess Who gamers apply Information Theory for optimal results
+![](/images/max/2000/1-TkW9quvg52IBgM06fM-7IA.jpeg)Hardcore Guess Who gamers apply Information Theory for optimal results
 
 Moreover, an optimal question is one that divides the population evenly, that is, one that regardless of the answer (_yes_ or _no_) discards half the characters. In any other case, you are not gaining the optimal amount of information with each question.
 
 But what if you can’t divide the characters evenly by their characteristics? To answer the question, first we recall the concept of entropy defined above. We can think of a question as a variable _X_ that splits the population into groups _xᵢ_ with probabilities _pᵢ_. For example, think of a question about the eye color of the character (the questions in the game are technically only _yes_ or _no_ but this can be generalized). With this in mind, the entropy of a question becomes:
 
-![](/content/images/max/2000/1-KZq1CO03SyEnsH0qLamzRQ.png)
+![](/images/max/2000/1-KZq1CO03SyEnsH0qLamzRQ.png)
 
 The intuition here is that with each possible answer, we gain an amount of information  _— log_ _p_(_x_ ᵢ), meaning that if we receive an answer with a very low probability (i.e. we ask if the character has a feature that is shared by very few people, and the answer is yes), the amount of information we gained is higher than an answer with more probability.
 
@@ -70,7 +70,7 @@ On the other hand, entropy is related to uncertainty. For example, if we flip a 
 
 One common use of entropy is in decision trees, where one uses a set of features (features that split the data into disjoint sets) to construct a flowchart for a classification problem. Here, a common question is: which order should we “apply” the features in to get the best splits? A possible solution is to recursively always use the feature that maximizes the _information gain_. If we’re working with a dataset _S_ and our feature is called _X_ , the information gained on _S_ by _X_ , _I_(_S_ ,_X_), is calculated as:
 
-![](/content/images/max/2000/1-tIzlfBpMihRvpfZICpWZJA.png)
+![](/images/max/2000/1-tIzlfBpMihRvpfZICpWZJA.png)
 
 where _H_(_S_ |_X_) is the conditional entropy of _S_ given _X_. Intuitively, this is just the reduction in the entropy of the dataset _S_ if we know _X_. Thus, it makes sense to choose the features _X_ that maximize this value, as they will be the ones that reduce uncertainty the most, effectively obtaining the best splits.
 
@@ -78,15 +78,15 @@ Algorithms that consider the information gain at each node to choose the next fe
 
 As an example, consider the picture below, where a decision tree method was used on the famous Iris flower dataset and two features were selected, the petal width, first with 0.8 cm as a threshold and then 1.75 cm. Setting aside how these specific features are selected, why use the ≤ 0.8 first? With the information gain calculation we described, we can provide an answer. We will call the feature that separates petal width on 0.8 cm _X_ and the other one _Y_.
 
-![](/content/images/max/2000/1-dEesB-YyIVG81qhIDn_T_w.png)
+![](/images/max/2000/1-dEesB-YyIVG81qhIDn_T_w.png)
 
 Applying _X_ first splits the 150 data points (usually one would split between training and test sets, here for simplicity we use the entire set) into two sets: one containing the entire _setosa_ class (50 points, corresponding to ≤ 0.8 cm) and nothing else, and the other containing the rest. In that case the calculations yield:
 
-![](/content/images/max/2000/1-2dDOZS_8PGYonq3RZYoyAg.png)
+![](/images/max/2000/1-2dDOZS_8PGYonq3RZYoyAg.png)
 
 On the other hand, applying _Y_ first gives us one set with 50 _setosa_ , 49 _versicolor_ and 5 _virginica_ (≤ 1.75 cm) and another with no _setosa_ , 1 _versicolor_ and 45 _virginica_. This leaves us with:
 
-![](/content/images/max/2000/1-VCQsujq_mEufMZi1X4DGdw.png)
+![](/images/max/2000/1-VCQsujq_mEufMZi1X4DGdw.png)
 
 Thus the information gain from _X_ (petal width being under or over 0.8 cm) is greater than the one from _Y_ , and we should use it first. This makes sense intuitively, as _X_ completely separates the _setosa_ class from the other two, whereas using _Y_ first gives a more entangled split.
 

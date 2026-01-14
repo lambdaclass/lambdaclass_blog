@@ -4,7 +4,7 @@ date = 2025-09-25
 slug = "how-factoring-equality-polynomials-optimizes-sumcheck"
 
 [extra]
-feature_image = "/content/images/2025/12/Jean-Leon_Gerome_Pollice_Verso.jpg"
+feature_image = "/images/2025/12/Jean-Leon_Gerome_Pollice_Verso.jpg"
 authors = ["LambdaClass"]
 +++
 

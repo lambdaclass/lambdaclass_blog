@@ -5,7 +5,7 @@ slug = "for-the-first-time-enjoy-all-the-talks-of-buzzconf-2020-online-and-free-
 description = "Enjoy talks on functional programming, Julia, Python, data science, machine learning, observability, operating systems and more!"
 
 [extra]
-feature_image = "/content/images/2025/12/Schubert_Ulysses_and_Circe.jpg"
+feature_image = "/images/2025/12/Schubert_Ulysses_and_Circe.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -22,7 +22,7 @@ This conference is the result of a combined effort of private and public sectors
 
 We thank the generosity of the speakers who agreed to donate their time and we hope you enjoy their talks as much as we will.
 
-![](/content/images/max/2000/1-LzNJkTEcILfT_6U8t2baDg.jpeg)
+![](/images/max/2000/1-LzNJkTEcILfT_6U8t2baDg.jpeg)
 
 ### Mon, July 27–2pm PDT / 6pm GMT-3 / 9pm UTC
 
@@ -34,7 +34,7 @@ We thank the generosity of the speakers who agreed to donate their time and we h
 
  _Join us on YouTube:_[_https://youtu.be/QK6zEFdvXYw_](https://youtu.be/QK6zEFdvXYw)
 
-![](/content/images/max/2000/0-fTWA2R7HUM90oPA7.jpeg)
+![](/images/max/2000/0-fTWA2R7HUM90oPA7.jpeg)
 
 ### Mon, July 27–3pm PDT / 7pm GMT-3 / 10pm UTC
 
@@ -46,7 +46,7 @@ _Join us on Zoom:_[_https://zoom.us/j/92898927496_](https://zoom.us/j/9289892749
 
  _Join us on YouTube:_[_https://youtu.be/QK6zEFdvXYw_](https://youtu.be/QK6zEFdvXYw)
 
-![](/content/images/max/2000/0-Urum4vQ0RP0TZub3.jpeg)
+![](/images/max/2000/0-Urum4vQ0RP0TZub3.jpeg)
 
 ### Tue, July 28–2pm PDT / 6pm GMT-3 / 9pm UTC
 
@@ -58,7 +58,7 @@ _Join us on Zoom:_[_https://zoom.us/j/97859783809_](https://zoom.us/j/9785978380
 
  _Join us on YouTube:_[_https://youtu.be/N75ebGWz2o4_](https://youtu.be/N75ebGWz2o4)
 
-![](/content/images/max/2000/0-a3kX6m-ky8tQK27S.jpeg)
+![](/images/max/2000/0-a3kX6m-ky8tQK27S.jpeg)
 
 ### Tue, July 28–3pm PDT / 7pm GMT-3 / 10pm UTC
 
@@ -82,7 +82,7 @@ _Join us on Zoom:_[_https://zoom.us/j/95139644343_](https://zoom.us/j/9513964434
 
  _Join us on YouTube:_[_https://youtu.be/yGq0KnkqOgI_](https://youtu.be/yGq0KnkqOgI)
 
-![](/content/images/max/2000/0-Koxyxq-wrBx9iGfe.jpeg)
+![](/images/max/2000/0-Koxyxq-wrBx9iGfe.jpeg)
 
 ### Wed, July 29–3pm PDT / 7pm GMT-3 / 10pm UTC
 
@@ -94,7 +94,7 @@ _Join us on Zoom:_[_https://zoom.us/j/95139644343_](https://zoom.us/j/9513964434
 
  _Join us on YouTube:_[_https://youtu.be/yGq0KnkqOgI_](https://youtu.be/yGq0KnkqOgI)
 
-![](/content/images/max/2000/0-82lbeMCqONPXiKq1.jpeg)
+![](/images/max/2000/0-82lbeMCqONPXiKq1.jpeg)
 
 ### Thu, July 30–2pm PDT / 6pm GMT-3 / 9pm UTC
 
@@ -106,7 +106,7 @@ _Join us on Zoom:_[_https://zoom.us/j/94906592252_](https://zoom.us/j/9490659225
 
  _Join us on YouTube:_[_https://youtu.be/fbKHLdoG7wA_](https://youtu.be/fbKHLdoG7wA)
 
-![](/content/images/max/2000/0--gyZtKfGpWBIxRoz.jpeg)
+![](/images/max/2000/0--gyZtKfGpWBIxRoz.jpeg)
 
 ### Thu, July 30–3pm PDT / 7pm GMT-3 / 10pm UTC
 
@@ -118,7 +118,7 @@ _Join us on Zoom:_[_https://zoom.us/j/94906592252_](https://zoom.us/j/9490659225
 
  _Join us on YouTube:_[_https://youtu.be/fbKHLdoG7wA_](https://youtu.be/fbKHLdoG7wA)
 
-![](/content/images/max/2000/0-2EbV5-0r03R6aPYH.jpeg)
+![](/images/max/2000/0-2EbV5-0r03R6aPYH.jpeg)
 
 ### Fri, July 31–2pm PDT / 6pm GMT-3 / 9pm UTC
 
@@ -130,7 +130,7 @@ _Join us on Zoom:_[_https://zoom.us/j/92628004626_](https://zoom.us/j/9262800462
 
  _Join us on YouTube:_[_https://youtu.be/t-ebpSHyBEE_](https://youtu.be/t-ebpSHyBEE)
 
-![](/content/images/max/2000/0-7y4gqQ8d8_6veW_j.jpeg)
+![](/images/max/2000/0-7y4gqQ8d8_6veW_j.jpeg)
 
 ### Fri, July 31–3pm PDT / 7pm GMT-3 / 10pm UTC
 
@@ -142,6 +142,6 @@ _Join us on Zoom:_[_https://zoom.us/j/92628004626_](https://zoom.us/j/9262800462
 
  _Join us on YouTube:_[_https://youtu.be/t-ebpSHyBEE_](https://youtu.be/t-ebpSHyBEE)
 
-![](/content/images/max/2000/0-MOD81ymGRUNUrv7m.jpeg)
+![](/images/max/2000/0-MOD81ymGRUNUrv7m.jpeg)
 
 We hope to see you there! There will be time for Q&A with the speakers. [Register now](https://www.eventbrite.com.ar/e/buzzconf-2020-tickets-111836742708)!

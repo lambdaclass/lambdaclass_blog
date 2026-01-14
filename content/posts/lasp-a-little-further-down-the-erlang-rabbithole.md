@@ -5,7 +5,7 @@ slug = "lasp-a-little-further-down-the-erlang-rabbithole"
 description = "A few years ago I found Lasp: “a suite of libraries aimed at providing a comprehensive programming system for planetary scale Elixir and…"
 
 [extra]
-feature_image = "/content/images/2025/12/Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png"
+feature_image = "/images/2025/12/Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ A few years ago I found [Lasp](https://lasp-lang.readme.io/docs): _“a suite of
 
 _Discuss and vote at_[ _lobsters_](https://lobste.rs/s/3gvmyl/lasp_little_further_down_erlang) _,_[_reddit_](https://www.reddit.com/r/programming/comments/6a620o/lasp_a_little_further_down_the_erlang_rabbithole/) _and_[ _hn_](https://news.ycombinator.com/item?id=14300763) _._
 
-![](/content/images/max/2000/1-SKlcy2D4QxhBrMdNYNCIHA.jpeg)
+![](/images/max/2000/1-SKlcy2D4QxhBrMdNYNCIHA.jpeg)
 
 **What is Lasp?**
 

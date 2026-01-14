@@ -5,7 +5,7 @@ slug = "interview-with-norias-creator-a-promising-dataflow-database-implemented-
 description = "After reading Tensorflow’s original paper I learnt that four of its authors were authors of Microsoft Naiad’s research paper too. Naiad…"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-19-at-12.17.36---PM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-19-at-12.17.36---PM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]

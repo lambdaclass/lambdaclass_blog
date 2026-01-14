@@ -4,7 +4,7 @@ date = 2023-09-28
 slug = "overview-of-the-stone-prover"
 
 [extra]
-feature_image = "/content/images/2025/12/Napoleon-Ge--rome.jpg"
+feature_image = "/images/2025/12/Napoleon-Ge--rome.jpg"
 authors = ["LambdaClass"]
 +++
 

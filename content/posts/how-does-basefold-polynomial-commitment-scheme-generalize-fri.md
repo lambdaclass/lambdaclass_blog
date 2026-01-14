@@ -4,7 +4,7 @@ date = 2024-02-09
 slug = "how-does-basefold-polynomial-commitment-scheme-generalize-fri"
 
 [extra]
-feature_image = "/content/images/2025/12/Psyche_aux_enfers.jpg"
+feature_image = "/images/2025/12/Psyche_aux_enfers.jpg"
 authors = ["LambdaClass"]
 +++
 

@@ -4,7 +4,7 @@ date = 2023-10-17
 slug = "groth16"
 
 [extra]
-feature_image = "/content/images/2025/12/Rosa_-_The_Death_of_Regulus-_ca._1650-1652.jpg"
+feature_image = "/images/2025/12/Rosa_-_The_Death_of_Regulus-_ca._1650-1652.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

@@ -4,7 +4,7 @@ date = 2023-01-04
 slug = "lambdaclass-and-fuzzinglabs-partnership"
 
 [extra]
-feature_image = "/content/images/2025/12/AtaculdeNoapte.jpg"
+feature_image = "/images/2025/12/AtaculdeNoapte.jpg"
 authors = ["LambdaClass"]
 +++
 

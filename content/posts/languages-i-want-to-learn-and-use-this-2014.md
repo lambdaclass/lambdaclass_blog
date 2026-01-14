@@ -5,11 +5,11 @@ slug = "languages-i-want-to-learn-and-use-this-2014"
 description = "Take aim much higher than the mark"
 
 [extra]
-feature_image = "/content/images/2025/12/Edward_Burne-Jones.The_last_sleep_of_Arthur.jpg"
+feature_image = "/images/2025/12/Edward_Burne-Jones.The_last_sleep_of_Arthur.jpg"
 authors = ["LambdaClass"]
 +++
 
-![](/content/images/2025/12/1-w6YUSUjzOr5yeXXUggaEIg.png)
+![](/images/2025/12/1-w6YUSUjzOr5yeXXUggaEIg.png)
 
 #### Take aim much higher than the mark
 
@@ -29,7 +29,7 @@ Immediately after reading [Beating the Averages](http://paulgraham.com/avg.html)
 
 However, I didn’t have enough time to do it. At that moment I was coding a lot in Ruby, Python, C++ and Java in order to earn enough to live by my own.
 
-![](/content/images/max/2000/1-uDtazbx2QjY_M5c2iu-gNQ.jpeg)
+![](/images/max/2000/1-uDtazbx2QjY_M5c2iu-gNQ.jpeg)
 
 Now that I am a better paid code monkey and that I have enough free time, I am reading [The Land Of Lisp](http://landoflisp.com/). As I dive down into the rabbit hole of the Lisp world, I am trying to create my own emacs distribution called [Lunfardo](https://github.com/pyotrgalois/lunfardo). I think it’s a good way to learn Emacs and Lisp. I hope to finish reading the book and the [Lisp Koans](https://github.com/google/lisp-koans) in the following weeks.
 
@@ -39,13 +39,13 @@ Then I watched [Persistent Data Structures and Managed References](http://www.in
 
 However, as most developers, I think that the best way to learn a language is to use it in a real project. Therefore, I will try to implement a few ideas I got in Clojure.
 
-![](/content/images/max/2000/1-PyX6M9lSBXLHvVgAlDXrTA.png)
+![](/images/max/2000/1-PyX6M9lSBXLHvVgAlDXrTA.png)
 
 * * *
 
 ### Haskell
 
-![](/content/images/max/2000/1-mIrYVuSZtaYe3WJkRwUqwQ.jpeg)
+![](/images/max/2000/1-mIrYVuSZtaYe3WJkRwUqwQ.jpeg)
 
 The most important reason why I want to learn Haskell is that two of the most inteligent persons I know really love it -and that’s a good enough reason for me. After checking [Learn X in Y minutes Where X=haskell](http://learnxinyminutes.com/docs/haskell/), the syntax seems quite simple. I have read complaints about it. At this moment I really can’t see why. I will have to learn it before having a strong opinion.
 
@@ -57,7 +57,7 @@ This video from Brian Beckman caught my attention: [Don’t fear the Monad](http
 
 I have never used a really pure programming language. It’s time to check it out and weigh its benefits.
 
-![](/content/images/max/2000/1-3IMSBVSph3XTwJEidHh0tw.png)
+![](/images/max/2000/1-3IMSBVSph3XTwJEidHh0tw.png)
 
 [@mrb_bk](https://twitter.com/mrb_bk):
 
@@ -107,7 +107,7 @@ At last I wanted to mention my latest discover: Lisp Flavored Erlang (LFE)
 
 > Nothing Quite Compares to the taste of Erlang, aged in the oaken barrels of Lisp, served at a temperature of perfect hotness.
 
-![](/content/images/max/2000/1-Zv2If-7X5lPmvj_BAtOVIw.png)
+![](/images/max/2000/1-Zv2If-7X5lPmvj_BAtOVIw.png)
 
 I think this doesn’t need any more clarification. After learning Lisp I will give LFE a try. Check out its [awesome guide](http://lfe.github.io/user-guide/intro/1.html).
 
@@ -131,11 +131,11 @@ I bet now you want to read it too. But that’s not all. A guy that I really res
 
 > Learning to use R will help you also learn statistics better.
 
-![](/content/images/max/2000/1-SgUML3Hsk6MNGH3uvn7VRw.png)
+![](/images/max/2000/1-SgUML3Hsk6MNGH3uvn7VRw.png)
 
 A few weeks ago I started a course on coursera about [Machine Learning](https://www.coursera.org/course/ml). Apparently, R is also very useful if you are into Machine Learning. There also an interesting book from O’Reilly called **Machine Learning for hackers** that uses R. Check them if you are interested.
 
-![](/content/images/max/2000/1-ULb9lkajm38eGIfrtRX7ZQ.png)
+![](/images/max/2000/1-ULb9lkajm38eGIfrtRX7ZQ.png)
 
 * * *
 

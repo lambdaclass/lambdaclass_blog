@@ -4,7 +4,7 @@ date = 2023-12-12
 slug = "binius-moving-zk-forward"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_The_Old_Bridge_-_1957.34.1_-_Yale_University_Art_Gallery.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_The_Old_Bridge_-_1957.34.1_-_Yale_University_Art_Gallery.jpg"
 authors = ["LambdaClass"]
 +++
 

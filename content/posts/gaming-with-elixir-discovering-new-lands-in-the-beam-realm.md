@@ -5,7 +5,7 @@ slug = "gaming-with-elixir-discovering-new-lands-in-the-beam-realm"
 description = "In this opportunity I interviewed somebody I don’t normally interview: a client, Chris Jimison, CTO of Merigo. One of my clients. After working for almost a year with Merigo, I appreciate and…"
 
 [extra]
-feature_image = "/content/images/2025/12/Louis_XIV_en_Jupiter-_vainqueur_de_la_Fronde.jpg"
+feature_image = "/images/2025/12/Louis_XIV_en_Jupiter-_vainqueur_de_la_Fronde.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -18,7 +18,7 @@ To sum up I did this interview because I wanted to share my experience of using 
 
 _Discuss and vote at_[ _lobsters_](https://lobste.rs/s/f1wxuc/gaming_with_elixir_discovering_new_lands) _,_[_reddit_](https://www.reddit.com/r/programming/comments/66hnpk/gaming_with_elixir_discovering_new_lands_in_the/) _and_[ _hn_](https://news.ycombinator.com/item?id=14156379) _._
 
-![](/content/images/max/2000/1-3HjK0CX5813XXtDwfKIhWw.jpeg)
+![](/images/max/2000/1-3HjK0CX5813XXtDwfKIhWw.jpeg)
 
 **Could you describe your experience in the software industry?**
 

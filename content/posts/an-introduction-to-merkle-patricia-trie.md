@@ -4,7 +4,7 @@ date = 2025-06-09
 slug = "an-introduction-to-merkle-patricia-trie"
 
 [extra]
-feature_image = "/content/images/2025/12/Pallas_Athena_by_Rembrandt_Museu_Calouste_Gulbenkian_1488.jpg"
+feature_image = "/images/2025/12/Pallas_Athena_by_Rembrandt_Museu_Calouste_Gulbenkian_1488.jpg"
 authors = ["LambdaClass"]
 +++
 

@@ -4,7 +4,7 @@ date = 2025-03-05
 slug = "gkr-protocol-a-step-by-step-example"
 
 [extra]
-feature_image = "/content/images/2025/12/Battle_poitiers.jpg"
+feature_image = "/images/2025/12/Battle_poitiers.jpg"
 authors = ["LambdaClass"]
 +++
 

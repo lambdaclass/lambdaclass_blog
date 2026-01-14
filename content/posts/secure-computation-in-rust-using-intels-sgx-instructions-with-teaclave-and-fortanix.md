@@ -5,7 +5,7 @@ slug = "secure-computation-in-rust-using-intels-sgx-instructions-with-teaclave-a
 description = "TEEs can be thought of as processes that are running \"isolated\" from the OS and upper layers in a secure part of the CPU. The idea of this is to help to significantly reduce the attack surface. "
 
 [extra]
-feature_image = "/content/images/2025/12/Queen_Victoria_at_the_Tomb_of_Napoleon-_24_August_1855.jpg"
+feature_image = "/images/2025/12/Queen_Victoria_at_the_Tomb_of_Napoleon-_24_August_1855.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

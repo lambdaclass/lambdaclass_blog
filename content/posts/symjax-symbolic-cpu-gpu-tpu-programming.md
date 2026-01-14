@@ -5,7 +5,7 @@ slug = "symjax-symbolic-cpu-gpu-tpu-programming"
 description = "A symbolic programming version of JAX"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-19-at-12.10.16---PM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-19-at-12.10.16---PM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Symjax", "Jax", "Theano", "Symbolic", "Programming"]
 
 #### A symbolic programming version of JAX
 
-![](/content/images/max/2000/1-U2wpT5qoWqSOwrgYtgLJ3w.png)SymJAX's really cool logo
+![](/images/max/2000/1-U2wpT5qoWqSOwrgYtgLJ3w.png)SymJAX's really cool logo
 
 As we try to have a deeper undestanding of the world we live in, we tend to add more and more complex relationships in the models we use to describe it, so we need to borrow a hand from computers to run them.
 

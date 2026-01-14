@@ -4,7 +4,7 @@ date = 2025-10-13
 slug = "efficient-attention-explained-the-math-behind-linear-time-transformers"
 
 [extra]
-feature_image = "/content/images/2025/12/the-astronomer.jpg"
+feature_image = "/images/2025/12/the-astronomer.jpg"
 authors = ["LambdaClass"]
 +++
 

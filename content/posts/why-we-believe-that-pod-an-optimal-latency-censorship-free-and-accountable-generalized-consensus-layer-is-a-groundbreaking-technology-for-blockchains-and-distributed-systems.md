@@ -4,7 +4,7 @@ date = 2025-02-13
 slug = "why-we-believe-that-pod-an-optimal-latency-censorship-free-and-accountable-generalized-consensus-layer-is-a-groundbreaking-technology-for-blockchains-and-distributed-systems"
 
 [extra]
-feature_image = "/content/images/2025/12/Jean-Louis_Lefort_-_La_Sainte_Chapelle.png"
+feature_image = "/images/2025/12/Jean-Louis_Lefort_-_La_Sainte_Chapelle.png"
 authors = ["LambdaClass"]
 +++
 

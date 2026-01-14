@@ -4,7 +4,7 @@ date = 2023-11-02
 slug = "lookups"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-French_-_A_Hermit_Praying_in_the_Ruins_of_a_Roman_Temple_-_Google_Art_Project.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-French_-_A_Hermit_Praying_in_the_Ruins_of_a_Roman_Temple_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]

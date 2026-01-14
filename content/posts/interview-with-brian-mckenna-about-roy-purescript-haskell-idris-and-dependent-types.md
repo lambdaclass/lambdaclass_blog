@@ -5,7 +5,7 @@ slug = "interview-with-brian-mckenna-about-roy-purescript-haskell-idris-and-depe
 description = "As promised in our last interview for This is not a Monad tutorial we interviewed Brian McKenna, creator of the Roy programming language…"
 
 [extra]
-feature_image = "/content/images/2025/12/Discovery_of_Achilles_on_Skyros_by_Nicholas_Poussin_ca._1656_pubdom.jpg"
+feature_image = "/images/2025/12/Discovery_of_Achilles_on_Skyros_by_Nicholas_Poussin_ca._1656_pubdom.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -16,7 +16,7 @@ As promised in our [last interview](https://medium.com/this-is-not-a-monad-tutor
 
 In the following weeks we will be talking with the creators of [Red programming language](http://www.red-lang.org/), Robert Virding — Erlang co-inventor and [Lisp Flavored Erlang](http://lfe.io/) creator — and with [MirageOS unikernel](https://mirage.io/) dev team. 
 
-![](/content/images/max/2000/1-vYf7TCGE19Gni5ssKXQaHA.png)
+![](/images/max/2000/1-vYf7TCGE19Gni5ssKXQaHA.png)
 
 **What are Roy’s main features?**
 

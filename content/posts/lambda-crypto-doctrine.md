@@ -4,11 +4,11 @@ date = 2023-08-23
 slug = "lambda-crypto-doctrine"
 
 [extra]
-feature_image = "/content/images/2025/12/Allegory-on-the-Abdication-of-Emperor-Charles-v-in-Brussels.jpg"
+feature_image = "/images/2025/12/Allegory-on-the-Abdication-of-Emperor-Charles-v-in-Brussels.jpg"
 authors = ["LambdaClass"]
 +++
 
-![](/content/images/2023/08/image-1.png)
+![](/images/2023/08/image-1.png)
 
 We believe crypto has been incredibly successful at providing a trustless financial layer for the 21st century. In particular it has found product market fit in two main areas:
 

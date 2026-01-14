@@ -4,7 +4,7 @@ date = 2023-03-17
 slug = "how-to-use-the-consenyss-gnark-zero-knowledge-proof-library-and-disclosure-of-a-ddos-bug"
 
 [extra]
-feature_image = "/content/images/2025/12/Bartholomeus_van_der_Helst-_Banquet_of_the_Amsterdam_Civic_Guard_in_Celebration_of_the_Peace_of_Mu--nster.jpg"
+feature_image = "/images/2025/12/Bartholomeus_van_der_Helst-_Banquet_of_the_Amsterdam_Civic_Guard_in_Celebration_of_the_Peace_of_Mu--nster.jpg"
 authors = ["LambdaClass"]
 +++
 

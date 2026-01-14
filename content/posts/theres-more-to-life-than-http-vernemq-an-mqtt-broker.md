@@ -5,14 +5,14 @@ slug = "theres-more-to-life-than-http-vernemq-an-mqtt-broker"
 description = "At LambdaClass and our blog This is not a Monad tutorial we are a big fans of exploring new topics, different operating systems, platforms…"
 
 [extra]
-feature_image = "/content/images/2025/12/Joan_of_arc_interrogation.jpg"
+feature_image = "/images/2025/12/Joan_of_arc_interrogation.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Programming", "Mqtt", "Protocol"]
 +++
 
-![](/content/images/max/2000/1-vHHvudyYcHEpI5d52doOcQ.png)
+![](/images/max/2000/1-vHHvudyYcHEpI5d52doOcQ.png)
 
 At [LambdaClass](http://lambdaclass.com/) and our blog [This is not a Monad tutorial](https://medium.com/this-is-not-a-monad-tutorial/) we are a big fans of exploring new topics, different operating systems, platforms, languages and libraries/frameworks. We have been talking in our company about exploring new subjects like protocols.
 

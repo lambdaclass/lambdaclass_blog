@@ -5,7 +5,7 @@ slug = "weld-accelerating-numpy-scikit-and-pandas-as-much-as-100x-with-rust-and-
 description = "After working for weeks with Python’s data science stack and R I started to ask my self if there could not be a common intermediate…"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-19-at-12.17.52---PM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-19-at-12.17.52---PM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -20,7 +20,7 @@ That is how I contacted and interviewed [Shoumik Palkar](https://shoumik.xyz/), 
 
 Weld is far from being production ready but it is promising. If you are interested in the future of data science and in Rust, you will like this interview.
 
-![](/content/images/max/2000/1-hqC6KtF-l1RN8uDg99rmow.png)Not a Monad Tutorial new logo!
+![](/images/max/2000/1-hqC6KtF-l1RN8uDg99rmow.png)Not a Monad Tutorial new logo!
 
 * * *
 
@@ -34,7 +34,7 @@ We also have a new project called split annotations which will integrate with We
 
 Weld provides optimizations across functions in these libraries, whereas optimizing these libraries would only make individual function calls faster. In fact, many of these data libraries are already highly optimized on a per-function basis, but deliver performance below the limits of modern hardware because they do not exploit parallelism or do not make efficient use of the memory hierarchy. For example, many NumPy ndarray functions are already implemented in C, but calling each function requires scanning over each input in entirety. If these arrays do not fit in the CPU caches, most of the execution time can go into loading data from main memory rather than performing computations. Weld can look across individual function calls and perform optimizations such as loop fusion that will keep data in the CPU caches or registers. These kinds of optimizations can improve performance by over an order of magnitude on multi-core systems, because they enable better scaling.
 
-![](/content/images/max/2000/1-eheS9p1hxxEPH8Fqo3As8A.png)__Prototype integrations of Weld with Spark (top left), NumPy (top right), and TensorFlow (bottom left) show up to 30x improvements over the native framework implementations, with no changes to users’ application code. Cross library optimizations between Pandas and NumPy (bottom right) can improve performance by up to two orders of magnitude.__
+![](/images/max/2000/1-eheS9p1hxxEPH8Fqo3As8A.png)__Prototype integrations of Weld with Spark (top left), NumPy (top right), and TensorFlow (bottom left) show up to 30x improvements over the native framework implementations, with no changes to users’ application code. Cross library optimizations between Pandas and NumPy (bottom right) can improve performance by up to two orders of magnitude.__
 
 **What is Baloo?**
 

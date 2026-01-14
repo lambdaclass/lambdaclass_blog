@@ -4,7 +4,7 @@ date = 2023-01-13
 slug = "decentralized-private-computations-zexe-and-veri-zexe"
 
 [extra]
-feature_image = "/content/images/2025/12/Charles_Le_Brun_-_Entry_of_Alexander_into_Babylon.jpeg"
+feature_image = "/images/2025/12/Charles_Le_Brun_-_Entry_of_Alexander_into_Babylon.jpeg"
 authors = ["LambdaClass"]
 
 [taxonomies]

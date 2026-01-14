@@ -4,7 +4,7 @@ date = 2024-01-02
 slug = "lambdaworks-design-and-usage-part-1-finite-fields"
 
 [extra]
-feature_image = "/content/images/2025/12/Hubert_Robert_-_Studio_of_an_Antiquities_Restorer_in_Rome_-_Google_Art_Project_-cropped-.jpg"
+feature_image = "/images/2025/12/Hubert_Robert_-_Studio_of_an_Antiquities_Restorer_in_Rome_-_Google_Art_Project_-cropped-.jpg"
 authors = ["LambdaClass"]
 +++
 

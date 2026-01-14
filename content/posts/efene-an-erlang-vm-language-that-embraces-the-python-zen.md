@@ -5,14 +5,14 @@ slug = "efene-an-erlang-vm-language-that-embraces-the-python-zen"
 description = "In this ocasion we interviewed Mariano Guerra, creator of Efene. Efene is “an alternative syntax for the Erlang Programming Language…"
 
 [extra]
-feature_image = "/content/images/2025/12/Willem_van_Haecht_-II-_-_Apelles_painting_Campaspe_-_2.jpg"
+feature_image = "/images/2025/12/Willem_van_Haecht_-II-_-_Apelles_painting_Campaspe_-_2.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
 tags = ["Programming", "Functional Programming", "Erlang"]
 +++
 
-![](/content/images/max/2000/1-Y6aaUiw3qoh372nY7WNzJg.png)
+![](/images/max/2000/1-Y6aaUiw3qoh372nY7WNzJg.png)
 
 In this ocasion we interviewed [Mariano Guerra](https://github.com/marianoguerra), creator of Efene. [Efene](http://efene.org/) is _“an alternative syntax for the Erlang Programming Language focusing on simplicity, consistency, ease of use and programmer UX”._ After reading the interview with Mariano Guerra, check [Efene Quick Introduction for the Busy/Lazy Programmer](http://efene.org/quick-efene-introduction-busy-programmer.html) for learning more about Efene.
 
@@ -30,7 +30,7 @@ After [my talk](http://www.erlang-factory.com/conference/London2010/speakers/Mar
 
 **Why do you embrace the**[**Zen of Python**](https://www.python.org/dev/peps/pep-0020/)**?**
 
-![](/content/images/max/2000/1-6_ijRzr0oB6Zckr8GTrq4A.png) Zen of Python
+![](/images/max/2000/1-6_ijRzr0oB6Zckr8GTrq4A.png) Zen of Python
 
 Python was the first language I enjoyed coding in before I coded in C, C++, ASM and Java, but just because it was what I knew or they provided something I needed. With Python it was the first time I said “I’m a Python programmer” and not “I’m a programmer”, also the Python Argentina community helped a lot witht hat.
 

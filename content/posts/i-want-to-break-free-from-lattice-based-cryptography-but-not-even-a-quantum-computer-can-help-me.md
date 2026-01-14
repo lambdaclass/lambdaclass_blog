@@ -4,7 +4,7 @@ date = 2023-04-18
 slug = "i-want-to-break-free-from-lattice-based-cryptography-but-not-even-a-quantum-computer-can-help-me"
 
 [extra]
-feature_image = "/content/images/2025/12/Flinck-_Govert_-_Salomon_bidt_om_wijsheid_-_Paleis_op_de_Dam-_Amsterdam.jpg"
+feature_image = "/images/2025/12/Flinck-_Govert_-_Salomon_bidt_om_wijsheid_-_Paleis_op_de_Dam-_Amsterdam.jpg"
 authors = ["LambdaClass"]
 +++
 

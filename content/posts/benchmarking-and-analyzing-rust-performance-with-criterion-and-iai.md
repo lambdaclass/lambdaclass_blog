@@ -5,7 +5,7 @@ slug = "benchmarking-and-analyzing-rust-performance-with-criterion-and-iai"
 description = "In this post, we'll talk about our experience doing benchmarks in Rust, what tools we used and why it was important for us."
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.45.12---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.45.12---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]

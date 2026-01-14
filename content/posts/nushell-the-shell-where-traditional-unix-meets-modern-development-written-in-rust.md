@@ -5,7 +5,7 @@ slug = "nushell-the-shell-where-traditional-unix-meets-modern-development-writte
 description = "We interviewed its creators"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-19-at-12.10.37---PM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-19-at-12.10.37---PM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -30,7 +30,7 @@ Funny that you mention “awk”. In a way, Nu is a way of saying “what if we 
 
 In a way, it’s taking the original spirit of Unix — where you use pipelines to combine a set of tools — and imagining how that original spirit would work today, with what we know about programming languages and tools. And, being crossplatform, it’s nice to learn this approach and then be able to easily switch operating systems and use the same techniques.
 
-![](/content/images/max/2000/1-u77ccTVL0VJ7Cw2xT_7puA.png)NuShell screen capture
+![](/images/max/2000/1-u77ccTVL0VJ7Cw2xT_7puA.png)NuShell screen capture
 
 #### **Why use Rust? How much experience did you have beforehand?**
 
@@ -59,7 +59,7 @@ Rust also has a great package manager (Cargo), which means that gluing together 
 
 **Jonathan** : When people ask for POSIX-compliance, I think different people mean different things. Generally, I think they mean “don’t break my muscle memory”. That’s fair, it’s annoying to unlearn habits. That said, what it means to be compatible has changed a lot from the original ideas. I saw this tweet the other day which I thought sums it up pretty well:
 
-![](/content/images/max/2000/1-gQH1jV4nzbs_WurExrLnEw.png)Source: [Dan Luu](https://twitter.com/danluu/status/1234814736144797697)
+![](/images/max/2000/1-gQH1jV4nzbs_WurExrLnEw.png)Source: [Dan Luu](https://twitter.com/danluu/status/1234814736144797697)
 
 #### **Where does NuShell stand compared to others like zsh or fish? As of today, can I set it as my default shell?**
 

@@ -5,7 +5,7 @@ slug = "julia-gpu"
 description = "How the Julia language is making it easy for programmers to use GPU capabilities"
 
 [extra]
-feature_image = "/content/images/2025/12/Screenshot-2025-12-17-at-10.54.04---AM.png"
+feature_image = "/images/2025/12/Screenshot-2025-12-17-at-10.54.04---AM.png"
 authors = ["LambdaClass"]
 
 [taxonomies]
@@ -14,7 +14,7 @@ tags = ["Julia", "Gpu", "Cuda", "Data Science", "Machine Learning"]
 
 ### How the Julia language is making it easy for programmers to use GPU capabilities with JuliaGPU
 
-![](/content/images/max/2000/1-KJX3T1Y9T1Cj0aV3m-A22w.png)
+![](/images/max/2000/1-KJX3T1Y9T1Cj0aV3m-A22w.png)
 
 We are living in a time where more and more data is being created every day as well as new techniques and complex algorithms that try to extract the most out of it. As such, CPU capabilities are approaching a bottleneck in their computing power. GPU computing opened its way into a new paradigm for high-performance and parallel computation a long time ago, but it was not until recently that it become massively used for data science.  
 In this interview, [Tim Besard](https://twitter.com/maleadt), one of the main contributors to the JuliaGPU project, digs into some of the details about GPU computing and the features that make Julia a language suited for such tasks, not only from a performance perspective but also from a user one.

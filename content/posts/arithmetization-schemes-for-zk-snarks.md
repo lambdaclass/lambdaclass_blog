@@ -4,7 +4,7 @@ date = 2023-01-14
 slug = "arithmetization-schemes-for-zk-snarks"
 
 [extra]
-feature_image = "/content/images/2025/12/Siege-alesia-vercingetorix-jules-cesar.jpg"
+feature_image = "/images/2025/12/Siege-alesia-vercingetorix-jules-cesar.jpg"
 authors = ["LambdaClass"]
 
 [taxonomies]
