@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to use the Consenys&#x27;s Gnark Zero Knowledge Proof library and disclosure of a DoS bug - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">How to use the Consenys&#x27;s Gnark Zero Knowledge Proof library and disclosure of a DoS bug</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-03-17">March 17, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p>Zero Knowledge Proofs (ZKP) are a powerful cryptographic technique that allows two parties to exchange information without revealing any sensitive data. This method has the potential to revolutionize the way we handle privacy and security in various industries, such as finance, healthcare, and government. However, developing ZKP applications has traditionally been a challenging task, requiring a deep understanding of cryptography, programming, and mathematics.</p>
+<p>Fortunately, with the advancement of technology and the development of new libraries and frameworks, writing ZKP applications has become much easier. Nowadays, there are several libraries available that can significantly reduce the complexity of developing ZKP applications, such as <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/lambdaworks/">LambdaWorks</a>, <a rel="noopener external" target="_blank" href="https://github.com/arkworks-rs/">Arkworks</a>, and <a rel="noopener external" target="_blank" href="https://github.com/ConsenSys/gnark">Gnark</a>. These libraries provide developers with a set of tools and building blocks that simplify the implementation of complex cryptographic protocols.</p>
+<p>In this post, we will focus on reviewing Gnark, one of the most powerful and user-friendly libraries available for ZKP development. Gnark is an open-source library that provides developers with a high-level programming language and a set of tools to build efficient and secure ZKP applications. We will explore the features and benefits of gnark and show how it can simplify the process of building ZKP applications.</p>
+<h2 id="what-is-gnark">What is Gnark</h2>
+<p>Gnark, written in Go, is a fast ZK-SNARK library that offers both a high-level API and a low-level API to design circuits. The library is open-source and developed under the Apache 2.0 license.</p>
+<h2 id="why-gnark">Why Gnark</h2>
+<p>We are using Gnark as a backend for <a rel="noopener external" target="_blank" href="https://github.com/noir-lang/noir">Noir</a>. Noir is a domain-specific language for creating and verifying proofs. Noir compiles to an intermediate language which itself can be compiled to an arithmetic circuit or a rank-1 constraint system. This in itself brings up a few challenges within the design process but allows one to decouple the programming language completely from the backend. This is similar in theory to LLVM.</p>
+<h2 id="zk-with-gnark">ZK with Gnark</h2>
+<p>The main flow for generating a ZK-Proof and verifying it would be:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Arithmetization: This is generating the R1CS or Sparse R1CS circuit with its constraints.</span></span>
+<span class="giallo-l"><span>    2. Generate a proof of execution for this circuit, given some public and private variables.</span></span>
+<span class="giallo-l"><span>    3. Verify said proof with the same public inputs used when generating the proof.</span></span></code></pre>
+<p>Gnark has both a high level API and a low level API. The main difference relies in the arithmetization. In the high level API you, as a user, are abstracted from the <code>R1CS</code> or <code>SparseR1CS</code> building and in the low level API you need to build them by hand (constraint by constraint).</p>
+<p>In the following sections we’re going to explain and show some example usage of the high level and the low level APIs. We’ll start showing the bright side of Gnark which is the high level API.</p>
+<h2 id="always-look-on-the-bright-side">(Always look on) the bright side</h2>
+<p><img src="/images/external/Xs1ASoT.png" alt="" /></p>
+<h3 id="high-level-api">High-level API</h3>
+<p>Gnark’s high level API lives in the <code>frontend</code> package, you could find it in the root of the repo.</p>
+<p>Earlier we said that the main difference relies in the arithmetization, but what does this mean? How so? By arithmetization we basically mean building the circuit with which you’re going to generate your proof.</p>
+<p>In the case of the <code>frontend</code> package, building a circuit means to create your circuit struct which fields must be the variables of the circuit (a.k.a. circuit inputs) labeled as public or secret (not labeled fields are assumed secret variables by default). These inputs must be of type <code>frontend.Variable</code> and make up the witness. The witness has a secret part known to the prover only and a public part known to the prover and the verifier.</p>
+<p>After you have your circuit structure built you need to define the circuits behaviour. You must do this writing a <code>Define</code> function. <code>Define</code> declares the circuit logic. The compiler then produces a list of constraints which must be satisfied (a valid witness) in order to create a valid ZK-SNARK. The circuit in the example below proves the factorisation of the RSA-250 challenge.</p>
+<h4 id="example-rsa-from-gnark-s-playground">Example: RSA (from <a rel="noopener external" target="_blank" href="https://play.gnark.io/">gnark’s playground</a>)</h4>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>type Circuit struct {</span></span>
+<span class="giallo-l"><span>    P   frontend.Variable // p  --&gt; secret visibility (default)</span></span>
+<span class="giallo-l"><span>    Q   frontend.Variable `gnark:&quot;q,secret&quot;` // q  --&gt; secret visibility</span></span>
+<span class="giallo-l"><span>    RSA frontend.Variable `gnark:&quot;,public&quot;`  // rsa  --&gt; public visibility</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>func (circuit *Circuit) Define(api frontend.API) error {</span></span>
+<span class="giallo-l"><span>    // ensure we don&#39;t accept RSA * 1 == RSA</span></span>
+<span class="giallo-l"><span>    api.AssertIsDifferent(circuit.P, 1)</span></span>
+<span class="giallo-l"><span>    api.AssertIsDifferent(circuit.Q, 1)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // compute P * Q and store it in the local variable res.</span></span>
+<span class="giallo-l"><span>    rsa := api.Mul(circuit.P, circuit.Q)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // assert that the statement P * Q == RSA is true.</span></span>
+<span class="giallo-l"><span>    api.AssertIsEqual(circuit.RSA, rsa)</span></span>
+<span class="giallo-l"><span>    return nil</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="join-the-dark-side">(Join) the dark side</h2>
+<p><img src="/images/external/P4W3s57.png" alt="" /></p>
+<h3 id="low-level-api">Low-level API</h3>
+<p>Located in the <code>constraint</code> module at the root of the repo, we can find almost everything that we need to write an R1CS (for Groth16) or a Sparse R1CS for (Plonk) “by hand”. By hand we mean to build our circuit constraint by constraint. I said almost earlier because we’ll also need some stuff from the <code>gnark-crypto</code> library (provides elliptic curve and pairing-based cryptography and various algorithms of particular interest to zero knowledge proof systems).</p>
+<p>We say that the arithmetization here is by hand because both the circuit structure and the constraints need to be writen manually.</p>
+<p>To add the circuit inputs you have the methods <code>AddPublicVariable</code>, <code>AddSecretVariable</code> and <code>AddInternalVariable</code>. Calling this methods will return an index which corresponds to the concrete value of that variable in the witness vector. The order in which you all these matters in the way that an internal current witness index (in the circuit that you’re building) is being mutated.</p>
+<p>The circuit behaviour, which in the high-level API must be written in the <code>Define</code> function abstracted from the manual constraint generation, is defined constraint by constraint with the method <code>AddConstraint</code>. A constraint can be built initializing a <code>constraint.R1C</code> (in case of Groth16) or a <code>constraint.SparseR1C</code> (in the case of Plonk) term by term. Finally, terms can be created using the <code>MakeTerm</code> method.</p>
+<p>After this, the next steps (proving and verifying) are the same as in the high level API.</p>
+<h4 id="example-proving-that-x-cdot-y-z">Example: proving that $x \cdot y = z$</h4>
+<p>The next piece of code that proves that $x \cdot y = z$ where $x, z$ are public variables and $y$ a private variable (witness):</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>func Example() {</span></span>
+<span class="giallo-l"><span>    // [Y, Z]</span></span>
+<span class="giallo-l"><span>    publicVariables := []fr_bn254.Element{fr_bn254.NewElement(2), fr_bn254.NewElement(6)}</span></span>
+<span class="giallo-l"><span>    // [X]</span></span>
+<span class="giallo-l"><span>    secretVariables := []fr_bn254.Element{fr_bn254.NewElement(3)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* R1CS Building */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // (X * Y) == Z</span></span>
+<span class="giallo-l"><span>    // X is secret</span></span>
+<span class="giallo-l"><span>    // Y is public</span></span>
+<span class="giallo-l"><span>    // Z is public</span></span>
+<span class="giallo-l"><span>    r1cs := cs_bn254.NewR1CS(1)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Variables</span></span>
+<span class="giallo-l"><span>    _ = r1cs.AddPublicVariable(&quot;1&quot;) // the ONE_WIRE</span></span>
+<span class="giallo-l"><span>    Y := r1cs.AddPublicVariable(&quot;Y&quot;)</span></span>
+<span class="giallo-l"><span>    Z := r1cs.AddPublicVariable(&quot;Z&quot;)</span></span>
+<span class="giallo-l"><span>    X := r1cs.AddSecretVariable(&quot;X&quot;)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Coefficients</span></span>
+<span class="giallo-l"><span>    COEFFICIENT_ONE := r1cs.FromInterface(1)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Constraints</span></span>
+<span class="giallo-l"><span>    // (1 * X) * (1 * Y) == (1 * Z)</span></span>
+<span class="giallo-l"><span>    constraint := constraint.R1C{</span></span>
+<span class="giallo-l"><span>        L: constraint.LinearExpression{r1cs.MakeTerm(&amp;COEFFICIENT_ONE, X)}, // 1 * X</span></span>
+<span class="giallo-l"><span>        R: constraint.LinearExpression{r1cs.MakeTerm(&amp;COEFFICIENT_ONE, Y)}, // 1 * Y</span></span>
+<span class="giallo-l"><span>        O: constraint.LinearExpression{r1cs.MakeTerm(&amp;COEFFICIENT_ONE, Z)}, // 1 * Z</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    r1cs.AddConstraint(constraint)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    constraints, r := r1cs.GetConstraints()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for _, r1c := range constraints {</span></span>
+<span class="giallo-l"><span>        fmt.Println(r1c.String(r))</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* Universal SRS Generation */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    pk, vk, _ := groth16.Setup(r1cs)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* Proving */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    rightWitness := buildWitnesses(r1cs, publicVariables, secretVariables)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    p, _ := groth16.Prove(r1cs, pk, rightWitness)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* Verification */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    publicWitness, _ := rightWitness.Public()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    verifies := groth16.Verify(p, vk, publicWitness)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fmt.Println(&quot;Verifies with the right public values :&quot;, verifies == nil)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    wrongPublicVariables := []fr_bn254.Element{fr_bn254.NewElement(1), fr_bn254.NewElement(5)}</span></span>
+<span class="giallo-l"><span>    wrongWitness := buildWitnesses(r1cs, wrongPublicVariables, secretVariables)</span></span>
+<span class="giallo-l"><span>    wrongPublicWitness, _ := wrongWitness.Public()</span></span>
+<span class="giallo-l"><span>    verifies = groth16.Verify(p, vk, wrongPublicWitness)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fmt.Println(&quot;Verifies with the wrong public values :&quot;, verifies == nil)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>For you to be able to run this, you’ll need the <code>buildWitness</code> function:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>func buildWitnesses(r1cs *cs_bn254.R1CS, publicVariables fr_bn254.Vector, privateVariables fr_bn254.Vector) witness.Witness {</span></span>
+<span class="giallo-l"><span>    witnessValues := make(chan any)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    go func() {</span></span>
+<span class="giallo-l"><span>        defer close(witnessValues)</span></span>
+<span class="giallo-l"><span>        for _, publicVariable := range publicVariables {</span></span>
+<span class="giallo-l"><span>            witnessValues &lt;- publicVariable</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        for _, privateVariable := range privateVariables {</span></span>
+<span class="giallo-l"><span>            witnessValues &lt;- privateVariable</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    witness, err := witness.New(r1cs.CurveID().ScalarField())</span></span>
+<span class="giallo-l"><span>    if err != nil {</span></span>
+<span class="giallo-l"><span>        log.Fatal(err)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // -1 because the first variable is the ONE_WIRE.</span></span>
+<span class="giallo-l"><span>    witness.Fill(r1cs.GetNbPublicVariables()-1, r1cs.GetNbSecretVariables(), witnessValues)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    return witness</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h3 id="a-small-bug">A small bug</h3>
+<p>There’s a minor detail when using the low-level API that you have to take into account. Maybe you’ve noticed it but if not, take a look at this line in the example above:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>_ = r1cs.AddPublicVariable(&quot;1&quot;) // the ONE_WIRE</span></span></code></pre>
+<p>You’re probably wondering why this is necessary if we are not using the variable returned by the function. Well, we like to code so, let’s remove the line and the patch for this in the <code>buildWitness</code> function (for this patch, remove the -1 in the <code>witness.Fill</code> line of the function) execute the code.</p>
+<p>When doing that you’ll get this error:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>18:32:36 ERR error=&quot;invalid witness size, got 3, expected 2 = 1 (public) + 1 (secret)&quot; backend=groth16 nbConstraints=1</span></span></code></pre>
+<p>The error says that we are specting 2 variables (1 public and 1 private) when this is wrong. We’ve already declared 3 variables (2 public and 1 private).</p>
+<p>The reason why this happens and why the patch works is beyond the scope of this post but it’s a gnark’s implementation detail that leaked into the API. You can read more about that in this <a rel="noopener external" target="_blank" href="https://github.com/ConsenSys/gnark/issues/544">issue</a>.</p>
+<h2 id="infinite-loop-during-the-arithmetization">Infinite loop during the arithmetization</h2>
+<p>We found a small bug in the arithmetization code.</p>
+<p>Let’s modify a little bit our earlier Groth16’s example and</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>func Example() {</span></span>
+<span class="giallo-l"><span>    // [Y, Z]</span></span>
+<span class="giallo-l"><span>    publicVariables := []fr_bn254.Element{fr_bn254.NewElement(2), fr_bn254.NewElement(5)}</span></span>
+<span class="giallo-l"><span>    // [X]</span></span>
+<span class="giallo-l"><span>    secretVariables := []fr_bn254.Element{fr_bn254.NewElement(5)}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* R1CS Building */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // (X * Y) == Z + 5</span></span>
+<span class="giallo-l"><span>    // X is secret</span></span>
+<span class="giallo-l"><span>    // Y is public</span></span>
+<span class="giallo-l"><span>    // Z is public</span></span>
+<span class="giallo-l"><span>    // 5 is constant</span></span>
+<span class="giallo-l"><span>    r1cs := cs_bn254.NewR1CS(1)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Variables</span></span>
+<span class="giallo-l"><span>    _ = r1cs.AddPublicVariable(&quot;1&quot;) // the ONE_WIRE</span></span>
+<span class="giallo-l"><span>    Y := r1cs.AddPublicVariable(&quot;Y&quot;)</span></span>
+<span class="giallo-l"><span>    Z := r1cs.AddPublicVariable(&quot;Z&quot;)</span></span>
+<span class="giallo-l"><span>    X := r1cs.AddSecretVariable(&quot;X&quot;)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Constants</span></span>
+<span class="giallo-l"><span>    FIVE := r1cs.FromInterface(5)</span></span>
+<span class="giallo-l"><span>    CONST_FIVE_TERM := r1cs.MakeTerm(&amp;FIVE, 0)</span></span>
+<span class="giallo-l"><span>    CONST_FIVE_TERM.MarkConstant()</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Coefficients</span></span>
+<span class="giallo-l"><span>    COEFFICIENT_ONE := r1cs.FromInterface(1)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Constraints</span></span>
+<span class="giallo-l"><span>    // (1 * X) * (1 * Y) == (1 * Z) + (5 * 1)</span></span>
+<span class="giallo-l"><span>    constraint := constraint.R1C{</span></span>
+<span class="giallo-l"><span>        L: constraint.LinearExpression{r1cs.MakeTerm(&amp;COEFFICIENT_ONE, X)}, // 1 * X</span></span>
+<span class="giallo-l"><span>        R: constraint.LinearExpression{r1cs.MakeTerm(&amp;COEFFICIENT_ONE, Y)}, // 1 * Y</span></span>
+<span class="giallo-l"><span>        O: constraint.LinearExpression{</span></span>
+<span class="giallo-l"><span>            r1cs.MakeTerm(&amp;COEFFICIENT_ONE, Z)}, // 1 * Z 1</span></span>
+<span class="giallo-l"><span>            CONST_FIVE_TERM, // 5</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    r1cs.AddConstraint(constraint)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    constraints, r := r1cs.GetConstraints()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for _, r1c := range constraints {</span></span>
+<span class="giallo-l"><span>        fmt.Println(r1c.String(r))</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* Universal SRS Generation */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    pk, vk, _ := groth16.Setup(r1cs)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* Proving */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    rightWitness := buildWitnesses(r1cs, publicVariables, secretVariables)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    p, _ := groth16.Prove(r1cs, pk, rightWitness)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* Verification */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    publicWitness, _ := rightWitness.Public()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    verifies := groth16.Verify(p, vk, publicWitness)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fmt.Println(&quot;Verifies with the right public values :&quot;, verifies == nil)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    wrongPublicVariables := []fr_bn254.Element{fr_bn254.NewElement(1), fr_bn254.NewElement(5)}</span></span>
+<span class="giallo-l"><span>    wrongWitness := buildWitnesses(r1cs, wrongPublicVariables, secretVariables)</span></span>
+<span class="giallo-l"><span>    wrongPublicWitness, _ := wrongWitness.Public()</span></span>
+<span class="giallo-l"><span>    verifies = groth16.Verify(p, vk, wrongPublicWitness)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fmt.Println(&quot;Verifies with the wrong public values :&quot;, verifies == nil)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>At first glance it looks like this should work smoothly, but give it a try and run it. Noticed something wrong? If you tried it your answer’d be yes, because after a while you’ll end up with a <code>signal: killed</code> message.</p>
+<p>No problem, let’s fix it. Simply remove the following line:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>CONST_FIVE_TERM.MarkConstant()</span></span></code></pre>
+<p>The difference is just one line; we are making the same as above, only we are not marking the constant term as constant.</p>
+<h2 id="the-problem">The problem</h2>
+<p>If you run the fix above, you’ll see that execution finishes successfully and everyone is happy. Well, not so fast fren. This means you, as a Gnark user, can bypass the issue and build a working circuit. A malicious user, however, can still create faulty circuits that break execution.</p>
+<p>With this exploit, a server running a Gnark prover that accepts arbitrary circuits (Noir and Aleo Instructions are one example of languages that allow this behaviour to happen) can be brought down through a DDoS attack. A user can repeatedly send the faulty circuit shown above for execution, wasting cycles and forcing crashes over and over.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Gnark is from our point of view one of the best for developing ZKP applications with a lot of pros and cons, depending on what you want to do. In general if you want to develop ZKP apps the high-level API would be good enough for you. In our case, we needed to go a little deeper and because of that we found some flaws.</p>
+<p>So if you’re interested in learning more about how to develop ZKP applications using Gnark, stay tuned for our upcoming blog post. We will provide you with a step-by-step guide and show you how easy it can be to build powerful and secure ZKP applications using this amazing library.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

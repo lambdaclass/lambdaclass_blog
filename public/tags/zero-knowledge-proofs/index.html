@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Knowledge Proofs - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" class="active">Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<section class="taxonomy-page">
+    <header class="taxonomy-header">
+        <span class="taxonomy-label">Topic</span>
+        <h1>Zero Knowledge Proofs</h1>
+        <p class="taxonomy-count">19 articles</p>
+    </header>
+
+    <div class="posts-list">
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2024-02-17">February 17, 2024</time>
+                    
+                    <span class="reading-time">16 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;our-highly-subjective-view-on-the-history-of-zero-knowledge-proofs&#x2F;">Our highly subjective view on the history of Zero-Knowledge Proofs</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;our-highly-subjective-view-on-the-history-of-zero-knowledge-proofs&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;La_bataille_d-Austerlitz._2_decembre_1805_-Franc--ois_Ge--rard-.jpg" alt="Our highly subjective view on the history of Zero-Knowledge Proofs" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2024-01-28">January 28, 2024</time>
+                    
+                    <span class="reading-time">7 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;a-fast-trust-minimized-intent-based-bridge-solution-for-ethereum-and-l2s-powered-by-multi-proof-storage-proofs&#x2F;">A fast trust minimized intent based bridge solution for Ethereum and L2s powered by multi-proof storage proofs</a>
+                </h2>
+                
+                <p class="post-excerpt">Bridges are generally insecure and economically inefficient. We propose a bridge design that is simple, modular, and utilizes multi-storage proofs and the native messaging system between Ethereum and …</p>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;a-fast-trust-minimized-intent-based-bridge-solution-for-ethereum-and-l2s-powered-by-multi-proof-storage-proofs&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;F0087_Louvre_Gellee_port_au_soleil_couchant-_INV4715_rwk.jpg" alt="A fast trust minimized intent based bridge solution for Ethereum and L2s powered by multi-proof storage proofs" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-10-17">October 17, 2023</time>
+                    
+                    <span class="reading-time">14 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;groth16&#x2F;">An overview of the Groth16 proof system</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;groth16&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Rosa_-_The_Death_of_Regulus-_ca._1650-1652.jpg" alt="An overview of the Groth16 proof system" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-04-13">April 13, 2023</time>
+                    
+                    <span class="reading-time">9 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms&#x2F;">Transforming the Future with Zero-Knowledge Proofs, Fully Homomorphic Encryption and new Distributed Systems algorithms</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2023&#x2F;04&#x2F;Jan_Matejko-_Bitwa_pod_Grunwaldem--2-.jpg" alt="Transforming the Future with Zero-Knowledge Proofs, Fully Homomorphic Encryption and new Distributed Systems algorithms" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-03-06">March 06, 2023</time>
+                    
+                    <span class="reading-time">13 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;diving-deep-fri&#x2F;">Diving DEEP FRI in the STARK world: learning your daily moon math with a concrete example</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;diving-deep-fri&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Peter_Paul_Rubens_-_The_Fall_of_Phaeton_-National_Gallery_of_Art-.jpg" alt="Diving DEEP FRI in the STARK world: learning your daily moon math with a concrete example" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-03-01">March 01, 2023</time>
+                    
+                    <span class="reading-time">15 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;lambdaworks-or-how-we-decided-to-created-our-zksnarks-library-and-a-stark-prover&#x2F;">LambdaWorks or how we decided to create our zkSNARKs library and a STARK prover</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;lambdaworks-or-how-we-decided-to-created-our-zksnarks-library-and-a-stark-prover&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Peter_Paul_Rubens_110.jpg" alt="LambdaWorks or how we decided to create our zkSNARKs library and a STARK prover" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-02-24">February 24, 2023</time>
+                    
+                    <span class="reading-time">9 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;periodic-constraints-and-recursion-in-zk-starks&#x2F;">Everything you wanted to know about periodic constraints in STARKs but nobody told you</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;periodic-constraints-and-recursion-in-zk-starks&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Rudolf_Ritter_von_Alt_001.jpg" alt="Everything you wanted to know about periodic constraints in STARKs but nobody told you" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-02-02">February 02, 2023</time>
+                    
+                    <span class="reading-time">7 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;champagne-supernova-incrementally-verifiable-computation-2&#x2F;">Champagne SuperNova, incrementally verifiable computation</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;champagne-supernova-incrementally-verifiable-computation-2&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Abel-_Joseph_-_Self-Portrait_in_the_Studio_-_Google_Art_Project.jpg" alt="Champagne SuperNova, incrementally verifiable computation" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-23">January 23, 2023</time>
+                    
+                    <span class="reading-time">29 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;eyes-on-the-prize&#x2F;">ZPrize: eyes on the prize</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;eyes-on-the-prize&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Angelica_Kauffmann_-_Virgil_reading_the_---Aeneid---_to_Augustus_and_Octavia_-Hermitage-.jpg" alt="ZPrize: eyes on the prize" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-20">January 20, 2023</time>
+                    
+                    <span class="reading-time">12 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;incrementally-verifiable-computation-nova&#x2F;">Incrementally verifiable computation: NOVA</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;incrementally-verifiable-computation-nova&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Edmund_blair_leighton_accolade.jpg" alt="Incrementally verifiable computation: NOVA" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-14">January 14, 2023</time>
+                    
+                    <span class="reading-time">13 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;arithmetization-schemes-for-zk-snarks&#x2F;">Arithmetization schemes for ZK-SNARKs</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;arithmetization-schemes-for-zk-snarks&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Siege-alesia-vercingetorix-jules-cesar.jpg" alt="Arithmetization schemes for ZK-SNARKs" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-14">January 14, 2023</time>
+                    
+                    <span class="reading-time">11 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;how-to-transform-code-into-arithmetic-circuits&#x2F;">How to transform code into arithmetic circuits</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;how-to-transform-code-into-arithmetic-circuits&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;WATERHOUSE_-_Ulises_y_las_Sirenas_-National_Gallery_of_Victoria-_Melbourne-_1891._O--leo_sobre_lienzo-_100.6_x_202_cm-.jpg" alt="How to transform code into arithmetic circuits" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-13">January 13, 2023</time>
+                    
+                    <span class="reading-time">10 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;decentralized-private-computations-zexe-and-veri-zexe&#x2F;">Decentralized private computation: ZEXE and VERI-ZEXE</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;decentralized-private-computations-zexe-and-veri-zexe&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Charles_Le_Brun_-_Entry_of_Alexander_into_Babylon.jpeg" alt="Decentralized private computation: ZEXE and VERI-ZEXE" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-13">January 13, 2023</time>
+                    
+                    <span class="reading-time">36 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;pinocchio-virtual-machine-nearly-practical-verifiable-computation&#x2F;">Pinocchio Virtual Machine: Nearly Practical Verifiable Computation</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;pinocchio-virtual-machine-nearly-practical-verifiable-computation&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Wilhelm_von_Kobell_-_Cattle_Market_before_a_Large_City_on_a_Lake-_1820_-_Google_Art_Project.jpg" alt="Pinocchio Virtual Machine: Nearly Practical Verifiable Computation" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-11">January 11, 2023</time>
+                    
+                    <span class="reading-time">13 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;the-hunting-of-the-zk-snark&#x2F;">The hunting of the (zk)-SNARK</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;the-hunting-of-the-zk-snark&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;An_Incident_in_the_story_of_Don_Quixote-_by_Robert_Hillingford.jpg" alt="The hunting of the (zk)-SNARK" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-09">January 09, 2023</time>
+                    
+                    <span class="reading-time">10 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;multiscalar-multiplication-strategies-and-challenges&#x2F;">Multiscalar Multiplication: Strategies and Challenges</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;multiscalar-multiplication-strategies-and-challenges&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Belisarius_by_Francois-Andre_Vincent.jpg" alt="Multiscalar Multiplication: Strategies and Challenges" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-07">January 07, 2023</time>
+                    
+                    <span class="reading-time">19 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;verifiable-encryption-using-zero-knowledge-proofs&#x2F;">Verifiable AES: encryption using zero-knowledge proofs</a>
+                </h2>
+                
+                <p class="post-excerpt">Encryption is transforming messages into random-looking texts to ensure confidentiality between two parties.
+
+What is our objective here? We want to generate proof allowing us to verify an encryption …</p>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;verifiable-encryption-using-zero-knowledge-proofs&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Zonaro_GatesofConst.jpg" alt="Verifiable AES: encryption using zero-knowledge proofs" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2023-01-05">January 05, 2023</time>
+                    
+                    <span class="reading-time">13 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;fully-private-applications-a-zexe-protocol&#x2F;">Fully private applications: A ZEXE protocol</a>
+                </h2>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;fully-private-applications-a-zexe-protocol&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Blake_Dante_Hell_V.jpg" alt="Fully private applications: A ZEXE protocol" loading="lazy">
+            </a>
+            
+        </article>
+        
+        <article class="post-list-item">
+            <div class="post-list-content">
+                <div class="post-meta">
+                    <time datetime="2022-12-16">December 16, 2022</time>
+                    
+                    <span class="reading-time">15 min read</span>
+                    
+                </div>
+                <h2 class="post-title">
+                    <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;fully-homomorphic-encryption-zero-knowledge-proofs-and-multiparty-computation&#x2F;">Fully-homomorphic encryption, zero-knowledge proofs, and multiparty computation</a>
+                </h2>
+                
+                <p class="post-excerpt">ZKP can provide integrity of computations, FHE allows data sharing and calculation without compromising it and MPC gives the power to delegate expensive computations to other parties. In this post, we…</p>
+                
+            </div>
+            
+            <a href="https:&#x2F;&#x2F;blog.lambdaclass.com&#x2F;posts&#x2F;fully-homomorphic-encryption-zero-knowledge-proofs-and-multiparty-computation&#x2F;" class="post-list-image">
+                <img src="&#x2F;images&#x2F;2025&#x2F;12&#x2F;Akropolis_by_Leo_von_Klenze.jpg" alt="Fully-homomorphic encryption, zero-knowledge proofs, and multiparty computation" loading="lazy">
+            </a>
+            
+        </article>
+        
+    </div>
+
+    
+    <nav class="pagination">
+        
+        <span class="pagination-info">Page 1 of 1</span>
+        
+    </nav>
+    
+</section>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

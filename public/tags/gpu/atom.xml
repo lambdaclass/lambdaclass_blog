@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>LambdaClass Blog - Gpu</title>
+    <subtitle>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://blog.lambdaclass.com/tags/gpu/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2020-10-20T00:00:00+00:00</updated>
+    <id>https://blog.lambdaclass.com/tags/gpu/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Julia GPU</title>
+        <published>2020-10-20T00:00:00+00:00</published>
+        <updated>2020-10-20T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/julia-gpu/"/>
+        <id>https://blog.lambdaclass.com/posts/julia-gpu/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/julia-gpu/">&lt;h3 id=&quot;how-the-julia-language-is-making-it-easy-for-programmers-to-use-gpu-capabilities-with-juliagpu&quot;&gt;How the Julia language is making it easy for programmers to use GPU capabilities with JuliaGPU&lt;&#x2F;h3&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-KJX3T1Y9T1Cj0aV3m-A22w.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;We are living in a time where more and more data is being created every day as well as new techniques and complex algorithms that try to extract the most out of it. As such, CPU capabilities are approaching a bottleneck in their computing power. GPU computing opened its way into a new paradigm for high-performance and parallel computation a long time ago, but it was not until recently that it become massively used for data science.&lt;br &#x2F;&gt;
+In this interview, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;maleadt&quot;&gt;Tim Besard&lt;&#x2F;a&gt;, one of the main contributors to the JuliaGPU project, digs into some of the details about GPU computing and the features that make Julia a language suited for such tasks, not only from a performance perspective but also from a user one.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h4 id=&quot;please-tell-us-a-bit-about-yourself-what-is-your-background-what-is-your-current-position&quot;&gt;Please tell us a bit about yourself. What is your background? what is your current position?&lt;&#x2F;h4&gt;
+&lt;p&gt;I’ve always been interested in systems programming, and after obtaining my CS degree I got the opportunity to start a PhD at Ghent University, Belgium, right when Julia was first released around 2012. The language seemed intriguing, and since I wanted to gain some experience with LLVM, I decided to port some image processing research code from MATLAB and C++ to Julia. The goal was to match performance of the C++ version, but some of its kernels were implemented in CUDA C… So obviously Julia needed a GPU back-end!&lt;&#x2F;p&gt;
+&lt;p&gt;That was easier said than done, of course, and much of my PhD was about implementing that back-end and (re)structuring the existing Julia compiler to facilitate these additional back-ends. Nowadays I’m at Julia Computing, where I still work on everything GPU-related.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-is-juliagpu-what-is-the-goal-of-the-project&quot;&gt;What is JuliaGPU? What is the goal of the project?&lt;&#x2F;h4&gt;
+&lt;p&gt;JuliaGPU is the name we use to group GPU-related resources in Julia: There’s a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;JuliaGPU&quot;&gt;GitHub organization&lt;&#x2F;a&gt; where most packages are hosted, a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;juliagpu.org&#x2F;&quot;&gt;website&lt;&#x2F;a&gt; to point the way for new users, we have &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;JuliaGPU&#x2F;gitlab-ci&quot;&gt;CI infrastructure&lt;&#x2F;a&gt; for JuliaGPU projects, there’s a Slack channel and Discourse category, etc.&lt;&#x2F;p&gt;
+&lt;p&gt;The goal of all this is to make it easier to use GPUs for all kinds of users. Current technologies often impose significant barriers to entry: CUDA is fairly tricky to install, C and C++ are not familiar to many users, etc. With the software we develop as part of the JuliaGPU organization, we aim to make it easy to use GPUs, without hindering the ability to optimize or use low-level features that the hardware has to offer.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-is-gpu-computing-how-important-is-it-nowadays&quot;&gt;What is GPU computing? How important is it nowadays?&lt;&#x2F;h4&gt;
+&lt;p&gt;GPU computing means using the GPU, a device originally designed for graphics processing, to perform general-purpose computations. It has grown more important now that CPU performance is not improving as steadily as it used to. Instead, specialized devices like GPUs or FPGAs are increasingly used to improve the performance of certain computations. In the case of GPUs, the architecture is a great fit to perform highly-parallel applications. Machine learning networks are a good example of such parallel applications, and their popularity is one of the reasons GPUs have become so important.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;do-you-think-julia-is-an-appropriate-language-to-efficiently-use-gpu-capabilities-why&quot;&gt;Do you think Julia is an appropriate language to efficiently use GPU capabilities? Why?&lt;&#x2F;h4&gt;
+&lt;p&gt;Julia’s main advantage is that the language was designed to be compiled. Even though the syntax is high-level, the generated machine code is&lt;br &#x2F;&gt;
+compact and has great performance characteristics (for more details, see &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;janvitek.org&#x2F;pubs&#x2F;oopsla18b.pdf&quot;&gt;this paper&lt;&#x2F;a&gt;). This is crucial for GPU execution, where we are required to run native binaries and cannot easily (or efficiently) interpret code as is often required by other language’s semantics.&lt;&#x2F;p&gt;
+&lt;p&gt;Because we’re able to directly compile Julia for GPUs, we can use almost all of the language’s features to build powerful abstractions. For example, you can define your own types, use those in GPU arrays, compose that with existing abstractions like lazy “Transpose” wrappers, access those on the GPU while benefiting from automatic bounds-checking (if needed), etc.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;from-a-python-programmer-perspective-how-does-cuda-jl-compare-to-pycuda-are-their-functionalities-equivalent&quot;&gt;From a Python programmer perspective, how does CUDA.jl compare to PyCUDA? Are their functionalities equivalent?&lt;&#x2F;h4&gt;
+&lt;p&gt;PyCUDA gives the programmer access to the CUDA APIs, with high-level Python functions that are much easier to use. CUDA.jl provides the same, but in Julia. The &lt;code&gt;hello world&lt;&#x2F;code&gt; from PyCUDA’s home page looks almost identical in Julia:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;using CUDA&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;function multiply_them(dest, a, b)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; i = threadIdx().x&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; dest[i] = a[i] * b[i]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; return&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;end&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;a = CuArray(randn(Float32, 400))&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;b = CuArray(randn(Float32, 400))&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;dest = similar(a)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;@cuda threads=400 multiply_them(dest, a, b)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;println(dest-a.*b)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;There’s one very big difference: “multiply_them” here is a function written in Julia, whereas PyCUDA uses a kernel written in CUDA C. The reason is straightforward: Python is not simple to compile. Of course, projects like Numba prove that it is very much possible to do so, but in the end those are separate compilers that try to match the reference Python compilers as closely as possible. With CUDA.jl, we integrate with that reference compiler, so it’s much easier to guarantee consistent semantics and follow suit when the language changes (for more details,&lt;br &#x2F;&gt;
+refer to &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;1712.03112&quot;&gt;this paper&lt;&#x2F;a&gt;).&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;are-the-packages-in-the-juliagpu-organization-targeted-to-experienced-programmers-only&quot;&gt;Are the packages in the JuliaGPU organization targeted to experienced programmers only?&lt;&#x2F;h4&gt;
+&lt;p&gt;Not at all. CUDA.jl targets different kinds of (GPU) programmers. If you are confident writing your own kernels, you can do so, while using all of the low-level features CUDA GPUs have to offer. But if you are new to the world of GPU programming, you can use high-level array operations that use existing kernels in CUDA.jl. For example, the above element-wise multiplication could just as well be written as:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;using CUDA&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;a = CuArray(randn(Float32, 400))&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;b = CuArray(randn(Float32, 400))&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;dest = a .* b&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h4 id=&quot;is-it-necessary-to-know-how-to-code-in-cuda-jl-to-take-full-advantage-of-gpu-computing-in-julia&quot;&gt;Is it necessary to know how to code in CUDA.jl to take full advantage of GPU computing in Julia?&lt;&#x2F;h4&gt;
+&lt;p&gt;Not for most users. Julia has a powerful language of generic array operations (“map”, “reduce”, “broadcast”, “accumulate”, etc) which can be applied to all kinds of arrays, including GPU arrays. That means you can often re-use your codebase developed for the CPU with CUDA.jl (&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.sciencedirect.com&#x2F;science&#x2F;article&#x2F;abs&#x2F;pii&#x2F;S0965997818310123&quot;&gt;this paper&lt;&#x2F;a&gt; shows some powerful examples). Doing so often requires minimal changes: changing the array type, making sure you use array operations instead of for loops, etc.&lt;&#x2F;p&gt;
+&lt;p&gt;It’s possible you need to go beyond this style of programming, e.g., because your application doesn’t map cleanly onto array operations, to use specific GPU features, etc. In that case, some basic knowledge about CUDA and the GPU programming model is sufficient to write kernels in CUDA.jl.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;how-is-the-experience-of-coding-a-kernel-in-cuda-jl-in-comparison-to-cuda-c-and-how-transferable-is-the-knowledge-to-one-another&quot;&gt;How is the experience of coding a kernel in CUDA.jl in comparison to CUDA C and how transferable is the knowledge to one another?&lt;&#x2F;h4&gt;
+&lt;p&gt;It’s very similar, and that’s by design: We try to keep the kernel abstractions in CUDA.jl close to their CUDA C counterparts such that the programming environment is familiar to existing GPU programmers. Of course, by using a high-level source language there’s many quality-of-life improvements. You can allocated shared memory, for example, statically and dynamically as in CUDA C, but instead of a raw pointers we use an N-dimensional array object you can easily index. An example from the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;developer.nvidia.com&#x2F;blog&#x2F;using-shared-memory-cuda-cc&#x2F;&quot;&gt;NVIDIA developer blog&lt;&#x2F;a&gt;:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;__global__ void staticReverse(int *d, int n)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;{&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; __shared__ int s[64];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; int t = threadIdx.x;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; int tr = n-t-1;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; s[t] = d[t];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; __syncthreads();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; d[t] = s[tr];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The CUDA.jl equivalent of this kernel looks very familiar, but uses array objects instead of raw pointers:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;function staticReverse(d)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; s = @cuStaticSharedMem(Int, 64)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; t = threadIdx().x&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; tr = length(d)-t+1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; s[t] = d[t]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; sync_threads()&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; d[t] = s[tr]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; return&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;end&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Using array objects has many advantages, e.g. multi-dimensional is greatly simplified and we can just do “d[i,j]”. But it’s also safer, because these accesses are bounds checked:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; a = CuArray(1:64)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;64-element CuArray{Int64,1}:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 2&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 3&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; ⋮&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 62&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 63&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 64&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; @cuda threads=65 staticReverse(a)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;ERROR: a exception was thrown during kernel execution.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Stacktrace:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; [1] throw_boundserror at abstractarray.jl:541&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Bounds checking isn’t free, of course, and once we’re certain our code is correct we can add an “@inbounds” annotation to our kernel and get the high-performance code we expect:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; @device_code_ptx @cuda threads=64 staticReverse(a)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;.visible .entry staticReverse(.param .align 8 .b8 d[16]) {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; .reg .b32 %r&amp;lt;2&amp;gt;;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; .reg .b64 %rd&amp;lt;15&amp;gt;;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; .shared .align 32 .b8 s[512];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;mov.b64 %rd1, d;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; ld.param.u64 %rd2, [%rd1];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; ld.param.u64 %rd3, [%rd1+8];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; mov.u32 %r1, %tid.x;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; cvt.u64.u32 %rd4, %r1;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; mul.wide.u32 %rd5, %r1, 8;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; add.s64 %rd6, %rd5, -8;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; add.s64 %rd7, %rd3, %rd6;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; ld.global.u64 %rd8, [%rd7+8];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; mov.u64 %rd9, s;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; add.s64 %rd10, %rd9, %rd6;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; st.shared.u64 [%rd10+8], %rd8;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; bar.sync 0;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; sub.s64 %rd11, %rd2, %rd4;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; shl.b64 %rd12, %rd11, 3;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; add.s64 %rd13, %rd9, %rd12;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; ld.shared.u64 %rd14, [%rd13+-8];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; st.global.u64 [%rd7+8], %rd14;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; ret;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; a&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;64-element CuArray{Int64,1}:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 64&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 63&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 62&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; ⋮&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 3&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 2&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Tools like “@device_code_ptx” make it easy for an experienced developer to inspect generated code and ensure the compiler does what he wants.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;why-does-having-a-compiler-have-such-an-impact-in-libraries-like-cuda-jl-how-was-the-process-of-integrating-it-to-the-julia-compiler&quot;&gt;Why does having a compiler have such an impact in libraries like CUDA.jl? (How was the process of integrating it to the Julia compiler?)&lt;&#x2F;h4&gt;
+&lt;p&gt;Because we have a compiler at our disposal, we can rely on higher-order functions and other generic abstractions that specialize based on the arguments that users provide. That greatly simplifies our library, but also gives the user very powerful tools. As an example, we have carefully implemented a &lt;code&gt;mapreduce&lt;&#x2F;code&gt; function that uses shared memory, warp intrinsics, etc to perform a high-performance reduction. The implementation is generic though, and will automatically re-specialize (even at run time) based on the arguments to the function:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; mapreduce(identity, +, CuArray([1,2,3]))&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;6&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; mapreduce(sin, *, CuArray([1.1,2.2,3.3]))&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;-0.11366175839582586&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;With this powerful &lt;code&gt;mapreduce&lt;&#x2F;code&gt; abstraction, implemented by a experienced GPU programmer, other developers can create derived abstractions without such experience. For example, let’s implement a &lt;code&gt;count&lt;&#x2F;code&gt; function that evaluates for how many items a predicate holds true:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;count(predicate, array) = mapreduce(predicate, +, array)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; a = CUDA.rand(Int8, 4)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;4-element CuArray{Int8,1}:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 51&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 3&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 70&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; 100&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;julia&amp;gt; count(iseven, a)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;2&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Even though our &lt;code&gt;mapreduce&lt;&#x2F;code&gt; implementation has not been specifically implemented for the &lt;code&gt;Int8&lt;&#x2F;code&gt; type or the &lt;code&gt;iseven&lt;&#x2F;code&gt; predicate, the Julia compiler automatically specializes the implementation, resulting in kernel optimized for this specific invocation.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-were-the-biggest-challenges-when-developing-packages-for-juliagpu-particularly-writing-a-low-level-package-such-as-cuda-jl-in-a-high-level-programming-language-such-as-julia&quot;&gt;What were the biggest challenges when developing packages for JuliaGPU, particularly writing a low level package such as CUDA.jl in a high level programming language such as Julia?&lt;&#x2F;h4&gt;
+&lt;p&gt;Much of the initial work focused on developing tools that make it possible to write low-level code in Julia. For example, we developed the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;maleadt&#x2F;LLVM.jl&quot;&gt;LLVM.jl&lt;&#x2F;a&gt; package that gives us access to the LLVM APIs. Recently, our focus has shifted towards generalizing this functionality so that other GPU back-ends, like &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;JuliaGPU&#x2F;AMDGPU.jl&quot;&gt;AMDGPU.jl&lt;&#x2F;a&gt; or &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;JuliaGPU&#x2F;oneAPI.jl&quot;&gt;oneAPI.jl&lt;&#x2F;a&gt; can benefit from developments to CUDA.jl. Vendor-neutral array operations, for examples, are now implemented in &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;JuliaGPU&#x2F;GPUArrays.jl&quot;&gt;GPUArrays.jl&lt;&#x2F;a&gt; whereas shared compiler functionality now lives in &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;JuliaGPU&#x2F;GPUCompiler.jl&quot;&gt;GPUCompiler.jl&lt;&#x2F;a&gt;. That should make it possible to work on several GPU back-ends, even though most of them are maintained by only a single developer.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;regarding-the-latest-release-announced-in-the-juliagpu-blog-about-multi-device-programming-what-are-the-difficulties-that-this-new-functionality-solves-is-this-relevant-in-the-industry-where-big-computational-resources-are-needed&quot;&gt;Regarding the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;juliagpu.org&#x2F;2020-07-18-cuda_1.3&#x2F;&quot;&gt;latest release&lt;&#x2F;a&gt; announced in the JuliaGPU blog about multi-device programming, what are the difficulties that this new functionality solves? Is this relevant in the industry where big computational resources are needed?&lt;&#x2F;h4&gt;
+&lt;p&gt;In industry or large research labs, MPI is often used to distribute work across multiple nodes or GPUs. Julia’s MPI.jl supports that use case, and integrates with CUDA.jl where necessary. The multi-device functionality added to CUDA 1.3 additionally makes it possible to use multiple GPUs within a single process. It maps nicely on Julia’s task-based concurrency, and makes it easy to distribute work within a single node:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Threads.@threads for dev in devices()&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; device!(dev)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt; # do some work here&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;end&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h4 id=&quot;what-are-the-plans-for-the-near-future&quot;&gt;&lt;strong&gt;What are the plans for the near future?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;There aren’t any specific roadmaps, but one upcoming major feature is proper support for reduced-precision inputs, like 16-bits floating point. We already support Float16 arrays where CUBLAS or CUDNN does, but the next version of Julia will make it possible to write kernels that operate on these values.&lt;&#x2F;p&gt;
+&lt;p&gt;Other than that, features come as they do :-) Be sure to subscribe to the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;juliagpu.org&#x2F;post&#x2F;&quot;&gt;JuliaGPU blog&lt;&#x2F;a&gt; where we publish a short post for every major release of Julia’s GPU back-ends.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;You can find Tim at @&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;maleadt&quot;&gt;maleadt&lt;&#x2F;a&gt; on Twitter!&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

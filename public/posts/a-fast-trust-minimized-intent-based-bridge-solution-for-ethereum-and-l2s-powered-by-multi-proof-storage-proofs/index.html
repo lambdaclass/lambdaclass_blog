@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A fast trust minimized intent based bridge solution for Ethereum and L2s powered by multi-proof storage proofs - LambdaClass Blog</title>
+    <meta name="description" content="Bridges are generally insecure and economically inefficient. We propose a bridge design that is simple, modular, and utilizes multi-storage proofs and the native messaging system between Ethereum and Layer 2 networks (L2s) as a fallback mechanism.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">A fast trust minimized intent based bridge solution for Ethereum and L2s powered by multi-proof storage proofs</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-01-28">January 28, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p><strong>Authors:</strong><a rel="noopener external" target="_blank" href="https://twitter.com/thisisrj">Roberto Catalan</a> and <a rel="noopener external" target="_blank" href="https://twitter.com/federicocarrone">Federico Carrone</a></p>
+<p><em>Bridges are generally insecure and economically inefficient. They exhibit an asymmetry between users and bridge operators, where users can easily lose funds. We propose a bridge design that is simple, modular, and utilizes multi-storage proofs and the native messaging system between Ethereum and Layer 2 networks (L2s) as a fallback mechanism.</em></p>
+<h2 id="bridging-is-a-trust-issue">Bridging is a trust issue</h2>
+<p>How can we offer a system where the users don’t have to trust a facilitator to exchange their assets from an L2 to Ethereum?</p>
+<p>We propose a simple protocol that follows these steps:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. The user specifies a destination address on Ethereum and locks the tokens X to be bridged into an L2 escrow smart contract.</span></span>
+<span class="giallo-l"><span>    2. A market maker monitors a change of state in the escrow smart contract.</span></span>
+<span class="giallo-l"><span>    3. a. The market maker calls the transfer function of the PaymentRegistry Contract in Ethereum.  </span></span></code></pre>
+<p>b. The transfer function of the PaymentRegistry contract in Ethereum pays the tokens X to the User.
+4. A storage proof is generated, containing evidence of a transfer from the market maker’s Ethereum account to the user-specified address in Ethereum.
+5. Ethereum PaymentRegistry storage information is used as part of a storage proof.
+6. L2 Escrow contract verifies the storage proof of the PaymentRegistry contract in Ethereum and pays the MM with the initial tokens locked by the user.
+<img src="/images/2024/01/image.png" alt="" /></p>
+<p>The same design can be expanded to be used to bridge tokens from an L2 to another L2. The same design can include multi-proof storage proofs instead of using only one. We also have implemented a fallback mechanism using the native message mechanism between Ethereum and L2s in case the storage proof providers are offline.</p>
+<p><strong>Fallback mechanism</strong><br />
+If the storage proof providers are not available, the market maker can prove to the Escrow contract that they fulfilled the user’s intent through the rollup’s native messaging system. Using this messaging system has the same trust assumptions as the L2s used in the transfer.</p>
+<h2 id="risks">Risks</h2>
+<p>For the user, the risks include the existence of a bug in the code of the smart contract, the existence of a bug in the circuits of the ZK/validity proof verification and the fact that the storage proof provider can go offline. The first risk is mitigated by having a very simple smart contract. The second risk is mitigated by using multi-proof storage proofs and multiple ZK/validity proof implementations or TEEs. If the storage proof provider goes offline the fallback mechanism can be used.</p>
+<p>The risks for market makers are the same as for users, plus the risk of reorganization of the chain and the fact that the market maker receives the same tokens on the L2s rather than on Ethereum.</p>
+<p>Since the capital is locked for a short period (until the proof is generated or the message arrives), the risks are minimized and the attack surface is smaller for the market maker.</p>
+<h2 id="questions">Questions</h2>
+<p><strong>What are our disadvantages?</strong><br />
+The biggest disadvantage of this solution is that users can only bridge tokens that are present in both the origin and destination chains.<br />
+Another disadvantage is that the risks don’t disappear; they are simply transferred to the market maker.</p>
+<p><strong>How can users cancel their order?</strong><br />
+Initially, we are not going to offer the ability to cancel orders. The main reason is to avoid any timing attacks. For instance, a user could create an order and cancel it right after the market maker has paid them on the destination chain, thereby stealing funds from the market maker.</p>
+<p><strong>Is there any real-world implementation of this bridge?</strong><br />
+Yes. We have already implemented this between Starknet and Ethereum. We plan to integrate zkSync, Arbitrum, Optimism, Scroll, Base, and Linea next.<br />
+All integrations require the same codebase with a few modifications, except for Starknet, which is not EVM compatible.</p>
+<p><strong>How fast is it?</strong><br />
+From the user’s perspective, the bridging is completed in less than 30 seconds, as quickly as the time it takes the market maker to observe the user’s deposit and execute a transfer.<br />
+From the market maker’s perspective, they will be able to withdraw the money after paying the user and generating the storage proof. This normally takes between 5 and 15 minutes. It’s important to also consider that the market maker will need to rebalance their liquidity using the native bridge and wait for the finality of the native bridge to rebalance their portfolio.</p>
+<p><strong>How cheap is it?</strong><br />
+The cost of this bridge is similar to an ERC20 transfer plus the cost of proving the state of the L1 and L2. This second cost tends towards zero since it’s amortized by multiple calls that use the same proof, and the proving cost is minimal compared to on-chain transfers.</p>
+<p><strong>What is new in this design? Didn’t storage proofs solve this problem already?</strong><br />
+Storage proofs alone don’t fundamentally change the design of a traditional bridge. They merely enable a safer coordination mechanism.<br />
+Locking the user’s capital first provides guarantees to the market maker that they will receive the funds in exchange for fulfilling the user’s intent.</p>
+<p><strong>Couldn’t you solve this problem without Storage Proofs? What do they add to the table?</strong></p>
+<p>Yes, Storage Proofs are not 100% necessary to solve this problem. But they are a key technological component for a future proof architecture. If we want this protocol to scale, storage proofs are the best way to do this. It will allow us to prove many orders together.</p>
+<p><strong>What are the benefits against an Optimistic Oracle?</strong></p>
+<p>Optimistic Oracles were a great solution before Storage Proofs were a feasible solution, their main disadvantages are:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Optimistic Oracles relay in Game Theory to work and it&#39;s difficult to bootstrap an ecosystem to make them robust.</span></span>
+<span class="giallo-l"><span>    * Codebases are complex</span></span>
+<span class="giallo-l"><span>    * The settlement period takes a few hours (depending on the solution) and end up creating inefficiencies for the market makers.</span></span></code></pre>
+<p>On the other hand our protocol with the native messaging and storage proofs takes no longer than 15 minutes (between Ethereum and L2) to unlock the funds. The protocol codebase is no more than 500 lines of code and the risks are easy to understand by all the players and therefore easy to come up with ways to mitigate them.</p>
+<p><strong>Did anybody do something similar beforehand?</strong><br />
+Hop Protocol was one of the first bridges to allow cross-chain swaps between rollups and Ethereum with an AMM-based design using multiple messaging systems (native and optimistic). The main issue lies in the capital inefficiency of an AMM model and the significant security risks of locking large amounts of capital in complex cross-chain communications.</p>
+<p>Across was the first bridge to leverage intents for a faster bridge experience and lower capital costs per transaction. However, by using an Optimistic Oracle, it naturally has a challenging period that the market has to wait to get its funds back. To optimize some of the problems their settlement mechanism introduces, they offer financial products around their main bridge solution, such as Liquidity Pools that front the capital to the market makers.</p>
+<p><strong>What are our advantages?</strong><br />
+Our bet is that zero-knowledge proofs will continue to improve, becoming faster and safer, thus enhancing our solution and allowing us to offer better prices by lowering risks and shortening the repayment period.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Fast and cheap bridging experience for the user</span></span>
+<span class="giallo-l"><span>    * Short capital lock-up period for the market maker</span></span>
+<span class="giallo-l"><span>    * Low on-chain complexity. The smart contracts in total are not larger than 300 lines of code.</span></span></code></pre><h2 id="next-steps">Next steps</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Speeding up message passing with EigenLayer to allow cross-chain swap settlements between L2s. The protocol should have the option to send faster messages between rollups and Ethereum with similar trust assumptions of the native messaging system.</span></span>
+<span class="giallo-l"><span>    * Introducing Partially Filled Orders, offering cheaper but slower transfers with batching.</span></span>
+<span class="giallo-l"><span>    * Intent-based DeFi Pooling.</span></span>
+<span class="giallo-l"><span>    * Unified wallet abstraction across multiple L2s.</span></span></code></pre>
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

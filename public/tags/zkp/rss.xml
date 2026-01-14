@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+      <title>LambdaClass Blog - zkp</title>
+      <link>https://blog.lambdaclass.com</link>
+      <description>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</description>
+      <generator>Zola</generator>
+      <language>en</language>
+      <atom:link href="https://blog.lambdaclass.com/tags/zkp/rss.xml" rel="self" type="application/rss+xml"/>
+      <lastBuildDate>Wed, 01 Mar 2023 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>LambdaWorks or how we decided to create our zkSNARKs library and a STARK prover</title>
+          <pubDate>Wed, 01 Mar 2023 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.lambdaclass.com/posts/lambdaworks-or-how-we-decided-to-created-our-zksnarks-library-and-a-stark-prover/</link>
+          <guid>https://blog.lambdaclass.com/posts/lambdaworks-or-how-we-decided-to-created-our-zksnarks-library-and-a-stark-prover/</guid>
+          <description xml:base="https://blog.lambdaclass.com/posts/lambdaworks-or-how-we-decided-to-created-our-zksnarks-library-and-a-stark-prover/">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;&#x2F;h2&gt;
+&lt;p&gt;We think that most ZK libraries are not yet easy-to-use. Most of them assume that the user had a significant cryptography background, making it hard for a newcomer to learn from them, even if he had all the code in front of him. We also found that some commonly used libraries had poor documentation or hard-to-follow examples for beginners. In addition to this some libraries don’t follow state of the art engineering practices that are crucial to build reliable systems that go to production. There are many efforts like Cairo, Noir that don’t have these issues but they are full blown programming languages. We wanted a tool to build languages like those, new proving systems or anything that we need.&lt;&#x2F;p&gt;
+&lt;p&gt;So, we decided to start building our &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;lambdaworks&quot;&gt;LambdaWorks&lt;&#x2F;a&gt; library with the following goals in mind:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. Implemented in Rust with WASM support and an FFI API in other mainstream languages&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. Easy to use API&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. Contains most famous proving systems (Groth16, Plonk, STARKs, Plonky2 and maybe Halo2) and recursion&#x2F;IVC (Nova, Supernova)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. Allow for hardware acceleration, such as GPU and FPGA integration&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    5. Clear documentation with different kinds of tutorials, from starters to advanced users&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Given their importance and applications, we decided to begin our library by implementing the STARKs’ prover. We had to implement finite field arithmetic and basic cryptographic stuff, such as Merkle trees and hash functions. We will continue with elliptic curves and SNARKs.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;starks&quot;&gt;STARKs&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;eprint.iacr.org&#x2F;2018&#x2F;046.pdf&quot;&gt;STARKs&lt;&#x2F;a&gt; (scalable, transparent arguments of knowledge) are cryptographic primitives, which are a convenient means to an end. The goal we are after is computational integrity, that is, showing that a computation was performed correctly (according to a set of instructions). For example, we want to prove that we computed the first 5000 values of a sequence correctly, or we ran a given machine learning algorithm, or we processed 4000 transactions in a blockchain. STARKs provide us with short proof of the integrity of the computation. The advantage STARKs gives us is that checking the proof is much faster than performing the naïve verification (re-executing the program by the verifier).&lt;&#x2F;p&gt;
+&lt;p&gt;There are many interesting resources to learn the basics of STARKs, such as &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;starkware.co&#x2F;stark-101&#x2F;&quot;&gt;Starkware’s STARK 101&lt;&#x2F;a&gt;, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;aszepieniec.github.io&#x2F;stark-anatomy&#x2F;overview&quot;&gt;Anatomy of a STARK&lt;&#x2F;a&gt;, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;andrewmilson&#x2F;ministark&quot;&gt;Ministark&lt;&#x2F;a&gt;, as well as Starkware’s blog on arithmetization (&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;medium.com&#x2F;starkware&#x2F;arithmetization-i-15c046390862&quot;&gt;parts I&lt;&#x2F;a&gt; and &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;medium.com&#x2F;starkware&#x2F;arithmetization-ii-403c3b3f4355&quot;&gt;II&lt;&#x2F;a&gt;).&lt;&#x2F;p&gt;
+&lt;p&gt;The STARK protocol contains the following steps:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Arithmetization&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Transformation to polynomial equations.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * FRI, which has two steps: commitment and decommitment.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h2 id=&quot;arithmetization&quot;&gt;Arithmetization&lt;&#x2F;h2&gt;
+&lt;p&gt;An execution trace is a table containing $w$ columns (the registers) and $T$ rows representing each state of the system. A trace looks like this:&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Register 1&lt;&#x2F;th&gt;&lt;th&gt;Register 2&lt;&#x2F;th&gt;&lt;th&gt;$\dots$&lt;&#x2F;th&gt;&lt;th&gt;Register w&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;$x_{1,0}$&lt;&#x2F;td&gt;&lt;td&gt;$x_{2,0}$&lt;&#x2F;td&gt;&lt;td&gt;$\dots$&lt;&#x2F;td&gt;&lt;td&gt;$x_{w,0}$&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;$x_{1,1}$&lt;&#x2F;td&gt;&lt;td&gt;$x_{2,1}$&lt;&#x2F;td&gt;&lt;td&gt;$\dots$&lt;&#x2F;td&gt;&lt;td&gt;$x_{w,1}$&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;$\vdots$&lt;&#x2F;td&gt;&lt;td&gt;$\vdots$&lt;&#x2F;td&gt;&lt;td&gt;$\ddots$&lt;&#x2F;td&gt;&lt;td&gt;$\vdots$&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;$x_{1,T}$&lt;&#x2F;td&gt;&lt;td&gt;$x_{2,T}$&lt;&#x2F;td&gt;&lt;td&gt;$\dots$&lt;&#x2F;td&gt;&lt;td&gt;$x_{w,T}$&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;p&gt;We will interpret each column (register) as the evaluation of a polynomial over a domain (we will call it the trace evaluation domain). For example, we can say that $f_1(x)$ is the polynomial representing column 1 and thus:&lt;br &#x2F;&gt;
+$f_1(0)=x_{1,0}$&lt;br &#x2F;&gt;
+$f_1(1)=x_{1,1}$&lt;br &#x2F;&gt;
+$\vdots$&lt;br &#x2F;&gt;
+$f_1(T)=x_{1,T}$&lt;&#x2F;p&gt;
+&lt;p&gt;To make things easier and faster, we will use as trace evaluation domain a multiplicative subgroup, $\mathbb{Z_p}^\star$ of size $2^n$, such that $2^n \geq T$. That group has a generator, $\omega$, which spans all elements in the subgroup. The subgroup can be represented by the powers of $\omega$, $\{ 1, \omega , \omega^2 , \omega^3 ,…, \omega^N \}$. Our trace polynomial satisfies then&lt;br &#x2F;&gt;
+$f_1(1)=x_{1,0}$&lt;br &#x2F;&gt;
+$f_1(\omega)=x_{1,1}$&lt;br &#x2F;&gt;
+$\vdots$&lt;br &#x2F;&gt;
+$f_1(\omega^{T-1})=x_{1,T}$&lt;&#x2F;p&gt;
+&lt;p&gt;The elements in the execution trace satisfy certain relations given by the computation and boundary conditions. We call these relations constraints. They can be broadly classified into two groups:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Boundary constraints.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Transition constraints.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Boundary constraints are rather straightforward: they specify the value of a register at a given time. For example, when we initialize the computations, each register has a given value. In the case of the Fibonacci sequence,&lt;br &#x2F;&gt;
+$a_0=a_1=1$&lt;br &#x2F;&gt;
+If our trace consists of a single column representing the sequence, the first two elements are equal to one:&lt;br &#x2F;&gt;
+$x_{1,0}=1$&lt;br &#x2F;&gt;
+$x_{1,1}=1$&lt;&#x2F;p&gt;
+&lt;p&gt;We can translate the constraints into polynomial relations. We know that $x_{1,0}=f_1(1)$ and $x_{1,1}=f_1(\omega)$. If the constraint holds, say at $x=\omega$, then the monomial $x-\omega$ divides $f_1(x)-1$. This means that the result of the division of $f(x)-1$ by $x-\omega$ is a polynomial,&lt;br &#x2F;&gt;
+$$ Q_{BC,1}(x)=\frac{f_1(x)-1}{x-\omega} $$&lt;br &#x2F;&gt;
+Analogously,&lt;br &#x2F;&gt;
+$$ Q_{BC,0}(x)=\frac{f_1(x)-1}{x-1} $$&lt;&#x2F;p&gt;
+&lt;p&gt;One drawback in this approach is that if we have $n$ boundary constraints, we get $n$ polynomials. One optimization is to interpolate boundary constraints and obtain a new polynomial. In this case,&lt;br &#x2F;&gt;
+$f_{BC}(1)=1$&lt;br &#x2F;&gt;
+$f_{BC}(\omega)=1$&lt;br &#x2F;&gt;
+Combining everything, we get&lt;br &#x2F;&gt;
+$$ Q_{BC}(x)=\frac{f(x)-f_{BC}(x)}{Z_{BC}(x)}$$&lt;br &#x2F;&gt;
+where $Z_{BC}(x)$ is the polynomial vanishing on the points where the boundary conditions are enforced:&lt;br &#x2F;&gt;
+$Z_{BC}(x)=(x-1)(x-\omega)$&lt;&#x2F;p&gt;
+&lt;p&gt;Transition constraints are relations between different rows that can be applied at various calculation points. In the case of the Fibonacci sequence, we have $a_{n+2}=a_{n+1}+a_n$ for every $n={0,1,…T-2 }$. In terms of the trace polynomial,&lt;br &#x2F;&gt;
+$f_1(\omega^2 x)-f_1(\omega x)-f_1(x)=0$&lt;br &#x2F;&gt;
+If the constraint is satisfied, the following function should be a polynomial,&lt;br &#x2F;&gt;
+$$Q_T(x)=\frac{f_1(\omega^2 x)-f_1(\omega x)-f_1(x)}{Z_T(x)} $$&lt;br &#x2F;&gt;
+where $Z_T(x)$ is the vanishing polynomial where the transition constraints are enforced,&lt;br &#x2F;&gt;
+$Z_T(x)=\prod_{k=0}^{T-2} (x-\omega^k)$&lt;&#x2F;p&gt;
+&lt;p&gt;Transition constraints are commonly expressed as multivariate polynomials linking two consecutive rows of the execution trace. For example, if we denote by $x$ a given row and $y$ is the next, a constraint could be something like&lt;br &#x2F;&gt;
+$P(x,y)=y-x^2=0$&lt;br &#x2F;&gt;
+If we compose the constraint polynomial with the trace polynomial, we have $x=t(x)$, $y=t(\omega x)$, so&lt;br &#x2F;&gt;
+$t(\omega x) - t(x)^2=0$&lt;&#x2F;p&gt;
+&lt;p&gt;If we did the calculations properly, then $Q_{BC}(x)$ and $Q_T(x)$ should be polynomials; if not, they are rational functions (quotients of two polynomials). We can reduce proving that each of them is a polynomial by taking a random linear combination&lt;br &#x2F;&gt;
+$$ CP(x)=\alpha_{BC} Q_{BC}(x)+\alpha_{T} Q_T(x) $$&lt;br &#x2F;&gt;
+If $Q_{BC}(x)$ and $Q_T(x)$ are both polynomials, so is $CP(x)$. But if at least one of them is a rational function, then $CP(x)$ is unlikely to be a polynomial.&lt;&#x2F;p&gt;
+&lt;p&gt;Given that proving that $CP(x)$ is a polynomial is difficult, we will show that it is close to a low-degree polynomial. To do so, we will project $CP(x)$ to a new function with a smaller degree. We will continue taking projections until we reach a constant polynomial. The critical ingredient is that the projection operation respects the distance. If the original function is far from a low-degree polynomial, then the projections will also be far from it. Before jumping to the procedure (called FRI), we must commit to the trace polynomials.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;committing-to-the-trace&quot;&gt;Committing to the trace&lt;&#x2F;h2&gt;
+&lt;p&gt;We need to evaluate the trace polynomials over a much larger domain; the domain size is $\beta 2^n$, where $\beta$ is the blowup factor. To avoid problems, we shift the domain by multiplying the elements by $h$, which belongs to the coset. The low-degree extension domain (simply domain) is given by&lt;br &#x2F;&gt;
+$$D = \{ h, h \eta , h \eta^2 , … , h \eta^{ 2^n -1} \} $$&lt;br &#x2F;&gt;
+Here $\eta$ is the generator of the subgroup of order $\beta 2^n$ so that it does not get confused with $\omega$ (though we could relate them by taking $\omega=\eta^\beta$).&lt;br &#x2F;&gt;
+We evaluate the trace polynomials over this large domain and obtain vectors representing each evaluation:&lt;br &#x2F;&gt;
+$$[ f_1 (h) , f_1 (h \eta) ,… , f_1 (h \eta^{ 2^n -1} )]$$&lt;br &#x2F;&gt;
+$$[f_2 (h) , f_2 (h \eta) , … , f_2 (h \eta^{ 2^n -1} )]$$&lt;br &#x2F;&gt;
+$$[f_w (h) , f_w (h \eta ) , … , f_w ( h \eta^{ 2^n -1} )]$$&lt;&#x2F;p&gt;
+&lt;p&gt;To commit to these evaluations, we build Merkle trees, and the prover sends the root of the Merkle trees to the verifier. To make things easier, the elements of each row of the low-degree extension of the trace are grouped into a single leaf.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;committing-to-the-composition-polynomial&quot;&gt;Committing to the composition polynomial&lt;&#x2F;h2&gt;
+&lt;p&gt;We use the same domain $$D = \{ h, h \eta , h \eta^2 , … , h \eta^{ 2^n -1} \} $$ to evaluate the composition polynomial. We can then create a Merkle tree from these evaluations and send the root to the verifier.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;relating-the-lde-of-execution-trace-and-the-composition-polynomial&quot;&gt;Relating the LDE of execution trace and the composition polynomial&lt;&#x2F;h2&gt;
+&lt;p&gt;At some point, the verifier will ask the prover for the value of the composition polynomial at one point, $z$, that is, $CP(z)$. The verifier needs to be sure that the composition polynomial results from applying the polynomial constraints onto the trace polynomials. Given the value $z \in D$ (in DEEP, the value of $z$ is sampled outside the domain), the prover needs to send the values of the trace polynomials at given points so that the verifier can check the calculation. For example, in the case of Fibonacci (we will ignore all other constraints just for simplicity),&lt;br &#x2F;&gt;
+$P(u,v,w)=w-v-u=0$&lt;br &#x2F;&gt;
+$P(t(x),t(\omega x),t(\omega^2 x))=t(\omega^2x)-t(\omega x)-t(x)=0$&lt;br &#x2F;&gt;
+To create the composition polynomial, we must divide the previous polynomial by the corresponding vanishing polynomial. So, if we pick $x=z$, we have&lt;&#x2F;p&gt;
+&lt;p&gt;$$Q(z)=\frac{t(\omega^2z)-t(\omega z)-t(z)}{Z_D(z)}$$&lt;&#x2F;p&gt;
+&lt;p&gt;The prover needs to send those three values. Note that $z=h \eta^k$, so the prover needs to send the values of $t(\omega^2 h \eta^k)$, $t(\omega h \eta^k)$, $t( h \eta^k)$, which are separated by $\beta$ elements in the Merkle tree. The verifier takes the three values, evaluates the vanishing polynomials, and checks that&lt;br &#x2F;&gt;
+$Q(z)=CP(z)$&lt;&#x2F;p&gt;
+&lt;p&gt;This way, the verifier is convinced that the composition polynomial is related to the execution trace via the constraint polynomials.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;fri-protocol&quot;&gt;FRI protocol&lt;&#x2F;h2&gt;
+&lt;p&gt;The prover must show that $CP(x)$ is close to a low-degree polynomial. To do so, he will randomly fold the polynomial, reducing the degree, until he gets a constant polynomial (in optimizations, obtaining a constant polynomial is unnecessary, as the prover could send all the coefficients of a polynomial and have the verifier check it). The FRI protocol has two steps: commit and decommit.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;commitment&quot;&gt;Commitment&lt;&#x2F;h3&gt;
+&lt;p&gt;The prover takes $CP(x)$ and splits it in the following way:&lt;br &#x2F;&gt;
+$$g(x^2)=\frac{CP(x)+CP(-x)}{2}$$&lt;br &#x2F;&gt;
+$$x h(x^2)=\frac{CP(x)-CP(-x)}{2}$$&lt;br &#x2F;&gt;
+so that&lt;br &#x2F;&gt;
+$$CP(x)=g(x^2)+x h(x^2)$$&lt;br &#x2F;&gt;
+The verifier chooses a random value $\alpha_0$, and the prover forms the polynomial,&lt;br &#x2F;&gt;
+$P_1(x)=g(x^2)+\alpha_0 h(x^2)$&lt;br &#x2F;&gt;
+with the new domain $D_1 = \{ h^2 , h^2 \eta^2 , … , h^2 \eta^m \}$ having half the size of $D$.&lt;&#x2F;p&gt;
+&lt;p&gt;The prover can perform the low-degree extension by evaluating $P_1(x)$ over $D_1$ and then commit to it by creating a Merkle tree and sending the root. He can continue with the procedure by halving the degree at each step. For step $k$, we have&lt;br &#x2F;&gt;
+$$P_k(y^2)=\frac{P_{k-1}(y)+P_{k-1}(-y)}{2}+\alpha_{k-1}\left(\frac{P_{k-1}(y)-P_{k-1}(-y)}{2}\right)$$&lt;br &#x2F;&gt;
+and&lt;br &#x2F;&gt;
+$$D_k = \{ h^{ 2^{k-1} } , (h \eta)^{ 2^{k-1} } , … ,( \eta^l h)^{ 2^{k-1} } \}$$&lt;br &#x2F;&gt;
+The prover evaluates $P_k(x)$ over $D_k$ and commits to it, sending the Merkle root.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;decommitment&quot;&gt;Decommitment&lt;&#x2F;h3&gt;
+&lt;p&gt;The verifier chooses at random a point $q$ belonging to $D$. The prover needs to convince him that the trace polynomials and composition polynomial are related (we covered that previously) and that the elements of consecutive FRI layers are also related. For each layer, the prover needs to send two elements to the verifier, $P_k(z)$ and $P_k(-z)$. He also needs to show that these elements belong to the corresponding Merkle tree, so the authentication paths for each element are also required.&lt;&#x2F;p&gt;
+&lt;p&gt;The verifier can check the correctness of the FRI layers by performing a colinearity check. Given $P_k(z)$, $P_k(-z)$ and $P_{k+1}(z^2)$, the verifier can compute&lt;br &#x2F;&gt;
+$$g_{k+1}(z^2)=\frac{P_k(z)+P_k(-z)}{2}$$&lt;br &#x2F;&gt;
+$$h_{k+1}(z^2)=\frac{P_k(z)-P_k(-z)}{2z}$$&lt;br &#x2F;&gt;
+and get the value for the next layer&lt;br &#x2F;&gt;
+$$u_{k+1}=g_{k+1}(z^2)+\alpha_k h_{k+1}(z^2)$$&lt;br &#x2F;&gt;
+If the prover performed the calculations correctly, then&lt;br &#x2F;&gt;
+$$u_{k+1}=P_{k+1}(z^2)$$&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;a-toy-example-for-fri&quot;&gt;A toy example for FRI&lt;&#x2F;h2&gt;
+&lt;p&gt;We will use a simple example to understand how everything works on FRI. We choose $p=17$, whose multiplicative group has order $16=2^4$ and set $\eta=3$, which is a primitive root of unity (that is, $3^{16}=1$ and $3^k \neq 1$ for $0 &amp;lt;k&amp;lt;16$). Our composition polynomial is $P_0 (x) = x^3 + x^2 + 1$. The domain for the LDE is simply $ D_0 = \mathbb{Z_{17}}^\star = \{1 , 2 , 3 , 4 , 5 , 6 , … , 16 \}$. The following table contains the LDE of $P_0(x)$:&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Index&lt;&#x2F;th&gt;&lt;th&gt;$x$&lt;&#x2F;th&gt;&lt;th&gt;$P_0(x)$&lt;&#x2F;th&gt;&lt;th&gt;Index&lt;&#x2F;th&gt;&lt;th&gt;$x$&lt;&#x2F;th&gt;&lt;th&gt;$P_0(x)$&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;0&lt;&#x2F;td&gt;&lt;td&gt;1&lt;&#x2F;td&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;td&gt;8&lt;&#x2F;td&gt;&lt;td&gt;16&lt;&#x2F;td&gt;&lt;td&gt;1&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;&#x2F;td&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;td&gt;9&lt;&#x2F;td&gt;&lt;td&gt;14&lt;&#x2F;td&gt;&lt;td&gt;0&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;&#x2F;td&gt;&lt;td&gt;9&lt;&#x2F;td&gt;&lt;td&gt;12&lt;&#x2F;td&gt;&lt;td&gt;10&lt;&#x2F;td&gt;&lt;td&gt;8&lt;&#x2F;td&gt;&lt;td&gt;16&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;td&gt;10&lt;&#x2F;td&gt;&lt;td&gt;13&lt;&#x2F;td&gt;&lt;td&gt;11&lt;&#x2F;td&gt;&lt;td&gt;7&lt;&#x2F;td&gt;&lt;td&gt;2&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;4&lt;&#x2F;td&gt;&lt;td&gt;13&lt;&#x2F;td&gt;&lt;td&gt;4&lt;&#x2F;td&gt;&lt;td&gt;12&lt;&#x2F;td&gt;&lt;td&gt;4&lt;&#x2F;td&gt;&lt;td&gt;13&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;5&lt;&#x2F;td&gt;&lt;td&gt;5&lt;&#x2F;td&gt;&lt;td&gt;15&lt;&#x2F;td&gt;&lt;td&gt;13&lt;&#x2F;td&gt;&lt;td&gt;12&lt;&#x2F;td&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;6&lt;&#x2F;td&gt;&lt;td&gt;15&lt;&#x2F;td&gt;&lt;td&gt;14&lt;&#x2F;td&gt;&lt;td&gt;14&lt;&#x2F;td&gt;&lt;td&gt;2&lt;&#x2F;td&gt;&lt;td&gt;13&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;7&lt;&#x2F;td&gt;&lt;td&gt;11&lt;&#x2F;td&gt;&lt;td&gt;8&lt;&#x2F;td&gt;&lt;td&gt;15&lt;&#x2F;td&gt;&lt;td&gt;6&lt;&#x2F;td&gt;&lt;td&gt;15&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;p&gt;Suppose the verifier samples $\beta_0=3$. The prover performs the random folding over $P_0(x)$,&lt;br &#x2F;&gt;
+$g_1( x^2 ) = 1 + x^2$&lt;br &#x2F;&gt;
+$xh_1 ( x^2 ) = x^3 $&lt;br &#x2F;&gt;
+so&lt;br &#x2F;&gt;
+$P_1 ( x^2 ) = 1 + ( 1 + \beta_0) x^2$&lt;br &#x2F;&gt;
+To make things simpler,&lt;br &#x2F;&gt;
+$P_1(y)=1+4y$&lt;br &#x2F;&gt;
+with $y = x^2$. The new domain is obtained by squaring the elements of $D_0$. The LDE of $P_1(y)$ is&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Index&lt;&#x2F;th&gt;&lt;th&gt;$y$&lt;&#x2F;th&gt;&lt;th&gt;$P_1(y)$&lt;&#x2F;th&gt;&lt;th&gt;Index&lt;&#x2F;th&gt;&lt;th&gt;$y$&lt;&#x2F;th&gt;&lt;th&gt;$P_1(y)$&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;0&lt;&#x2F;td&gt;&lt;td&gt;1&lt;&#x2F;td&gt;&lt;td&gt;5&lt;&#x2F;td&gt;&lt;td&gt;4&lt;&#x2F;td&gt;&lt;td&gt;16&lt;&#x2F;td&gt;&lt;td&gt;14&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;&#x2F;td&gt;&lt;td&gt;9&lt;&#x2F;td&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;td&gt;5&lt;&#x2F;td&gt;&lt;td&gt;8&lt;&#x2F;td&gt;&lt;td&gt;16&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;&#x2F;td&gt;&lt;td&gt;13&lt;&#x2F;td&gt;&lt;td&gt;2&lt;&#x2F;td&gt;&lt;td&gt;6&lt;&#x2F;td&gt;&lt;td&gt;4&lt;&#x2F;td&gt;&lt;td&gt;0&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;td&gt;15&lt;&#x2F;td&gt;&lt;td&gt;10&lt;&#x2F;td&gt;&lt;td&gt;7&lt;&#x2F;td&gt;&lt;td&gt;2&lt;&#x2F;td&gt;&lt;td&gt;9&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;p&gt;The verifier samples $\beta_1=2$ and the prover folds $P_1(y)$ to get $P_2(z)$,&lt;br &#x2F;&gt;
+$P_2(z)=1+4\beta_1=9$&lt;br &#x2F;&gt;
+which is a constant polynomial. The domain $D_2 = \{ 1 , 13 , 16 , 4 \}$. All the elements in the LDE evaluate to 9, so there is no need for a table.&lt;&#x2F;p&gt;
+&lt;p&gt;The evaluations of the polynomials $P_0(x)$, $P_1(x)$, and $P_2(x)$ are each committed using a Merkle tree and sent to the verifier.&lt;&#x2F;p&gt;
+&lt;p&gt;Suppose the verifier selects index 4 in the LDE to check the correctness of the FRI layers. The prover needs to send him the following:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * $P_0(13)=4$ and $P_0(-13)=P_0(4)=13$ and their authentication paths.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * $P_1(16)=14$ and $P_1(-16)=P_1(1)=5$ and their authentication paths.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * $P_2(4)=9$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We can see that, for the first layer, the prover passes the values at positions 4 and 12, then 4 and 1 (which is $index+|D_1|&#x2F;2$, where $|D_1|$ is the number of elements in $D_1$, but since 8 exceeds the maximum value, we wrap around).&lt;&#x2F;p&gt;
+&lt;p&gt;The verifier does the following calculation,&lt;br &#x2F;&gt;
+$$u=\frac{P_0(13)+P_0(4)}{2}+\beta_0\left(\frac{P_0(13)-P_0(4)}{2\times 13}\right)$$&lt;&#x2F;p&gt;
+&lt;p&gt;Recall that division by $t$ is simply multiplication by $t^{-1}$. In the case of $2$, we have $2^{-1}=9$, since $2\times 9=18\equiv 1 \pmod{17}$. Thus,&lt;br &#x2F;&gt;
+$$u=2^{-1}\left(4+13\right)+3\times 9^{-1}\left(4-13\right)$$&lt;br &#x2F;&gt;
+The first term is $0$, while the second is $48\equiv 14 \pmod{17}$, so&lt;br &#x2F;&gt;
+$u=14$.&lt;br &#x2F;&gt;
+Next, he checks&lt;br &#x2F;&gt;
+$u=P_1(16)$&lt;br &#x2F;&gt;
+Both are $14$, so the first layer is correct.&lt;&#x2F;p&gt;
+&lt;p&gt;The verifier moves on to the next layer. He needs to calculate&lt;br &#x2F;&gt;
+$$u=\frac{P_1(16)+P_1(1)}{2}+\beta_1\left(\frac{P_1(16)-P_1(1)}{2\times 16}\right)$$&lt;&#x2F;p&gt;
+&lt;p&gt;If we work the calculations,&lt;br &#x2F;&gt;
+$$u=\frac{2}{2}+2\left(\frac{9}{2 \times 16}\right)$$&lt;br &#x2F;&gt;
+But this is just&lt;br &#x2F;&gt;
+$$u=1+(-9)=1+8=9$$&lt;br &#x2F;&gt;
+Now,&lt;br &#x2F;&gt;
+$$P_2(4)=9=u$$&lt;br &#x2F;&gt;
+so all the layers have been checked. You should try selecting an index and showing that all the calculations match.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;&#x2F;h2&gt;
+&lt;p&gt;STARKs are powerful cryptographic primitives allowing a party to prove the integrity of a computation. To generate the proof, we obtain the execution trace of the program and interpret each column of the trace as the evaluations of a polynomial over a “nice” domain. The rows of the execution trace are related by low-degree polynomials, which determine the constraints. When we compose the constraint polynomials with the trace polynomials, we enforce the constraints over the execution trace. We can then divide them by the vanishing polynomial over their validity domain (the places where each constraint is enforced); if the constraints hold, the division is exact and yields a polynomial. Instead of proving that the result is a polynomial, STARKs show that the result is close to a low-degree polynomial. FRI randomly folds the function, halving the degree at each step; the critical point is that this folding preserves distance from low-degree polynomials. The protocol contains two phases: commit, in which the prover binds himself to evaluations of the polynomials over their corresponding domain, and decommit, where he generates the proof that allows the verifier to check the calculations. In an upcoming post, we will cover some optimizations and examples.&lt;&#x2F;p&gt;
+</description>
+      </item>
+    </channel>
+</rss>

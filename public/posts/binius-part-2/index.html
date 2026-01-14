@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNARKs on binary fields: Binius - Part 2 - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">SNARKs on binary fields: Binius - Part 2</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-01-05">January 05, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>This post is a continuation of our discussion on <a rel="noopener external" target="_blank" href="https://gitlab.com/UlvetannaOSS/binius">Binius</a>, a new proof system that works over binary fields. Before continuing, see the <a href="/snarks-on-binary-fields-binius/">first part</a> if you are unfamiliar with some of the concepts or <a href="/binius-moving-zk-forward/">our post</a> on why we think this proof system can help move the industry forward.</p>
+<p>In this part, we will focus on the concatenated codes (which will allow us to extend the polynomial commitment scheme for small fields) and the different protocols to check statements over multivariate polynomials.</p>
+<h2 id="concatenated-codes">Concatenated Codes</h2>
+<p>In our previous post, we covered the polynomial commitment scheme for small fields. To develop the general commitment scheme, we first need to introduce the packing scheme and concatenated codes. Remember that in this setting we are working with a tower of fields, $\tau_0 \subset \tau_1 \subset \dots \subset \tau_t$. We work with a $[n_0 , k_0 , d_0]$ linear outer code with a $[n_i , k_i , d_i]$ linear inner code. The outer code works over $\tau_{i + k}$, while the inner code works over $\tau_i$.</p>
+<p>The whole construction depends on packing several elements from a field, and interpreting them as elements from an extension field. We can view $2^k$ elements from $\tau_i$ as a single element from $\tau_{i + k}$ (we can view it as a $\tau_i$ vector space, as we can see the complex numbers as a two dimensional vector space over the real numbers).</p>
+<p>The concatenated code’s encoding procedure works as follows:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Pack the initial message over $\tau_i$ into elements of $\tau_{i+k}$. For example, we have four bit variables from $\tau_0$, $0, 1, 1, 1$ and we can group then as an element $0111$ from $\tau_2$.</span></span>
+<span class="giallo-l"><span>    2. Encode the packed message using the outer code. For example, we can use Reed-Solomon encoding.</span></span>
+<span class="giallo-l"><span>    3. Unpack each symbol in the codeword into a message over $\tau_i$.</span></span>
+<span class="giallo-l"><span>    4. Encode using the inner code and concatenate the elements. This encoding may be the trivial one, that is, applying the identity code.</span></span></code></pre>
+<p>One problem we face is that we have to use the extension code. We have an interplay between different fields: the field representing the coefficients of the polynomial, the field for the alphabet of the code, the intermediate field and the extension field which we use for cryptographic security (here, $\tau_t$). To work with the extension code, we define a structure containing elements from $\tau_i$ in a rectangular array (of $2^{\tau - i} \times 2^k$ elements). Each row contains $2^k$ elements, which can be interpreted as a $\tau_{i + k}$ element. Analogously, the $2^{\tau - i}$ elements in a column can be interpreted as a single element in $\tau_t$. The structure has a dual view: as a vector space over $\tau_t$ of dimension $2^k$ (viewing the columns) or as a vector space over $\tau_{i + k}$ of dimension $2^{t - i}$. Multiplication of the array by an element from $\tau_i$ is interpreted as multiplication elementwise. If we want to multiply by an element over $\tau_t$, we take each column (which is a single element from $\tau_t$) and perform the multiplication of each column by the element. In an analogous way, we can multiply by an element in $\tau_{i + k}$ by multiplying each row.</p>
+<p>The block level encoding-based polynomial commitment scheme’s procedure is:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Commit($p$): Arrange the coefficients of the polynomial into an $m_0 \times m_1$ matrix, with entries in $\tau_i$. Group the elements taking chunks of $2^\kappa$ and interpret them as elements in $\tau_{i + k}$ and apply the extended encoding row-wise, obtaining a matrix of size $m_0 \times n$ with elements over $\tau_\tau$. Build a Merkle tree from the columns and output the root as commitment.</span></span>
+<span class="giallo-l"><span>    2. Prove($p$,$s$): The prover arranges the coefficients into an $m_0 \times m_1$ matrix $t$ with entries in $\tau_i$. He computes and sends in the clear $t^\prime = \otimes_{ i = l_1 }^\ell (1 - r_i , r_i ) . T$ to the verifier. The verifier samples $\rho$ indexes $j_0 , j_1 , ... j_{\rho - 1}$. The prover sends the columns of the encoded matrix $U$ with their accompanying Merkle paths.</span></span>
+<span class="giallo-l"><span>    3. Verify($\pi , r , s$): The verifier checks that $t^\prime \otimes_{ i = 0}^{l_1} .(1 - r_i , r_i ) = s$. Then, the verifier interprets $t^\prime$ as chunks of size $2^k$ and applies the extended code, unpacking all the elements to get $u^\prime$. The verifier checks that all the columns supplied are included in the Merkle tree, and checks that $\otimes_{ i = l_1 }^\ell ( 1 - r_i , r_i ).u$.</span></span></code></pre>
+<p>The size of the proof can be calculated from $t^\prime$ ($m_1$ elements from $\tau_t$), the columns (consisting of $\rho m_0$ elements from $\tau_{i + k}$) plus the authentication paths for the $\rho$ columns. Assuming a digest size of $256$ bits, we have $2^\tau m_1 + 2^{i + k} \rho m_0 + 2^8 \rho \log_2 {n}$ bits.</p>
+<h2 id="protocols">Protocols</h2>
+<p>Binius contains a list of key polynomial predicates, based on those proposed by <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2022/1355.pdf">HyperPlonk</a>:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Query</span></span>
+<span class="giallo-l"><span>    2. Sum</span></span>
+<span class="giallo-l"><span>    3. Zero</span></span>
+<span class="giallo-l"><span>    4. Product</span></span>
+<span class="giallo-l"><span>    5. Multiset</span></span>
+<span class="giallo-l"><span>    6. Permutation</span></span>
+<span class="giallo-l"><span>    7. LookUp</span></span></code></pre>
+<p>Almost all of the protocols boil down to a sumcheck. For the basics of the sumcheck protocol, see our <a href="/have-you-checked-your-sums/">previous post</a> or <a rel="noopener external" target="_blank" href="https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.pdf">Thaler’s book</a>.</p>
+<p>The zerocheck protocol is useful, for example, to prove that the gate constraints are enforced in HyperPlonk. In that protocol, we have a multilinear polynomial $M$ (which encodes the trace) and selector multilinear polynomials $S_1$, $S_2$, $S_3$, such that, for every point in ${0, 1 }^n$, we have<br />
+$0 = S_1 (M_0 + M_1 ) + S_2 M_0 M_1 + S_3 G(M_0 ,M_1 ) - M_2 + I$<br />
+where $M_0 (x) = M(0,0,x)$, $M_1 (x) = M(0,1,x)$, and $M_2 (x) = M(1,0,x)$.</p>
+<p>How can we prove that the multivariate polynomial, $P = S_1 (M_0 + M_1 ) + S_2 M_0 M_1 + S_3 G(M_0 ,M_1 ) - M_2 + I$ is equal to zero for every value in ${0, 1 }^n$ ? We let the verifier supply a random point $r_{zc}$ from $\mathbb{F}^n$ and build the multivariate polynomial<br />
+$P^\prime (x) = eq(r_{zc} , x) P(x)$<br />
+with $eq(x,y) = \prod ( x_i y_i + (1 - x_i ) (1 - y_i ))$ and we run the sumcheck protocol for $P^\prime (x)$, using as sum value $0$. The verifier will only need to do one evaluation of $P^\prime (x)$ at $x = r_{s}$.</p>
+<p>The use of the sumcheck with $P^\prime (x)$ involves multivariate polynomials which are not multilinear; this means that the prover has to send at each round a polynomial of at most degree $d$. HyperPlonk has an optimization for this case: the prover sends a commitment to a univariate polynomial of degree at most $d$ and provides an evaluation at a single point (instead of at least 3 points).</p>
+<p>Since most of the protocols end up in a sumcheck, we can batch the polynomials using a random linear combination and reduce all the checks to a single sumcheck. <a rel="noopener external" target="_blank" href="https://gitlab.com/UlvetannaOSS/binius/-/tree/main?ref_type=heads">Binius’s repo</a> contains the implementation of the zero, sum and evaluation checks.</p>
+<p>Binius proposes the use of Plonkish arithmetization; the main difference with HyperPlonk lies in the fact that the trace contains elements belonging to different subfields. Therefore, the gate constraints will express relations over different subfields. An execution is valid if</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. All gate constraints hold.</span></span>
+<span class="giallo-l"><span>    2. All global copy constraints are satisfied.</span></span>
+<span class="giallo-l"><span>    3. Every witness variable lies inside its prescribed subfield.</span></span></code></pre>
+<p>The first two conditions hold for any of the variants of Plonk; the last one is introduced because we work with extension towers.</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>In this post, we covered how the commitment scheme developed in the first part is extended to work with packed fields. We can view arrays of field elements in a dual way, packing the elements column or row-wise. The paper later presents some key protocols to prove predicates over polynomials, such as evaluation, sum and product check; these boil down to doing several sumchecks, which can be batched conveniently. These, together with some arithmetization scheme (such as Plonkish) can be used to yield a SNARK. Tha main difference between HyperPlonk and Binius lies in the fact that the trace elements in Binius may belong to different subfields. However, this does not add a new check. Rather, this could replace what could be additional checks in HyperPlonk. These subfield checks are guaranteed by the security property of the small-field polynomial commitment scheme.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

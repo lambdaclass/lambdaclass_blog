@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lambdaworks Design and Usage: Part 1 - Finite Fields - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Lambdaworks Design and Usage: Part 1 - Finite Fields</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-01-02">January 02, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>In this series of blog posts, we will see how Lambdaworks is implemented and the standard tools needed to develop provers. This first part will briefly overview the library and then focus on the finite field design and usage.</p>
+<p>Lambdaworks at its core is a library to create proving systems, and a collection of associated provers and verifiers ready to use. In this blog post, we will explore the building blocks of the proving systems and the Lambdaworks library.</p>
+<p>The most relevant sections of the library are:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Math</span></span>
+<span class="giallo-l"><span>    * Crypto</span></span>
+<span class="giallo-l"><span>    * Provers</span></span></code></pre>
+<p>Provers has a collection of proof systems. Crypto contains some primitives like MSM, hashes, and Merkle trees. Math has logic related to finite fields and elliptic curves.</p>
+<h2 id="math">Math</h2>
+<p>At the core of the Math library are finite fields, the main building block of all the constructions we use in Lambdaworks.</p>
+<p>The basic structure is designed under a relationship between a <code>Field</code> and its <code>FieldElement</code>. Let’s see how it works.</p>
+<h3 id="field-and-elements-main-ideas">Field and Elements: Main Ideas</h3>
+<p>A <code>Field</code> is an abstract definition. It knows the modulus and defines how the operations are performed.</p>
+<p>We usually create a new <code>Field</code> by instantiating an optimized backend. For example, this is the definition of the Pallas field:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// 4 is the number of 64-bit limbs needed to represent the field</span></span>
+<span class="giallo-l"><span>type PallasMontgomeryBackendPrimeField&lt;T&gt; = MontgomeryBackendPrimeField&lt;T, 4&gt;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#[derive(Debug, Clone, PartialEq, Eq)]</span></span>
+<span class="giallo-l"><span>pub struct MontgomeryConfigPallas255PrimeField;</span></span>
+<span class="giallo-l"><span>impl IsModulus&lt;U256&gt; for MontgomeryConfigPallas255PrimeField {</span></span>
+<span class="giallo-l"><span>    const MODULUS: U256 = U256::from_hex_unchecked(</span></span>
+<span class="giallo-l"><span>        &quot;40000000000000000000000000000000224698fc094cf91b992d30ed00000001&quot;,</span></span>
+<span class="giallo-l"><span>    );</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub type Pallas255PrimeField =</span></span>
+<span class="giallo-l"><span>    PallasMontgomeryBackendPrimeField&lt;MontgomeryConfigPallas255PrimeField&gt;;</span></span></code></pre>
+<p>As it can be seen, it is enough to define its modulus and instantiate it over a <code>PallasMontgomeryBackendPrimeField</code>.</p>
+<p>Internally, it resolves all the constants needed and creates all the required operations for the field. Notice that there are no macros involved. This holds for all the Lambdaworks code.</p>
+<p>Generics and traits are the only tools used to have genericity. This makes the job easier for the compiler to suggest possible functions to be called and makes the code easier to understand. Moreover, minimal traits are used to make the code easier to understand.</p>
+<p>Back to the fields, you will notice that other backends can be more efficient for some fields. For example, Mersenne31 and Goldilocks are defined over their backend.</p>
+<p>Back to the usage, suppose we want to create a <code>FieldElement</code>. This is as easy as instantiating the <code>FieldElement</code> over a <code>Field</code> and calling a <code>from_hex</code> function.</p>
+<p>For example:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let an_element = FieldElement::&lt;Stark252PrimeField&gt;::from_hex_unchecked(&quot;030e480bed5fe53fa909cc0f8c4d99b8f9f2c016be4c41e13a4848797979c662&quot;)</span></span></code></pre>
+<p>Notice we can alias the <code>FieldElement</code> to something like</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>type FE = FieldElement::&lt;Stark252PrimeField&gt;;</span></span></code></pre>
+<p>if we want to shorten the code and do not care about being explicit with the field.</p>
+<p>Once we have a field, we can make all the operations. We usually suggest working with references, but copies work too.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let field_a = FE::from_hex(&quot;3&quot;).unwrap();</span></span>
+<span class="giallo-l"><span>let field_b = FE::from_hex(&quot;7&quot;).unwrap();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// We can use pointers to avoid copying the values internally</span></span>
+<span class="giallo-l"><span>let operation_result = &amp;field_a * &amp;field_b</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// But all the combinations of pointers and values works</span></span>
+<span class="giallo-l"><span>let operation_result = field_a * field_b</span></span></code></pre>
+<p>Sometimes, optimized operations are preferred. For example,</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// We can make a square multiplying two numbers</span></span>
+<span class="giallo-l"><span>let squared = field_a * field_a;</span></span>
+<span class="giallo-l"><span>// Using exponentiation</span></span>
+<span class="giallo-l"><span>let squared = </span></span>
+<span class="giallo-l"><span>field_a.pow(FE::from_hex(&quot;2&quot;).unwrap())</span></span>
+<span class="giallo-l"><span>// Or using an optimized function</span></span>
+<span class="giallo-l"><span>let squared = field_a.square()</span></span></code></pre>
+<p>all compute the square of a number, but performance-wise, there is quite a big difference.</p>
+<p>Some useful instantiation methods are also provided for common constants and whenever const functions can be called. This is when creating functions that do not rely on the <code>IsField</code> trait since Rust does not support const functions in traits yet,</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// Defined for all field elements</span></span>
+<span class="giallo-l"><span>// Efficient, but nonconst for the compiler</span></span>
+<span class="giallo-l"><span>let zero = FE::zero() </span></span>
+<span class="giallo-l"><span>let one = FE::one()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Const alternatives of the functions are provided, </span></span>
+<span class="giallo-l"><span>// But the backend needs to be known at compile time. </span></span>
+<span class="giallo-l"><span>// This requires adding a where clause to the function</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let zero = F::ZERO</span></span>
+<span class="giallo-l"><span>let one = F::ONE</span></span>
+<span class="giallo-l"><span>let const_intstantiated = FE::from_hex_unchecked(&quot;A1B2C3&quot;);</span></span></code></pre>
+<p>For many use cases, we can treat these fields as a <code>PrimeField</code> instead of treating them as a <code>Field</code>. If the word <code>FieldExtension</code> is irrelevant, <code>PrimeField</code> is the right choice.</p>
+<p>You will notice traits are followed by an <code>Is</code>, so instead of accepting something of the form <code>IsField</code>, you can use <code>IsPrimeField</code> and access more functions. The most relevant is <code>.representative()</code>. This function returns a canonical representation of the element as a number, not a field.</p>
+<p>If the internal number is in Montgomery form, this function will reverse it.</p>
+<p>This allows us to make comparisons where it makes sense. Since fields work like circular lists of elements, order doesn’t make much sense.</p>
+<p>If we are in $\mathbb{F_3}$, for example, $4$ may look bigger than $2$, but $4$ is also $1$, and $1$ seems smaller than $2$. The question of “which element is bigger” doesn’t make much sense. This gets even messier if we interpret some numbers as negatives as other libraries.</p>
+<p>For this reason, comparisons are only allowed when we interpret the <code>FieldElement</code> as a number through the <code>representative()</code> function.</p>
+<h3 id="field-and-elements-serialization-and-deserialization">Field and Elements: Serialization and Deserialization</h3>
+<p>For serialization, we recommend using Serde with bincode. This has given the best results all around while maintaining good usability. By default, the serialization is done in the most compact mode possible and is not human-readable.</p>
+<p>To enable a human-readable serialization, where fields are written as strings, the feature <code>lambdaworks-serde-string</code> can be enabled.</p>
+<p>Serde is available at all levels of the library. So, if you have a FieldElements struct, you can simply derive a serialization.</p>
+<p><code>FieldElements</code> also have different algorithms to transform into bytes in the <code>ByteConversion</code> trait. This is a <code>from_bytes_le</code>, <code>from_bytes_be</code>, <code>to_bytes_le</code> and <code>to_bytes_be</code>.</p>
+<p>These smaller conversions to bytes are helpful when doing small tasks like appending data to a transcript but can become cumbersome when you have to serialize complex structures.</p>
+<h3 id="field-and-elements-advanced-usage-extensions-and-internals-deep-dive">Field and Elements: Advanced usage, Extensions, and Internals deep dive</h3>
+<p>Field extensions are used in two scenarios requiring slightly different properties: pairing computations and working with small fields with proof systems.</p>
+<h4 id="pairings">Pairings</h4>
+<p>When doing pairings, a degree $12$ extension is commonly used. This extension is usually created with a tower of extensions, where we make a degree $2$ extension of a degree $2$ extension of a degree $3$ extension. This is a non-naïve of making a degree $12$ extension.</p>
+<p>For example, we can see on the code:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub type Degree12ExtensionField = QuadraticExtensionField&lt;Degree6ExtensionField, LevelThreeResidue&gt;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub type Degree6ExtensionField = CubicExtensionField&lt;Degree2ExtensionField, LevelTwoResidue&gt;;</span></span></code></pre>
+<p>Using quadratic and cubic extensions, we are building the tower of fields. The key design for this to work is in the internal structure of the <code>IsField</code>. A field internally has a <code>BaseType</code> that, in practice, can either be a BigInteger, which we call <code>UnsignedInteger</code> to enable multiple backends of BigInts, or another <code>FieldElement.</code></p>
+<p>This works nicely for this scenario, but there is another to handle.</p>
+<h4 id="working-with-smaller-fields">Working with smaller fields</h4>
+<p>When working with proving systems that use small fields, like it could be a Stark with a 32-bit BabyBear, we need an extension to avoid security being broken. This is because we need to sample a random challenge from a much larger set than the degree of the polynomials involved. We will also use an extension to sample random challenges from a bigger set in this case.</p>
+<p>But this time, the critical issue is that we will be doing a lot of operations between the field and its subfield. These operations can be solved more efficiently than just doing them naïvely. Think of it as multiplying a complex number for a real one when needed instead of constantly multiplying complex numbers even when the imaginary part is 0.</p>
+<p>We define each <code>Field</code> as a <code>SubField</code> of another <code>Field</code> to solve this issue. For an unextended field, we define it as a subfield of itself, which is a true statement that you will not notice. When working with an extension, two sets of operations are defined—one for the field and one for the field against its subfield.</p>
+<p>The resolution of which operation to use is done with the type system, and so these optimizations are invisible when using the library. When using an operator, Lambdaworks picks the correct operation by itself.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Finite Fields are at the core of many proving systems, and having optimized backends is necessary for performance. Lambdaworks has developed its own backend, emphasizing performance and usability. The library also has other features, such as cryptographic primitives and different proof systems. In future blog posts, we will cover these parts, show how to use them, and explain some of the design decisions and the advantages that they may offer.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

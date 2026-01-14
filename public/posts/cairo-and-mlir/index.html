@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exciting times at the intersection of Compilers and Applied Cryptography: Cairo and MLIR - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Exciting times at the intersection of Compilers and Applied Cryptography: Cairo and MLIR</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-05-03">May 03, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p>Making a Cairo<br />
+not reinventing the wheel</p>
+<hr />
+<p>I love jazz.<br />
+Of all the jazz styles I love, jazz fusion is the one I enjoy most because I find any fusion of different things more stimulating.<br />
+Something exciting is happening at the intersection of programming language theory, compiler implementation, and applied cryptography.</p>
+<p>But the thing with jazz fusion is that it’s harder to get into unless you’re familiar with the elements being combined.<br />
+Let me show you a few songs and how we’re mixing it up.<br />
+If you’re familiar with one of these topics, bear with us; I promise it’s worth it.</p>
+<p>Put on your seatbelts.<br />
+3, 2, 1…</p>
+<p><img src="/images/external/BDuDQ6c.jpg" alt="" /></p>
+<h2 id="intro-beat">Intro beat</h2>
+<h3 id="compilers-llvm">Compilers &amp; LLVM</h3>
+<p>Some 20-something years ago, a group of compiler researchers at the University of Illinois needed a more flexible infrastructure.<br />
+What they developed became known as LLVM and has since become the foremost compiler tooling project.<br />
+It powers many of the compilers’ analysis and code generation components for Clang, Swift, Rust, and many more languages.</p>
+<p>From the 2004 CGO <a rel="noopener external" target="_blank" href="https://llvm.org/pubs/2004-01-30-CGO-LLVM.html">paper</a> introducing it:</p>
+<blockquote>
+<p>The LLVM compiler framework and code representation combine key capabilities that are important for practical, lifelong analysis and transformation of programs.</p>
+</blockquote>
+<p>At the heart of LLVM is LLVM IR, its Intermediate Representation.<br />
+IRs are a combination of data formats and algorithms that allow the best expression of the properties a tool wishes to guarantee or prove about code.</p>
+<p>An example of this is the fact that LLVM IR is what’s known as an SSA form, or Static Single Assignment, in which each variable will have a value assigned only once.<br />
+This allows the compiler to reason about it better than others. Otherwise, it enables analysis and optimizations, such as dead code elimination, constant propagation, and constant folding, and facilitates other stages, such as register allocation.</p>
+<p>All this to say that IRs are a compiler writer’s way of solving problems by building abstraction ladders, and LLVM became the de facto backend platform for modern compilers.</p>
+<h3 id="rise-of-ai">Rise of AI</h3>
+<p>You may know that machine learning algorithms and their applications are now a big deal.<br />
+The driver of many economic fortunes and solutions to problems we only dreamed of solving before, the statistical school of AI has settled (?) on a set of techniques that involve dealing with numerical operations on enormous matrices of numbers and stringing together large numbers of these operations into computation graphs.<br />
+These computational graphs’ fundamental elements are matrix multiplications, convolutions, data manipulations, and data movements.<br />
+This sounds very computationally expensive, and it is. So the industry has (and is) going to great lengths to scale these approaches, making them cheaper and more effective on ever larger data sets.</p>
+<p>A key observation was made at some point: many of the problems these algorithms solve have inherent or given parallelism, and we already had industry-producing machines designed explicitly for embarrassingly parallel numerical problems, namely shaders running on GPUs.<br />
+Thus the first wave of this effort was repurposing video graphics card hardware to make them applicable to this new area.</p>
+<p>Why did we change the tune from LLVM to AI and graphics card? Because as they matured, these algorithms, models, techniques, tools, and libraries were standardized into frameworks that could be used by many non-specialist programmers and that required appropriate languages in which to express them and their compilers.</p>
+<p>Since LLVM had an IR that could, with some effort, be abstracted over GPU processors, it was used in tools such as PyTorch and Tensorflow to produce the code that would run on these graphical processing units.<br />
+New hardware was designed, and LLVM was again used to target these new tensor processing units.</p>
+<p>As a result, Tensorflow has several compiler components embedded in it, made by different vendors: Google has XLA, NVIDIA has TensorRT, and Intel has NGraph, all of which integrate with the TensorFlow optimizer and code generator and are very hardware specific, but do not share common infrastructure.</p>
+<p><img src="/images/external/eRktk4K.jpg" alt="Figure 1 from the paper “MLIR:  A Compiler Infrastructure for the End of Moore’s Law”" /></p>
+<h3 id="back-to-languages">Back to languages</h3>
+<p>In these intervening years since the early 2000s, the pendulum has swung back from dynamic to statically typed languages with more advanced type systems and code analysis phases.<br />
+LLVM enabled Clang and new languages such as Rust, Julia, and Swift.<br />
+Something these projects share in common is that they have found that many language implementation problems are best modeled at higher abstraction levels and implemented their intermediate representations to solve domain-specific problems, like language/library-specific optimizations, flow-sensitive type checking (e.g., for linear types), and to improve the implementation of the lowering process.<br />
+Swift has SIL, Rust has MIR, and so on.</p>
+<p><img src="/images/external/5UG47By.jpg" alt="Figure 2 from the paper “MLIR:  A Compiler Infrastructure for the End of Moore’s Law”" /></p>
+<p>In other words, people started to realize that the complexity of the software stack above the low-level IR was very high since software reuse was low and quality was so variable.</p>
+<p>After twenty years of expanding hardware targets and changing problem spaces, LLVM was found lacking in certain areas.</p>
+<h2 id="what-is-mlir">What (is MLIR?)</h2>
+<p><img src="/images/external/KKNOAlx.jpg" alt="" /></p>
+<p>Out of this came <a rel="noopener external" target="_blank" href="https://mlir.llvm.org/">MLIR</a> (Multi-Level Intermediate Representation), a project started by Chris Lattner et al. to build a common infrastructure to support all these different subsystems and to learn from the mistakes made and lessons learned in the development of LLVM.</p>
+<p>I highly encourage you to read the introductory <a rel="noopener external" target="_blank" href="https://arxiv.org/pdf/2002.11054.pdf">paper</a> from whence these graphics came, as it is very readable, or to listen to the <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=qzljG6DKgic">talk</a> Lattner and Shpeisman gave presenting it.</p>
+<blockquote>
+<p>MLIR aims to address software fragmentation, improve compilation for heterogeneous hardware, significantly reduce the cost of building domain-specific compilers, and aid in connecting existing compilers.</p>
+</blockquote>
+<p>There are several types of intermediate representations: linear (like assembly, a sequence of instructions), tree-like (like ASTs), and graph-like (like data flow or call graphs).<br />
+As the project site states, “MLIR is intended to be a hybrid IR which can support multiple different requirements in a unified infrastructure.”</p>
+<p>Unlike LLVM IR, where one central IR contains a complete set of instructions to represent the CPU/GPU programs, in MLIR, there is no one IR.</p>
+<p>Instead, MLIR provides a set of very abstract concepts: dialects, operations, regions, etc.</p>
+<p>From the <a rel="noopener external" target="_blank" href="https://mlir.llvm.org/getting_started/Glossary/">glossary</a>:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>&gt; A dialect is a grouping of functionality that can be used to extend the MLIR system.</span></span>
+<span class="giallo-l"><span>&gt; A dialect creates a unique namespace within which new operations, attributes, and types are defined.</span></span>
+<span class="giallo-l"><span>&gt; This is the fundamental method by which to extend MLIR.</span></span>
+<span class="giallo-l"><span>&gt; In this way, MLIR is a meta-IR: its extensible framework allows it to be leveraged in many different ways</span></span></code></pre>
+<p>An <strong>operation</strong> is a unit of code in MLIR.<br />
+Operations are the building blocks for all code and computations represented by MLIR.<br />
+They are fully extensible (no fixed list of operations) and have application-specific semantics.</p>
+<p>When implementing the code emitter, operations could map to processor instructions.<br />
+When implementing an AST, nodes representing type conversions, function calls, and language operands could be mapped to operations.</p>
+<p>Operations can have an arbitrary number of operands, results, and attributes and may contain an arbitrary number of regions.</p>
+<p>A <strong>region</strong> is a control flow graph of MLIR blocks.</p>
+<p>A <strong>block</strong> , or basic Block, is a sequential list of operations without control flow.</p>
+<p>Note that this creates a nested IR structure, as regions consist of blocks, which in turn, consist of a list of operations.<br />
+Regions are a powerful mechanism to allow nested operations and localize information, simplifying code analysis and transformation.</p>
+<p>A <strong>module</strong> is an operation containing a single region containing a single block comprised of operations, providing an organizational structure for MLIR operations.</p>
+<p>MLIR allows multiple dialects, even those outside of MLIR’s codebase, to co-exist within one module.</p>
+<p>In the context of MLIR, conversion is distinct from translation.<br />
+The transformation of code represented in a dialect is called conversion. It can be either inter-dialect (when the conversion is into a semantically equivalent representation in another dialect) or intra-dialect. In contrast, translation is a transformation between MLIR and an external representation.</p>
+<p>Thus an application using MLIR will typically use a collection of dialects as needed.</p>
+<h3 id="what-are-the-advantages-of-llvm">What are the advantages of LLVM?</h3>
+<p>So you’re writing a compiler or need to add a backend to an existing compiler.<br />
+Aside from code reuse across the industry, what advantages does MLIR provide? Why would you choose it over LLVM?</p>
+<p>To begin with, the choice is not that binary since MLIR includes an LLVM IR dialect to which you can convert your application-specific dialect and thus leverage the existing LLVM toolchain.</p>
+<p>MLIR also tries to provide universal patterns or passes that can apply to suitable operations without hardcoding them.</p>
+<p>So MLIR allows you to easily defined your dialect, pick from a growing ecosystem of middle and low-level dialects targeting different computation models, and integrate them into your domain-specific compiler.</p>
+<p>As <a rel="noopener external" target="_blank" href="https://www.lei.chat/posts/compilers-and-irs-llvm-ir-spirv-and-mlir/">Lei Zhang</a> says:</p>
+<blockquote>
+<p>In other words, if LLVM IR is centralized by nature and favors unified compiler flows, the MLIR infrastructure and its dialect ecosystem are decentralized by nature and favor diverse compiler flows.<br />
+What is quite powerful is that MLIR enables different levels to be represented using the same infrastructure; so that the flow between different levels can become seamless.</p>
+</blockquote>
+<p>The UNIX way!</p>
+<p><img src="/images/external/HNaqpaU.jpg" alt="" /></p>
+<p>Other benefits include:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Source code location tracking by default (each operand has a source code memory address attribute, so errors directly point to the line of source code in which the error occurred)</span></span>
+<span class="giallo-l"><span>    * All functions run on multiple cores by default</span></span>
+<span class="giallo-l"><span>    * Optimizations done by other languages can be reused</span></span>
+<span class="giallo-l"><span>    * Reuse LLVM for machine code generation</span></span></code></pre>
+<p>Finally, suppose your domain does benefit from running all or some of your code in a GPU, TPU, or ASIC. In that case, MLIR provides a way to reuse an existing dialect targeting that computation model and hardware by writing a conversion to it and plugging in a code generator for final translation.</p>
+<p>It includes dialects for SPIR-V, a general <a rel="noopener external" target="_blank" href="https://mlir.llvm.org/docs/Dialects/GPU/">GPU</a> dialect, and specific ones for <a rel="noopener external" target="_blank" href="https://mlir.llvm.org/docs/Dialects/NVGPU/">NVidia</a> and <a rel="noopener external" target="_blank" href="https://mlir.llvm.org/docs/Dialects/AMDGPU">AMD</a> GPUs.</p>
+<p>All these advantages are direct results of MLIR’s abstraction level.</p>
+<h2 id="why">Why?</h2>
+<p>Let’s change the tune again.</p>
+<p>In the land of blockchains, cryptocurrencies, and distributed finance, several developments have converged:</p>
+<p>First, the more established blockchains have paralleled the story in the machine learning world, offloading as much hashing as possible to GPUs and later ASICs (facing us mere mortals to scrabbling for the crumbs or resigned to playing emacs Tetris on my Raspberry Pi).<br />
+Newer chains and L2s are expected to follow the same path.</p>
+<p>Second, as their applications have become more mainstream (albeit with ups and downs), two concerns have taken center stage: scalability and privacy.<br />
+Blockchains are not known for their efficiency, so the effort has gone into trying to have the best of both worlds, in part by moving away from Proof of Work, moving work to L2s, and turning back to guarantees provided by cryptographic techniques.<br />
+As new techniques have been discovered and older ones have matured, Zero Knowledge Proof systems have emerged as the predominant area from which solutions to these two problems can be built.</p>
+<p>But as is well known, despite a good amount of gatekeeping, cryptography is not something one can pick up over the weekend and “roll one’s own,” especially in developing areas such as ZKP.<br />
+It’s not <em>just</em> that their proper use is complex or that many components are still in alpha, but because translating computation in a programming language to a form that can be input to these cryptographic primitives takes a lot of work and some ingenuity.<br />
+Most ZKP protocols involve arithmetization, which is the process of representing computation in a numerical format that can be used by the proving system, usually by taking the instructions in the computation and building an expression graph of operations on bits called an arithmetic circuit and then generating an <em>execution trace</em> , which very briefly is a matrix of field elements representing the evolution of the computation over time.<br />
+This execution trace is fed to the prover.</p>
+<p>To encapsulate these processes, virtual machines have been designed and implemented to generate these numerical execution traces and provide computational guarantees, such as <a rel="noopener external" target="_blank" href="https://github.com/0xPolygonMiden/miden-vm">Miden</a> and <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/cairo-rs/pulls">cairo-rs</a>.<br />
+Once you have a virtual machine, you need a compiler and an intermediate representation.</p>
+<p>You also can’t accept just any program since you need to know that its execution is provable unless you’re willing to take the possibility of nonterminating programs, invalid transactions which consume excessive gas, the production of invalid or incomplete traces, and having the prover just quit in the middle.<br />
+Type theory and intermediate representations within compilers have become one of the most potent tools for producing code that has properties we can mechanically reason about and check.</p>
+<p>So, in short, the need to run on more diverse hardware, to incorporate programming language technology, to enable the easy use of complex cryptographic primitives, to transport guarantees from developer tooling to execution layers have all come together to bring about a small renaissance of language implementation in the crypto world.</p>
+<h3 id="cairo-sierra">Cairo &amp; Sierra</h3>
+<p><a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/cairo">Cairo</a> is a “language for creating provable programs for general computation” through the use of STARK-based validity proofs.<br />
+If you’re not from a cryptography background, ZKP and STARKS are too deep a rabbit hole for one article spanning so many topics; STARKs enable blockchain scaling by efficiently proving the integrity of computations.</p>
+<blockquote>
+<p>STARKs (Scalable, Transparent Argument of Knowledge) is a proof system that enables the proving and verification of computations.<br />
+It allows processing a big computation, generating proof for the computation’s correctness, and verifying the proof in very few steps.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * [www.starknet.io](https://www.starknet.io/en/posts/engineering/starks-starkex-and-starknet)</span></span></code></pre></blockquote>
+<p>As Cairo matures, improvements have been added, such as a linear type system implementing ownership similar to Rust and an intermediate representation providing guarantees.<br />
+Programming in Cairo is a bit different than your average von Neumann machine-based language: programs written in it run under a nondeterministic, immutable, contiguous memory model to ensure that all relevant memory has proper values and that appropriate values are not destroyed before the proof is generated, i. e. all correct programs are provable.</p>
+<p>The Cairo compiler eventually compiles Cairo code to a “Cairo assembly,” which the virtual machines run to compute results and generate traces.<br />
+However, as mentioned before, not all representations are adequate for all tasks, so Cairo introduced Sierra (<strong>S</strong> afe <strong>I</strong> nt<strong>E</strong> rmediate <strong>R</strong> ep<strong>R</strong> esent<strong>A</strong> tion).</p>
+<p>Sierra’s goal is to guarantee that the generated code is always provable, and it achieves this by several means.</p>
+<p>As mentioned, the memory model is immutable and contiguous and guarantees that memory will not be written twice, and thus, dereferences cannot fail.<br />
+The linear type system ensures that values are used exactly once,</p>
+<p>There are no loops, and recursion is used instead; coupled with a gas meter for operations, this ensures termination.</p>
+<p>Assertions and panics are converted to conditional branches.</p>
+<h3 id="why-use-mlir-in-the-context-of-cairo">Why use MLIR in the context of Cairo?</h3>
+<p>Cairo is also being used to build StarkNet, a permissionless Ethereum layer 2 network on which provable smart contracts can be deployed.<br />
+Nodes on the network receive transactions and must verify they are valid before going about the business of generating the proof.<br />
+The contract code must be run with the transaction inputs to generate the state change, the proof, and verify.</p>
+<p>Another motivation is developer experience and tooling quality.<br />
+Before deploying said contracts, the code must be written and tested, and being able to run Cairo code faster improves turnaround time in the development loop.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Enable faster checking of Cairo contract TX</span></span>
+<span class="giallo-l"><span>    * Faster Gas computation</span></span>
+<span class="giallo-l"><span>    * To enable better L2 sequencers</span></span>
+<span class="giallo-l"><span>    * To enable better developer tooling</span></span></code></pre><h3 id="sierra-structure">Sierra Structure</h3>
+<p>So what does Sierra look like?<br />
+We’ll see some examples shortly.<br />
+Briefly, Sierra is a linear intermediate representation.<br />
+A Sierra program consists of four sections:<br />
+The types used in a particular program<br />
+The <em>libfuncs</em> used<br />
+The program statements<br />
+The descriptions of the user-defined functions</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>/// A full Sierra program.</span></span>
+<span class="giallo-l"><span>#[derive(Clone, Debug, Eq, PartialEq)]</span></span>
+<span class="giallo-l"><span>pub struct Program {</span></span>
+<span class="giallo-l"><span>    /// Declarations for all the user types.</span></span>
+<span class="giallo-l"><span>    pub type_declarations: Vec&lt;TypeDeclaration&gt;,</span></span>
+<span class="giallo-l"><span>    /// Declarations for all the used library functions.</span></span>
+<span class="giallo-l"><span>    pub libfunc_declarations: Vec&lt;LibfuncDeclaration&gt;,</span></span>
+<span class="giallo-l"><span>    /// The code of the program.</span></span>
+<span class="giallo-l"><span>    pub statements: Vec&lt;Statement&gt;,</span></span>
+<span class="giallo-l"><span>    /// Descriptions of the functions - signatures and entry points.</span></span>
+<span class="giallo-l"><span>    pub funcs: Vec&lt;Function&gt;,</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Libfuncs (or library functions) are representations of calls to built-in functions whose implementations are vetted to be correct, then compiled to Cairo assembly.<br />
+The built-in libfuncs implementation is generic and can be specialized as defined in the libfunc declaration section.</p>
+<p>Statements can either invoke a libfunc or return a variable and are executed in sequence:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>/// A possible statement.</span></span>
+<span class="giallo-l"><span>#[derive(Clone, Debug, Eq, PartialEq)]</span></span>
+<span class="giallo-l"><span>pub enum GenStatement&lt;StatementId&gt; {</span></span>
+<span class="giallo-l"><span>    Invocation(GenInvocation&lt;StatementId&gt;),</span></span>
+<span class="giallo-l"><span>    Return(Vec&lt;VarId&gt;),</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>User-defined functions have an identifier, their type signature and parameters, and a statement identifier that marks the function entry point among the program statements.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub type Function = GenFunction&lt;StatementIdx&gt;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>/// Represents a function (its name, signature, and entry point).</span></span>
+<span class="giallo-l"><span>#[derive(Clone, Debug, Eq, PartialEq)]</span></span>
+<span class="giallo-l"><span>pub struct GenFunction&lt;StatementId&gt; {</span></span>
+<span class="giallo-l"><span>    /// The name of the function.</span></span>
+<span class="giallo-l"><span>    pub id: FunctionId,</span></span>
+<span class="giallo-l"><span>    /// The parameter types and return types.</span></span>
+<span class="giallo-l"><span>    pub signature: FunctionSignature,</span></span>
+<span class="giallo-l"><span>    /// The parameters of the function.</span></span>
+<span class="giallo-l"><span>    pub params: Vec&lt;Param&gt;,</span></span>
+<span class="giallo-l"><span>    /// The statement id where the function starts.</span></span>
+<span class="giallo-l"><span>    pub entry_point: StatementId,</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="how-does-one-use-mlir">How (does one use MLIR)?</h2>
+<p>In our application context, the Cairo &amp; StarkNet software stack, most of it is transitioning to or being developed in Rust, so we would like to integrate with this language seamlessly.</p>
+<p>MLIR has a [C-compatible API](<a rel="noopener external" target="_blank" href="https://mlir.llvm.org/docs/CAPI/">https://mlir.llvm.org/docs/CAPI/</a>, which can be easily interfaced with.<br />
+<a rel="noopener external" target="_blank" href="https://crates.io/crates/mlir-sys">mlir-sys</a> provides auto-generated bindings to this interface, and <a rel="noopener external" target="_blank" href="https://crates.io/crates/melior-next">melior</a> provides a somewhat more idiomatic wrapper around it.</p>
+<p>MLIR as a library is part of the LLVM distribution, so if you have the latest LLVM as a system library, you will have access to MLIR.</p>
+<p>Our project resides at <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/cairo_sierra2mlir"><code>github.com/lambdaclass/cairo_sierra2mlir</code></a>.<br />
+You can find detailed setup instructions that should leave you with a working development environment. When developing on Apple hardware, if you don’t want to make compile your own, store-bought brew-provided LLVM system libraries are fine.</p>
+<p>Our first task is to parse the provided Sierra program.<br />
+Fortunately, the Cairo compiler libraries provide excellent functionality:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>cairo_lang_sierra::ProgramParser::new()</span></span>
+<span class="giallo-l"><span>            .parse(fs::read_to_string(input).unwrap().as_str())</span></span>
+<span class="giallo-l"><span>            .unwrap(),</span></span></code></pre>
+<p>Once we have the Sierra representation in memory, we can start the translation process.<br />
+Here is a high-level overview:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>stateDiagram-v2</span></span>
+<span class="giallo-l"><span>    direction LR</span></span>
+<span class="giallo-l"><span>    state &quot;Load sierra program&quot; as Sierra</span></span>
+<span class="giallo-l"><span>    state &quot;Initialize compiler&quot; as init</span></span>
+<span class="giallo-l"><span>    state &quot;Initialize execution engine&quot; as engine</span></span>
+<span class="giallo-l"><span>    state if_skip_jit &lt;&lt;choice&gt;&gt;</span></span>
+<span class="giallo-l"><span>    state &quot;Load MLIR dialects&quot; as dialects</span></span>
+<span class="giallo-l"><span>    state &quot;Create built-in module&quot; as module</span></span>
+<span class="giallo-l"><span>    state &quot;Create libc wrappers&quot; as libc</span></span>
+<span class="giallo-l"><span>    state &quot;Process Types&quot; as types</span></span>
+<span class="giallo-l"><span>    state &quot;Process Library functions&quot; as libfuncs</span></span>
+<span class="giallo-l"><span>    state &quot;Save non-flow function info&quot; as func_info</span></span>
+<span class="giallo-l"><span>    state &quot;Process functions&quot; as funcs</span></span>
+<span class="giallo-l"><span>    state &quot;Calculate block ranges per function&quot; as blocks</span></span>
+<span class="giallo-l"><span>    state &quot;Process statements&quot; as statements</span></span>
+<span class="giallo-l"><span>    state &quot;Apply MLIR passes&quot; as passes</span></span>
+<span class="giallo-l"><span>    [*] --&gt; Initialize</span></span>
+<span class="giallo-l"><span>    state Initialize {</span></span>
+<span class="giallo-l"><span>        sierra --&gt; init</span></span>
+<span class="giallo-l"><span>        init --&gt; if_skip_jit</span></span>
+<span class="giallo-l"><span>        if_skip_jit --&gt; engine: if JIT</span></span>
+<span class="giallo-l"><span>        if_skip_jit --&gt; dialects: if Compile</span></span>
+<span class="giallo-l"><span>        engine --&gt; dialects</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    Initialize --&gt; Compile</span></span>
+<span class="giallo-l"><span>    state Compile {</span></span>
+<span class="giallo-l"><span>        module --&gt; libc</span></span>
+<span class="giallo-l"><span>        libc --&gt; types</span></span>
+<span class="giallo-l"><span>        types --&gt; libfuncs</span></span>
+<span class="giallo-l"><span>        types --&gt; func_info</span></span>
+<span class="giallo-l"><span>        func_info --&gt; libfuncs</span></span>
+<span class="giallo-l"><span>        libfuncs --&gt; funcs</span></span>
+<span class="giallo-l"><span>        funcs --&gt; blocks</span></span>
+<span class="giallo-l"><span>        blocks --&gt; statements</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    Compile --&gt; passes</span></span>
+<span class="giallo-l"><span>    passes --&gt; Output</span></span>
+<span class="giallo-l"><span>    Output --&gt; [*]</span></span></code></pre>
+<p>The first step is initializing our machinery.<br />
+We need to create our dialect and context and register them. A context contains IR, dialects, and passes and owns various objects, such as types, locations, and dialect instances.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let registry = dialect::Registry::new();</span></span>
+<span class="giallo-l"><span>register_all_dialects(&amp;registry);</span></span>
+<span class="giallo-l"><span>let context = Context::new();</span></span>
+<span class="giallo-l"><span>context.append_dialect_registry(&amp;registry);</span></span>
+<span class="giallo-l"><span>context.load_all_available_dialects();</span></span>
+<span class="giallo-l"><span>register_all_llvm_translations(&amp;context);</span></span></code></pre>
+<p>We also need to create a region with a block for the builtin module:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let location = Location::unknown(&amp;context);</span></span>
+<span class="giallo-l"><span>let region = Region::new();</span></span>
+<span class="giallo-l"><span>let block = Block::new(&amp;[]);</span></span>
+<span class="giallo-l"><span>region.append_block(block);</span></span>
+<span class="giallo-l"><span>let module_op = operation::Builder::new(&quot;builtin.module&quot;, location)</span></span>
+<span class="giallo-l"><span>    .add_regions(vec![region])</span></span>
+<span class="giallo-l"><span>    .build();</span></span>
+<span class="giallo-l"><span>let module = Module::from_operation(module_op).unwrap();</span></span></code></pre>
+<p>Once initialization is done, we can start converting by processing, in sequence: types, libfuncs, functions, and statements. We won’t go into full detail, but we can look at an exciting example short enough to inspect its transformation process: a program performing addition and subtraction of field elements and see how libruls are processed.</p>
+<p>For every function declaration in the libfunc declaration section of our Sierra program, the libfunc name will be matched, and the execution of compilation will be dispatched to the appropriate Rust function.</p>
+<p>This simple function takes a Felt (a 252-bit Field Element) and returns a struct with two values:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn something(a: felt252) -&gt; (felt252, felt252) {</span></span>
+<span class="giallo-l"><span>    (a + 2, a - 2)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The cairo compiler outputs the following Sierra:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>type felt252 = felt252;</span></span>
+<span class="giallo-l"><span>type Tuple&lt;felt252, felt252&gt; = Struct&lt;ut@Tuple, felt252, felt252&gt;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>libfunc felt252_const&lt;2&gt; = felt252_const&lt;2&gt;;</span></span>
+<span class="giallo-l"><span>libfunc dup&lt;felt252&gt; = dup&lt;felt252&gt;;</span></span>
+<span class="giallo-l"><span>libfunc felt252_add = felt252_add;</span></span>
+<span class="giallo-l"><span>libfunc felt252_sub = felt252_sub;</span></span>
+<span class="giallo-l"><span>libfunc struct_construct&lt;Tuple&lt;felt252, felt252&gt;&gt; = struct_construct&lt;Tuple&lt;felt252, felt252&gt;&gt;;</span></span>
+<span class="giallo-l"><span>libfunc store_temp&lt;Tuple&lt;felt252, felt252&gt;&gt; = store_temp&lt;Tuple&lt;felt252, felt252&gt;&gt;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>felt252_const&lt;2&gt;() -&gt; ([1]);</span></span>
+<span class="giallo-l"><span>dup&lt;felt252&gt;([0]) -&gt; ([0], [3]);</span></span>
+<span class="giallo-l"><span>felt252_add([3], [1]) -&gt; ([2]);</span></span>
+<span class="giallo-l"><span>felt252_const&lt;2&gt;() -&gt; ([4]);</span></span>
+<span class="giallo-l"><span>felt252_sub([0], [4]) -&gt; ([5]);</span></span>
+<span class="giallo-l"><span>struct_construct&lt;Tuple&lt;felt252, felt252&gt;&gt;([2], [5]) -&gt; ([6]);</span></span>
+<span class="giallo-l"><span>store_temp&lt;Tuple&lt;felt252, felt252&gt;&gt;([6]) -&gt; ([7]);</span></span>
+<span class="giallo-l"><span>return([7]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>simple::simple::something@0([0]: felt252) -&gt; (Tuple&lt;felt252, felt252&gt;);</span></span></code></pre>
+<p>Despite being quite low-level, it is still readable:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * declare a felt constant with value 2 into memory cell 1</span></span>
+<span class="giallo-l"><span>    * duplicate the value in memory cell 0 into cell 3</span></span>
+<span class="giallo-l"><span>    * add the value in the memory cell 1 to the one in cell 3 and put the result in cell 2</span></span>
+<span class="giallo-l"><span>    * declare a felt constant with value 2 into memory cell 4</span></span>
+<span class="giallo-l"><span>    * subtract the value in the memory cell 4 from the value in cell 0, and put the result in cell 5</span></span>
+<span class="giallo-l"><span>    * construct a tuple of type `&lt;felt252, felt252&gt;` with values from cells 2 and 5, and put it in cell 6</span></span>
+<span class="giallo-l"><span>    * store this value in cell 7 in preparation for returning it</span></span>
+<span class="giallo-l"><span>    * return the value in cell 7</span></span></code></pre>
+<p>The meat in this simple example is the “<code>felt252_add</code>” libfunc which implements addition for field elements.<br />
+Let’s see how this is implemented in our MLIR dialect:</p>
+<p>We’ll need a region with several blocks, one in which the calculation occurs, another in which we’ll return values that result in numbers greater or equal than the field prime, and another for returning values lesser than the field prime.<br />
+We obtain the arguments, perform the addition, and check the result against the field prime.</p>
+<p>This condition is represented by the <code>op_cond_br</code> conditional branch operation from the MLIR <code>cf</code> dialect, which</p>
+<blockquote>
+<p>… contains low-level, i.e., non-region-based, control flow constructs.<br />
+These constructs generally represent control flow directly on SSA blocks of a control flow graph.<br />
+The cond_br terminator operation represents a conditional branch on a boolean (1-bit integer) value. If the bit is set, then the first destination is jumped to; if it is false, the second destination is chosen.</p>
+</blockquote>
+<p>In our case, due to how addiction works in the field, if the result is greater than the field prime, we can simply subtract the prime value to wrap around. In other words, if the result is greater, jump to the <code>gte_prime_block</code> or “greater than prime block,” and if not, jump to the <code>in_range_block.</code></p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn create_libfunc_felt_add(</span></span>
+<span class="giallo-l"><span>        &amp; &#39;ctx self,</span></span>
+<span class="giallo-l"><span>        func_decl: &amp;LibfuncDeclaration,</span></span>
+<span class="giallo-l"><span>        parent_block: BlockRef&lt;&#39;ctx&gt;,</span></span>
+<span class="giallo-l"><span>        storage: &amp;mut Storage&lt;&#39;ctx&gt;,</span></span>
+<span class="giallo-l"><span>    ) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        let id = func_decl.id.debug_name.as_ref().unwrap().to_string();</span></span>
+<span class="giallo-l"><span>        let sierra_felt_type = SierraType::Simple(self.felt_type());</span></span>
+<span class="giallo-l"><span>        let felt_type = sierra_felt_type.get_type();</span></span>
+<span class="giallo-l"><span>        let felt_type_location = sierra_felt_type.get_type_location(&amp;self.context);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        let region = Region::new();</span></span>
+<span class="giallo-l"><span>        //Block in which the calculation occurs</span></span>
+<span class="giallo-l"><span>        let entry_block = Block::new(&amp;[felt_type_location, felt_type_location]);</span></span>
+<span class="giallo-l"><span>        //Block for wrapping values &gt;= PRIME</span></span>
+<span class="giallo-l"><span>        let gte_prime_block = Block::new(&amp;[]);</span></span>
+<span class="giallo-l"><span>        //Block for returning values &lt; PRIME</span></span>
+<span class="giallo-l"><span>        let in_range_block = Block::new(&amp;[]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        // res = lhs + rhs</span></span>
+<span class="giallo-l"><span>        let lhs = entry_block.argument(0)?.into();</span></span>
+<span class="giallo-l"><span>        let rhs = entry_block.argument(1)?.into();</span></span>
+<span class="giallo-l"><span>        let res_op = self.op_add(&amp;entry_block, lhs, rhs);</span></span>
+<span class="giallo-l"><span>        let res = res_op.result(0)?.into();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        // gt_prime &lt;=&gt; res_result &gt;= PRIME</span></span>
+<span class="giallo-l"><span>        let prime_op = self.prime_constant(&amp;entry_block);</span></span>
+<span class="giallo-l"><span>        let prime = prime_op.result(0)?.into();</span></span>
+<span class="giallo-l"><span>        let gte_prime_op = self.op_cmp(&amp;entry_block, CmpOp::UnsignedGreaterThanEqual, res, prime);</span></span>
+<span class="giallo-l"><span>        let gte_prime = gte_prime_op.result(0)?.into();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        // if gt_prime</span></span>
+<span class="giallo-l"><span>        self.op_cond_br(&amp;entry_block, gte_prime, &amp;gte_prime_block, &amp;in_range_block, &amp;[], &amp;[]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        // gt prime block</span></span>
+<span class="giallo-l"><span>        let wrapped_res_op = self.op_sub(&amp;gte_prime_block, res, prime);</span></span>
+<span class="giallo-l"><span>        let wrapped_res = wrapped_res_op.result(0)?.into();</span></span>
+<span class="giallo-l"><span>        self.op_return(&amp;gte_prime_block, &amp;[wrapped_res]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        // in range block</span></span>
+<span class="giallo-l"><span>        self.op_return(&amp;in_range_block, &amp;[res]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        region.append_block(entry_block);</span></span>
+<span class="giallo-l"><span>        region.append_block(in_range_block);</span></span>
+<span class="giallo-l"><span>        region.append_block(gte_prime_block);</span></span>
+<span class="giallo-l"><span>        let func = self.op_func(</span></span>
+<span class="giallo-l"><span>            &amp;id,</span></span>
+<span class="giallo-l"><span>            &amp;create_fn_signature(&amp;[felt_type, felt_type], &amp;[felt_type]),</span></span>
+<span class="giallo-l"><span>            vec![region],</span></span>
+<span class="giallo-l"><span>            FnAttributes::libfunc(false, true),</span></span>
+<span class="giallo-l"><span>        )?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        parent_block.append_operation(func);</span></span>
+<span class="giallo-l"><span>        storage.libfuncs.insert(</span></span>
+<span class="giallo-l"><span>            id,</span></span>
+<span class="giallo-l"><span>            SierraLibFunc::create_function_all_args(</span></span>
+<span class="giallo-l"><span>                vec![sierra_felt_type.clone(), sierra_felt_type.clone()],</span></span>
+<span class="giallo-l"><span>                vec![sierra_felt_type],</span></span>
+<span class="giallo-l"><span>            ),</span></span>
+<span class="giallo-l"><span>        );</span></span>
+<span class="giallo-l"><span>        Ok(())</span></span>
+<span class="giallo-l"><span>    }</span></span></code></pre>
+<p>This is the MLIR corresponding to the felt252_add libfunc:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>func.func @felt252_add(%arg0: i256, %arg1: i256) -&gt; i256 attributes {llvm.dso_local, llvm.linkage = #llvm.linkage&lt;internal&gt;, passthrough = [&quot;norecurse,&quot; &quot;alwaysinline,&quot; &quot;nounwind&quot;]} {</span></span>
+<span class="giallo-l"><span>    %0 = arith.addi %arg0, %arg1 : i256</span></span>
+<span class="giallo-l"><span>    %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 = arith.constant 3618502788666131213697322783095070105623107215331596699973092056135872020481 : i256</span></span>
+<span class="giallo-l"><span>    %1 = arith.cmpi uge, %0, %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 : i256</span></span>
+<span class="giallo-l"><span>    cf.cond_br %1, ^bb2, ^bb1</span></span>
+<span class="giallo-l"><span>  ^bb1:  // pred: ^bb0</span></span>
+<span class="giallo-l"><span>    return %0 : i256</span></span>
+<span class="giallo-l"><span>  ^bb2:  // pred: ^bb0</span></span>
+<span class="giallo-l"><span>    %2 = arith.subi %0, %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 : i256</span></span>
+<span class="giallo-l"><span>    return %2 : i256</span></span>
+<span class="giallo-l"><span>  }</span></span></code></pre>
+<p>As you can see, we have three basic blocks, and the last instruction of the first is a conditional jump.</p>
+<p>This is the entire resulting MLIR before going the registered passes:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>module {</span></span>
+<span class="giallo-l"><span>  func.func @felt252_add(%arg0: i256, %arg1: i256) -&gt; i256 attributes {llvm.dso_local, llvm.linkage = #llvm.linkage&lt;internal&gt;, passthrough = [&quot;norecurse,&quot; &quot;alwaysinline,&quot; &quot;nounwind&quot;]} {</span></span>
+<span class="giallo-l"><span>    %0 = arith.addi %arg0, %arg1 : i256</span></span>
+<span class="giallo-l"><span>    %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 = arith.constant 3618502788666131213697322783095070105623107215331596699973092056135872020481 : i256</span></span>
+<span class="giallo-l"><span>    %1 = arith.cmpi uge, %0, %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 : i256</span></span>
+<span class="giallo-l"><span>    cf.cond_br %1, ^bb2, ^bb1</span></span>
+<span class="giallo-l"><span>  ^bb1:  // pred: ^bb0</span></span>
+<span class="giallo-l"><span>    return %0 : i256</span></span>
+<span class="giallo-l"><span>  ^bb2:  // pred: ^bb0</span></span>
+<span class="giallo-l"><span>    %2 = arith.subi %0, %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 : i256</span></span>
+<span class="giallo-l"><span>    return %2 : i256</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>  func.func @felt252_sub(%arg0: i256, %arg1: i256) -&gt; i256 attributes {llvm.dso_local, llvm.linkage = #llvm.linkage&lt;internal&gt;, passthrough = [&quot;norecurse,&quot; &quot;alwaysinline,&quot; &quot;nounwind&quot;]} {</span></span>
+<span class="giallo-l"><span>    %0 = arith.subi %arg0, %arg1 : i256</span></span>
+<span class="giallo-l"><span>    %c0_i256 = arith.constant 0 : i256</span></span>
+<span class="giallo-l"><span>    %1 = arith.cmpi slt, %0, %c0_i256 : i256</span></span>
+<span class="giallo-l"><span>    cf.cond_br %1, ^bb2, ^bb1</span></span>
+<span class="giallo-l"><span>  ^bb1:  // pred: ^bb0</span></span>
+<span class="giallo-l"><span>    return %0 : i256</span></span>
+<span class="giallo-l"><span>  ^bb2:  // pred: ^bb0</span></span>
+<span class="giallo-l"><span>    %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 = arith.constant 3618502788666131213697322783095070105623107215331596699973092056135872020481 : i256</span></span>
+<span class="giallo-l"><span>    %2 = arith.addi %0, %c3618502788666131213697322783095070105623107215331596699973092056135872020481_i256 : i256</span></span>
+<span class="giallo-l"><span>    return %2 : i256</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>  func.func @&quot;struct_construct&lt;Tuple&lt;felt252, felt252&gt;&gt;&quot;(%arg0: i256, %arg1: i256) -&gt; !llvm.struct&lt;packed (i256, i256)&gt; attributes {llvm.dso_local, llvm.linkage = #llvm.linkage&lt;internal&gt;, passthrough = [&quot;norecurse,&quot; &quot;alwaysinline,&quot; &quot;nounwind&quot;]} {</span></span>
+<span class="giallo-l"><span>    %0 = llvm. mir.undef : !llvm.struct&lt;packed (i256, i256)&gt;</span></span>
+<span class="giallo-l"><span>    %1 = llvm.insertvalue %arg0, %0[0] : !llvm.struct&lt;packed (i256, i256)&gt;</span></span>
+<span class="giallo-l"><span>    %2 = llvm.insertvalue %arg1, %1[1] : !llvm.struct&lt;packed (i256, i256)&gt;</span></span>
+<span class="giallo-l"><span>    return %2 : !llvm.struct&lt;packed (i256, i256)&gt;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>  func.func @&quot;simple::simple::something&quot;(%arg0: i256) -&gt; !llvm.struct&lt;packed (i256, i256)&gt; attributes {llvm.dso_local, llvm.emit_c_interface} {</span></span>
+<span class="giallo-l"><span>    cf.br ^bb1(%arg0 : i256)</span></span>
+<span class="giallo-l"><span>  ^bb1(%0: i256):  // pred: ^bb0</span></span>
+<span class="giallo-l"><span>    %c2_i256 = arith.constant 2 : i256</span></span>
+<span class="giallo-l"><span>    %1 = call @felt252_add(%0, %c2_i256) : (i256, i256) -&gt; i256</span></span>
+<span class="giallo-l"><span>    %c2_i256_0 = arith.constant 2 : i256</span></span>
+<span class="giallo-l"><span>    %2 = call @felt252_sub(%0, %c2_i256_0) : (i256, i256) -&gt; i256</span></span>
+<span class="giallo-l"><span>    %3 = call @&quot;struct_construct&lt;Tuple&lt;felt252, felt252&gt;&gt;&quot;(%1, %2) : (i256, i256) -&gt; !llvm.struct&lt;packed (i256, i256)&gt;</span></span>
+<span class="giallo-l"><span>    return %3 : !llvm.struct&lt;packed (i256, i256)&gt;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Great, so we have converted Sierra to MLIR using several built-in dialects and our own.<br />
+To be able to run our code, we need to lower it to something that can be run.<br />
+An excellent choice, for now, is LLVM IR since we want to run our Cairo code as native CPU instructions and can use the very solid LLVM infrastructure to compile LLVM IR to a binary object.<br />
+We also want to leverage MLIR and LLVM’s pass manager infrastructure to take advantage of the optimizations it provides.</p>
+<p>We create a pass manager and add the passes we want our code to go through:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let pass_manager = pass::Manager::new(&amp;compiler.context);</span></span>
+<span class="giallo-l"><span>    register_all_passes();</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_func_to_llvm());</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_scf_to_cf());</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_cf_to_llvm());</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_arithmetic_to_llvm());</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_index_to_llvm());</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_math_to_llvm());</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_memref_to_llvmconversion_pass());</span></span>
+<span class="giallo-l"><span>    pass_manager.add_pass(pass::conversion::convert_reconcile_unrealized_casts());</span></span>
+<span class="giallo-l"><span>    if optimized {</span></span>
+<span class="giallo-l"><span>        pass_manager.add_pass(pass::transform::canonicalizer());</span></span>
+<span class="giallo-l"><span>        pass_manager.add_pass(pass::transform::inliner());</span></span>
+<span class="giallo-l"><span>        pass_manager.add_pass(pass::transform::symbol_dce());</span></span>
+<span class="giallo-l"><span>        pass_manager.add_pass(pass::transform::cse());</span></span>
+<span class="giallo-l"><span>        pass_manager.add_pass(pass::transform::sccp());</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    pass_manager.enable_verifier(true);</span></span>
+<span class="giallo-l"><span>    pass_manager.run(&amp;mut compiler.module)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let op = compiler.module.as_operation();</span></span>
+<span class="giallo-l"><span>    if op.verify() {</span></span>
+<span class="giallo-l"><span>        if debug_info {</span></span>
+<span class="giallo-l"><span>            Ok(op.debug_print())</span></span>
+<span class="giallo-l"><span>        } else {</span></span>
+<span class="giallo-l"><span>            Ok(op.to_string())</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    } else {</span></span>
+<span class="giallo-l"><span>        Err(color_eyre::eyre::eyre!(&quot;error verifying&quot;))</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>What do these passes do?</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * convert_func_to_llvm`: converts the `func`dialect, which contains operations surrounding high-order function abstractions, such as calls, to the`llvm` dialect, which maps LLVM IR into MLIR by defining the corresponding operations and types.</span></span>
+<span class="giallo-l"><span>    * `convert_scf_to_cf`: converts the `scf` (Structured Control Flow, with loops and ifs) dialect to the `cf` (Control Flow) dialect, replacing structured control flow with a CFG. In LLVM, you have to analyze branches to detect loops. SCF is at a higher abstraction.</span></span>
+<span class="giallo-l"><span>    * `convert_cf_to_llvm`: converts the `cf` dialect to the `llvm` dialect.</span></span>
+<span class="giallo-l"><span>    * `convert_arithmetic_to_llvm`: converts the `arith` dialect (which holds basic integer and floating point mathematical operations) to the `llvm` dialect.</span></span>
+<span class="giallo-l"><span>    * `convert_math_to_llvm`: converts the `math` dialect (which holds mathematical operations on integer and floating types beyond simple arithmetics) to the `llvm` dialect.</span></span>
+<span class="giallo-l"><span>    * `convert_index_to_llvm`: converts the `index` dialect (which contains operations for manipulating values of the built-in index type) to the `llvm` dialect.</span></span>
+<span class="giallo-l"><span>    * `convert_memref_to_llvmconversion_pass`: The `member` dialect is intended to hold core member creation and manipulation ops, which are not strongly associated with any particular other dialect or domain abstraction.</span></span>
+<span class="giallo-l"><span>    * `convert_reconcile_unrealized_casts`: this pass simplifies and eliminates unrealized conversion cast operations, commonly introduced by partial dialect conversions, that transitively convert a value to another value of the same type.</span></span></code></pre>
+<p>The optimization passes we will apply are:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * `canonicalize`: Canonicalize operations. This pass performs various types of canonicalizations over a set of operations by iteratively applying the canonicalization patterns of all loaded dialects until either a fixpoint is reached or the maximum number of iterations/rewrites is exhausted. Canonicalization is an important part of compiler IR design: it makes it easier to implement reliable compiler transformations and to reason about what is better or worse in the code, and it forces interesting discussions about the goals of a particular level of IR. Most compilers have canonicalization passes, and sometimes they have many different ones (e.g., inst-combine, dag combine, etc, in LLVM). Because MLIR is a multi-level IR, it can provide a single canonicalization infrastructure and reuse it across many different IRs that it represents.</span></span>
+<span class="giallo-l"><span>    * `more inline`: the more inline pass inline function calls.</span></span>
+<span class="giallo-l"><span>    * `symbol_dce`: this pass deletes all symbols that are found to be unreachable.</span></span>
+<span class="giallo-l"><span>    * `cse`: this pass implements a generalized algorithm for common sub-expression elimination.</span></span>
+<span class="giallo-l"><span>    * `sccp`: this pass implements a general algorithm for sparse conditional constant propagation. This algorithm detects values that are known to be constant and optimistically propagates this throughout the IR. Any values proven to be constant are replaced and removed if possible.</span></span></code></pre><h4 id="execution">Execution</h4>
+<p>We now have an in-memory representation of our program in optimized MLIR. How can we execute our code?</p>
+<p>MLIR provides an ExecutionEngine, which takes a module and expects it to be translatable to LLVM IR, and then uses the LLVM JIT ExecutionEngine to compile and run it.<br />
+The engine must also know the entry point for execution, and the following example is from a benchmark of the Fibonacci function:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let program = ProgramParser::new().parse(include_str!(&quot;programs/fib.sierra&quot;)).unwrap();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let engine = ExecutionEngine::new(</span></span>
+<span class="giallo-l"><span>    &amp;compiler.module,</span></span>
+<span class="giallo-l"><span>    2,</span></span>
+<span class="giallo-l"><span>    &amp;[</span></span>
+<span class="giallo-l"><span>        &amp;format!(</span></span>
+<span class="giallo-l"><span>            &quot;{}/libmlir_c_runner_utils.{}&quot;,</span></span>
+<span class="giallo-l"><span>            run_llvm_config(&amp;[&quot;--libdir&quot;]).trim(),</span></span>
+<span class="giallo-l"><span>            env!(&quot;SHARED_LIB_EXT&quot;),</span></span>
+<span class="giallo-l"><span>        ),</span></span>
+<span class="giallo-l"><span>        env!(&quot;S2M_UTILS_PATH&quot;),</span></span>
+<span class="giallo-l"><span>    ],</span></span>
+<span class="giallo-l"><span>    false,</span></span>
+<span class="giallo-l"><span>);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>unsafe {</span></span>
+<span class="giallo-l"><span>    engine.invoke_packed(&quot;fib::fib::main&quot;, &amp;mut []).unwrap();</span></span>
+<span class="giallo-l"><span>};</span></span></code></pre><h2 id="conclusions">Conclusions</h2>
+<p>As said, MLIR is a young project.<br />
+Although there is a healthy number of case studies and <a rel="noopener external" target="_blank" href="https://mlir.llvm.org/users/">users</a> enough to look at the sunset sky and muse, “This is the way,” there are a few caveats.</p>
+<p>First, although it is clear that the project has made an effort, documentation is scarce.<br />
+The API is documented, and there are great getting started tutorials, but if you stray off the signaled path, you end up looking at test code, other projects, and trial and error.</p>
+<p>Second, the project is written in C++.<br />
+It provides a C-compatible API with which to fashion bindings in your language, but it is under development and unstable.<br />
+The Python bindings are also under development and not enabled by default.<br />
+The Rust bindings are somewhat auto-generated and not very mature.<br />
+You may end up having to build some tools to build this tool to build the tool you want to ship, also known as yak shaving of an especially hairy breed.</p>
+<p>Third, like any powerful tool that allows one to operate on a high level of abstraction, it requires you to be able to bridge abstraction layers and truly understand your goals and the obstacles you face in reaching them.<br />
+Knowledge of compiler technology and the techniques and vocabulary involved is a must.<br />
+Perhaps with more maturity, other tools will be able to be fashioned, which can hide complexity for more specific domains.</p>
+<p>We would like to salute and thank the team and community behind LLVM and MLIR, and Cairo.<br />
+Foundational technologies are rare, difficult to develop, and require great insight and vision to come to terms with.<br />
+These stones feel like the base on which great things will rest.</p>
+<p><img src="/images/external/iT9Qv1X.jpg" alt="" /></p>
+<h2 id="references-and-resources">References and Resources</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * [MLIR Homepage](https://mlir.llvm.org/)</span></span>
+<span class="giallo-l"><span>    * 2019 EuroLLVM Developers’ Meeting: T. Shpeisman &amp; C. Lattner “MLIR: Multi-Level Intermediate Representation Compiler Infrastructure” [Video](https://www.youtube.com/watch?v=qzljG6DKgic) and [Slides](https://llvm.org/devmtg/2019-04/slides/Keynote-ShpeismanLattner-MLIR.pdf)</span></span>
+<span class="giallo-l"><span>    * MLIR Tutorial [Video](https://www.youtube.com/watch?v=Y4SvqTtOIDk) and [Slides](https://llvm.org/devmtg/2020-09/slides/MLIR_Tutorial.pdf)</span></span>
+<span class="giallo-l"><span>    * [Yizhou Shan&#39;s notes on MLIR](http://lastweek.io/notes/MLIR/)</span></span>
+<span class="giallo-l"><span>    * [Lei Zhang&#39;s &quot;Compilers and IRs: LLVM IR, SPIR-V, and MLIR&quot;](https://www.lei.chat/posts/compilers-and-irs-llvm-ir-spirv-and-mlir/)</span></span>
+<span class="giallo-l"><span>    * [Starkware glossary: STARKs, StarkEx, and StarkNet](https://medium.com/starkware/starks-starkex-and-starknet-9a426680745a)</span></span>
+<span class="giallo-l"><span>    * [Starkware: Cairo 1.0](https://medium.com/starkware/cairo-1-0-aa96eefb19a0)</span></span>
+<span class="giallo-l"><span>    * [Starkware: Cairo 1.0 is here](https://medium.com/starkware/cairo-1-0-is-here-7e1ac8377038)</span></span></code></pre>
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

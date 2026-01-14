@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>LambdaClass Blog - cairo</title>
+    <subtitle>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://blog.lambdaclass.com/tags/cairo/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2025-02-07T00:00:00+00:00</updated>
+    <id>https://blog.lambdaclass.com/tags/cairo/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Responsible disclosure: A potential sequencer-prover inconsistency in the Cairo VM</title>
+        <published>2025-02-07T00:00:00+00:00</published>
+        <updated>2025-02-07T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/responsible-disclosure-a-potential-sequencer-prover-inconsistency-in-the-cairo-vm/"/>
+        <id>https://blog.lambdaclass.com/posts/responsible-disclosure-a-potential-sequencer-prover-inconsistency-in-the-cairo-vm/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/responsible-disclosure-a-potential-sequencer-prover-inconsistency-in-the-cairo-vm/">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+&lt;p&gt;On Sunday, January 26th, Starkware informed us that they had found a critical issue in the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;cairo-vm&quot;&gt;Cairo VM&lt;&#x2F;a&gt; related to a program that would successfully execute on the VM but would violate the AIR constraints. The bug was found while investigating a separate issue reported by a third party and a fix was already implemented in a PR. The PR was merged, and a release was cut, which is already updated. You can read Starkware’s disclosure post &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;community.starknet.io&#x2F;t&#x2F;remediating-a-potential-sequencer-prover-inconsistency-in-the-cairo-vm&#x2F;115313&quot;&gt;here&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;technical-implementation&quot;&gt;Technical Implementation&lt;&#x2F;h3&gt;
+&lt;p&gt;The fix in pull request &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;cairo-vm&#x2F;pull&#x2F;1925&quot;&gt;#1925&lt;&#x2F;a&gt; adds two changes:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Additional verification while decoding instructions&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Additional verification on `verify_secure_runner`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h4 id=&quot;instruction-decoding-call-instruction&quot;&gt;Instruction Decoding**: Call Instruction**&lt;&#x2F;h4&gt;
+&lt;p&gt;The call instruction does roughly the following:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. Saves the current frame pointer to `[ap]`&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. Saves the call return address to `[ap + 1]`&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. Updates both `fp` and `ap` to `ap + 2`, skipping over the saved data.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. Updates the `pc` to the start of the target function&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;As some of the flags of the call instruction are fixed, we can verify that:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The `dst` register holds `ap+0`, where the current frame pointer will be stored.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;dst_register == AP&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;dst_offset   == 0&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The `op0` register holds `ap+1`, where the call return address will be stored.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;op0_register == AP&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;op0_offset   == 1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Both `fp` and `ap` are updated to `ap+2`:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;ap_update == Add2&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;fp_update == APPlus2&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;If these conditions are not met, the decoding fails.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;instruction-decoding-return-instruction&quot;&gt;Instruction Decoding**: Return Instruction**&lt;&#x2F;h4&gt;
+&lt;p&gt;The return instruction does roughly the following:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. Restores the previous frame pointer (at `[fp - 2]`)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. Jumps to the call return address (at `[fp - 1]`)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;As some of the flags of the return instruction are fixed, we can verify that:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The program counter is updated with an absolute jump&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pc_update == Jump&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The jump location is taken from `res`, which equals `fp-1`:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;res_logic   == Op1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;op1_offset  == -1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;op1_address == FP&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The next frame pointer is taken from `dst`, which equals `fp-2`&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;fp_update    == Dst&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;dst_register == FP&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;dst_offset   == -2&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;If these conditions are not met, the decoding also fails.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;conditional-jump&quot;&gt;Conditional Jump&lt;&#x2F;h4&gt;
+&lt;p&gt;This PR also enforces that when &lt;code&gt;pc_update&lt;&#x2F;code&gt; is equal to &lt;code&gt;4&lt;&#x2F;code&gt; (conditional jump), then &lt;code&gt;res_logic&lt;&#x2F;code&gt; must equal &lt;code&gt;0&lt;&#x2F;code&gt; (which implies ignoring that field).&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This behavior is documented in the Cairo Whitepaper, page 33:&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;if pc_update == 4:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    if res_logic == 0 &amp;amp;&amp;amp; opcode == 0 &amp;amp;&amp;amp; ap_update != 1:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        res = Unused&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    else:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        Undefined Behavior&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h4 id=&quot;secure-runner-verification&quot;&gt;&lt;strong&gt;Secure runner verification&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;The &lt;code&gt;verify_secure_runner&lt;&#x2F;code&gt; function verifies that the completed run in a runner is safe to be relocated and used by other Cairo programs.&lt;&#x2F;p&gt;
+&lt;p&gt;The PR verifies that the final frame pointer coincides with the caller’s frame pointer, stored at &lt;code&gt;[initial_frame_pointer - 2]&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * When using `ExecutionMode::ProofModeCanonical`, the whole address must match.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * When using `ExecutionMode::RunnerMode`, only the offset must match.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h3 id=&quot;impact-analysis&quot;&gt;Impact Analysis&lt;&#x2F;h3&gt;
+&lt;p&gt;As noted in Starkware’s &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;community.starknet.io&#x2F;t&#x2F;remediating-a-potential-sequencer-prover-inconsistency-in-the-cairo-vm&#x2F;115313&quot;&gt;release&lt;&#x2F;a&gt;:&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;”Since the missing check was in the sequencer and not the prover this has no implication whatsoever on the correctness or security of Starknet. In theory, it could have created a situation that a transaction that appears to have passed will later be reverted (reorg)”&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;the main risk was having transactions from &lt;code&gt;Cairo0&lt;&#x2F;code&gt; contracts execute on the sequencer and revert instead of being proved. Since the transaction would not pass the prover there is no risk of incorrect transaction being proved but the revert would impact user experience.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;As we’ve stated before, issues such as this one are always possible and likely in complex software and highlight the importance of having multiple teams paying attention to security, close collaboration between them, having simple codebases, and scrutinizing the interactions between components.&lt;&#x2F;p&gt;
+&lt;p&gt;Many thanks to Starkware for the notice and quick fix!&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

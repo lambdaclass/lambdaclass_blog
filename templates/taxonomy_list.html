@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Topics - {{ config.title }}{% endblock %}
+
+{% block content %}
+<section class="taxonomy-list-page">
+    <header class="taxonomy-list-header">
+        <h1>Topics</h1>
+        <p class="taxonomy-list-description">Explore our articles by topic area</p>
+    </header>
+
+    <div class="tags-cloud">
+        {% for term in terms %}
+        <a href="{{ term.permalink }}" class="tag-cloud-item" style="--weight: {{ term.pages | length }}">
+            <span class="tag-name">{{ term.name | title }}</span>
+            <span class="tag-count">{{ term.pages | length }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

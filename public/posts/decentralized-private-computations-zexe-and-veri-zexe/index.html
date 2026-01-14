@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized private computation: ZEXE and VERI-ZEXE - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Decentralized private computation: ZEXE and VERI-ZEXE</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-01-13">January 13, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>The <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2018/962.pdf">ZEXE</a> (Zero-knowledge EXEcution) protocol appeared in 2018, introducing the cryptographic primitive of decentralized private computation (DPC). It aims to solve two main drawbacks that decentralized ledgers suffer: privacy and scalability.</p>
+<p>Let’s take the examples of Bitcoin and Ethereum. We see that the history of all transactions is public (which could leak sensitive information on your company’s suppliers, acquaintances, or the services you hire). Ethereum offers programmability but requires each node to execute every operation, where the least powerful device acts as a bottleneck. ZCash tackles the privacy problem but does not offer programmability, just private transactions. ZEXE tries to get the best of both worlds:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Privately running arbitrary programs.</span></span>
+<span class="giallo-l"><span>    * Being able to run computations offline.</span></span>
+<span class="giallo-l"><span>    * Providing proof of the integrity of the computations, which nodes can verify quickly.</span></span></code></pre>
+<p>For an overview of the protocol, we recommend our previous post on <a href="/fully-private-applications-a-zexe-protocol/">ZEXE</a>. As a quick reminder, the protocol offers the following features:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Programmability: we can run arbitrary programs.</span></span>
+<span class="giallo-l"><span>    2. Fast verification: we can prove the validity of our computations by using zk-SNARKs (zero-knowledge Succinct Non-interactive ARguments of Knowledge), which offer short (succinct) proofs that verifiers can check on-chain in a few milliseconds.</span></span>
+<span class="giallo-l"><span>    3. Data and function privacy: the protocol hides relevant input information and functions when we execute transitions in the ledger.</span></span></code></pre>
+<p>The ZEXE protocol has seen several improvements since its introduction to enhance its performance. This post will analyze the differences between the original protocol and a recent proposal, <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2022/802.pdf">VERI-ZEXE</a>. The authors of VERI-ZEXE compared their protocol’s performance with the original proposal of ZEXE and its early modifications. There are no comparisons between the current improved versions of the ZEXE protocol and VERI-ZEXE.</p>
+<h2 id="building-blocks">Building blocks</h2>
+<p>We mentioned that the ZEXE protocol uses zk-SNARKs, which allow us to provide proofs of integrity for given computations, which anyone can verify much faster than the naïve approach of re-execution. The highest cost of the system is related to the generation of the proof, which relies on elliptic curve operations. You can look at the basics of some SNARK systems in <a href="/the-hunting-of-the-zk-snark/">our previous post</a>.</p>
+<p>Modern proof systems have two main building blocks: a polynomial interactive oracle proof -PIOP- (which transforms a given computation into polynomial equations) and a polynomial commitment scheme -PCS-. We get different proving systems depending on our choices, each of which has advantages and disadvantages. Some examples of PIOPs are Marlin, PLONK (Permutations over Lagrange-bases for Oecumenical Noninteractive arguments of Knowledge) -and all its derivates- and Spartan. Among the PCS, we have KZG (Kate-Zarevucha-Goldberg), FRI (Fast Reed-Solomon Interactive Oracle Proofs of Proximity), Bulletproofs, and DARK (Diophantine ARgument of Knowledge), to name a few.</p>
+<p>To be able to perform proofs in a fast and efficient way, we need “SNARK-friendly” cryptographic primitives and operations. A function is “SNARK-friendly” if its representation as an arithmetic circuit is small. For example, intuitive and straightforward bitwise operations such as AND and XOR have a complex circuit representation. Therefore, the cost of functions in the context of SNARKs must consider the complexity of the arithmetic circuit used to represent the operation and its variables.</p>
+<p>A great deal of the cost in SNARK systems comes from:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Multiscalar multiplication ([MSM](/multiscalar-multiplication-strategies-and-challenges/)). These are operations of the form \\( Q= \sum_k a_k P_k \\), where \\( a_k \\) are numbers and \\( P_k \\) are points belonging to an elliptic curve.</span></span>
+<span class="giallo-l"><span>    * Elliptic curve pairings. These are used in the verification of some systems. They involve field extensions and operations between different groups of elliptic curves.</span></span>
+<span class="giallo-l"><span>    * Polynomial evaluations over non-native fields.</span></span>
+<span class="giallo-l"><span>    * Fiat-Shamir transform: a hash function is needed to generate the challenges. Many well-established cryptographic primitives have complicated representations as arithmetic circuits, which makes their evaluation costly.</span></span></code></pre>
+<p>Research efforts are attempting to solve all of these problems. GPUs or FPGA can <a rel="noopener external" target="_blank" href="https://www.zprize.io/prizes/accelerating-msm-operations-on-gpu-fpga">speed up the calculation of MSM</a>. New hash functions and encryption schemes with nicer arithmetic circuits can further reduce the complexity of frequently used cryptographic primitives (for example, <a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2019/458.pdf">Poseidon</a> and <a rel="noopener external" target="_blank" href="https://tosc.iacr.org/index.php/ToSC/article/view/8695/8287">Vision and Rescue</a>).</p>
+<h2 id="veri-zexe-s-choices">VERI-ZEXE’s choices</h2>
+<p>To tackle these problems, VERI-ZEXE changes the proving system and cryptographic primitives. Here are some of the main modifications:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * PLONK as PIOP. Over the last years, PLONK has seen several significant improvements, such as high-degree custom gates, the use of lookup tables, and the use of multilinear polynomials (which avoids using fast Fourier transform) (such as turboPLONK, ultraPLONK, and [hyperPLONK](https://eprint.iacr.org/2022/1355.pdf)).</span></span>
+<span class="giallo-l"><span>    * Lightweight verifier circuit via [accumulation scheme](https://eprint.iacr.org/2020/499.pdf). The protocol moves out the pairing check from the SNARK circuit and delays the verification to the ledger&#39;s validators.</span></span>
+<span class="giallo-l"><span>    * Instance merging. When performing transactions, birth and death predicates of records have to be checked. Instead of verifying each predicate separately, the protocol leverages that the predicates can be taken in birth/death pairs, resulting in a larger predicate. However, since the verification of the combined predicate has a simpler circuit representation (this means that the number of operations does not scale linearly), the overall cost is reduced.</span></span>
+<span class="giallo-l"><span>    * Proof batching. We can generate and verify proofs in batches by exploiting the properties of some PCS, such as KZG. These allow the opening of \\( N \\) different commitments simultaneously, with a cost that does not scale linearly in the number of commitments (that is, you can open \\( N \\) commitments for less than the cost of \\( N \\) separate openings).</span></span>
+<span class="giallo-l"><span>    * Variable base MSM via a lookup table. The MSM is carried out by combining Pippenger&#39;s algorithm (which splits the scalars into blocks) with a [lookup table](https://eprint.iacr.org/2020/315.pdf), reducing the cost of elliptic curve additions.</span></span>
+<span class="giallo-l"><span>    * Polynomial evaluation over non-native fields. The circuits of the prover and the verifier lie in different finite fields. One way to deal with this was using two pairs of elliptic curves. VERI-ZEXE uses modular addition and multiplication with range check with lookup, resulting in a slightly more complicated circuit.</span></span>
+<span class="giallo-l"><span>    * SNARK-friendly symmetric primitives. Using collision-resistant hash functions, pseudorandom generators, and commitment schemes with a smaller circuit representation (which reduces the number of operations), resulting in less memory and time use. For example, the Fiat-Shamir transformation uses the sponge construction of the Rescue permutation.</span></span></code></pre>
+<p>The use of PLONK and its additions, together with simpler constructions for cryptographic primitives, results in a reduction of more than one order of magnitude in the total number of constraints, which in turn decreases the scale of the MSM multiplications and overall proving time.</p>
+<h2 id="accumulation-schemes-as-and-incrementally-verifiable-computation-ivc">Accumulation schemes (AS) and Incrementally verifiable computation (IVC)</h2>
+<p>The verification of proofs requires the calculation of costly pairing operations. The original ZEXE protocol used incrementally verifiable computation to prove the satisfiability of user-defined predicates using SNARK recursion: given a computation at step \( N \), the prover would receive the state \( z_{N} \) and a proof \( \pi_{N-1} \) attesting to the correct execution of the previous step. The prover would then execute step \( N \) and generate a proof \( \pi_N \) which certifies that “the new state \( z^\prime \) is the result of the correct execution and that \( \pi_{N-1} \) is true (in other words, that the prover did the \( N-1 \) previous steps correctly)”. In this last step, the computational burden comes in: to check the proof, the verifier’s computation is embedded inside the prover’s circuit, which slows down the proof’s generation.</p>
+<p>An accumulation scheme proceeds differently by delaying the verification of the final proof to the ledger’s validators. At each step of the calculation, the prover receives the current state and an accumulator, which is partially verified (the prover checks that the accumulation results are correct but does not calculate the elliptic curve pairing operation). The group elements in the accumulator must be masked using a randomizer, which acts as an additional witness (secret input) for the accumulator’s verifier. This masking ensures that the accumulator does not leak information on the computations being carried out,</p>
+<h2 id="lookup-tables-and-efficient-modular-operations">Lookup tables and efficient modular operations</h2>
+<p>Using lookup tables for elliptic curve addition in the Pippenger algorithm and efficient operations for modular arithmetic reduces the number of PLONK constraints by a factor of 6.</p>
+<p>The idea behind lookup tables for MSM is as follows:<br />
+\[ Q= \sum_i a_i P_i \]<br />
+The Pippenger algorithm splits the scalars \( a_i \) into \( m \) windows of length \( c \) (For example, a scalar is a 256-bit number, and we choose a window of 8-bits). We can write each scalar as<br />
+\[ a_i= \sum_j a_{ij}2^{mj}\]<br />
+where each \( a_{ij} \) is in the range \( {0,1,…,2^c-1} \). We can compute, for each point \( P_i \) all possible combinations of scalars values \( 2P_i,3P_i,4P_i,…,(2^c-1)P_i\).</p>
+<p>We can now calculate the result \( Q_{ij}=a_{ij}P_i\) by looking at the table (which has a more straightforward description than pure elliptic curve operations) and get the results of the j-th bucket,<br />
+\[ B_j = \sum_i Q_{ij} \]<br />
+We can get the final result by finally adding over the \( m \) buckets,<br />
+\[ Q=\sum_j B_j 2^{cj}\]</p>
+<h2 id="further-improvements-from-hyperplonk">Further improvements from HyperPlonk?</h2>
+<p><img src="/images/external/xymqID7.jpg" alt="" /></p>
+<p>VERI-ZEXE uses PLONK with lookup tables, resulting in fewer constraints and shorter proving times. Two weeks ago, HyperPLONK came out, providing linear time prover and high-degree custom gates. One of the key changes is the shift from univariate polynomials (polynomials in one variable, \(x \), such as \(a_0+a_1x+a_2x2+…a_dxd \)) to multivariate linear polynomials (polynomials in several variables, where the degree of each \( x_k \) is at most one, such as \( a_0 +a_1x_1+a_2x_2+a_{12}x_1x_2+a_{145}x_1x_4x_5 \)). This change avoids using the fast Fourier transform (FFT) for very large systems (with over \(2^{20} \) constraints), which has a superlinear cost (roughly speaking, the FFT for \( n \) points needs \( n\log(n) \) operations). Preliminary studies have shown that this new PLONK version performs better for circuits with more than 16000 constraints compared to optimized versions of the original proposal. We will cover this topic in an upcoming post.</p>
+<h2 id="summary">Summary</h2>
+<p>ZK proofs are the key to many new applications, such as decentralized finances, governance, etc. The ZEXE protocol introduced the concept of decentralized private computation, allowing users to run private applications over public ledgers. The original proposal was based on non-universal proving systems, which have efficient performance but require a new trusted setup for each program we want to run. Since then, several significant improvements in proving systems (such as Marlin and PLONK) and new “SNARK-friendly” cryptographic primitives (such as symmetric ciphers and hash functions) have been introduced, resulting in increased performance and lower computational costs. These changes allow less powerful devices to act as provers and run more complex programs.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

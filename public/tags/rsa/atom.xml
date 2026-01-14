@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>LambdaClass Blog - RSA</title>
+    <subtitle>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://blog.lambdaclass.com/tags/rsa/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-08-26T00:00:00+00:00</updated>
+    <id>https://blog.lambdaclass.com/tags/rsa/atom.xml</id>
+    <entry xml:lang="en">
+        <title>How to create your own crappy RSA as a software developer</title>
+        <published>2022-08-26T00:00:00+00:00</published>
+        <updated>2022-08-26T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/how-to-create-your-own-crappy-rsa-as-a-software-developer/"/>
+        <id>https://blog.lambdaclass.com/posts/how-to-create-your-own-crappy-rsa-as-a-software-developer/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/how-to-create-your-own-crappy-rsa-as-a-software-developer/">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;&#x2F;h2&gt;
+&lt;p&gt;One of the key developments in cryptography was the introduction of public key (or asymmetric) cryptosystems. These rely on pairs of keys: one of them is the public key (known to everybody) and the other is the private key (known only to the specific user). The public key is used to encrypt messages (anybody can do this since it is public), while the private key is used to decrypt the messages. This contrasts with symmetric encryption, where there is one key that can perform both operations (and was the only method available before the 1970s). This meant that a secure channel was needed to exchange&#x2F;decide on the key, so that only certain priviledged parties were able to do cryptography. The real-time cryptography and the internet as we know it was enabled by public key cryptography. Depending on the method used, the keys could be numbers -for example, (RSA) or, in the case of elliptic curve cryptography (ECC), a number and a point of an elliptic curve. The algorithm of encryption and decryption is also publicly known, so the security of the whole system depends on never revealing the private key (this is known as &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Kerckhoffs%27s_principle&quot;&gt;Kerckhoff’s principle&lt;&#x2F;a&gt;). Asymmetric cryptography plays a fundamental role in many applications and protocols, offering confidentiality, authenticity, and non-repudiability of data and electronic communications. Internet standards, such as TLS, SSH, and PGP rely on this cryptographic primitive.&lt;&#x2F;p&gt;
+&lt;p&gt;RSA (named after Rivest, Shamir, and Adleman) is one of the first public key cryptosystems, the most widely used, and one of the simplest to understand and implement (1). We will discuss today how RSA works, how to implement its basic structure, and what are some of the pitfalls and weaknesses of this system (which have led to its losing ground against ECC).&lt;&#x2F;p&gt;
+&lt;p&gt;We will be using some math and cryptography concepts below; you may want to review our math &lt;a href=&quot;&#x2F;math-survival-kit-for-developers&#x2F;&quot;&gt;survival kit&lt;&#x2F;a&gt; first.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;how-rsa-works&quot;&gt;How RSA works&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;non-rigorous-mathematical-idea&quot;&gt;Non-rigorous mathematical idea&lt;&#x2F;h3&gt;
+&lt;p&gt;RSA relies on four key steps: key generation, key distribution, encryption, and decryption. Instead of describing each of them in sequence, we will give an overview of the whole process and then go into the details. The basic idea is the following: given a number $n$ (public), there are two numbers $e$ (public key, used for encryption) and $d$ (private key, used for decryption), which are multiplicative inverses (that is, $d\times e=1$, so $e=d^{-1}$). Given a message $M$, expressed as a number between $0$ and $n-1$, the encryption $E(M)$ is done by taking the $e$-th power of $M$,&lt;br &#x2F;&gt;
+$E(M)=M^e$&lt;br &#x2F;&gt;
+Decryption is done similarly by taking the $d$-th power of the encrypted message,&lt;br &#x2F;&gt;
+${E(M)}d=(M{e})d=M{d\times e}=M$&lt;br &#x2F;&gt;
+Of course, if you think in terms of high-school math, there are several problems, starting with the obvious fact that knowing $e$ allows you to calculate $d$ and that the encrypted message can grow into a very large number (and take a lot of space). This is where number theory and modular arithmetic come to our rescue.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;steps&quot;&gt;Steps&lt;&#x2F;h3&gt;
+&lt;p&gt;Let’s now look in more detail at each of the steps and how we can get something that is very difficult to crack unless you know the secret key.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. Key generation:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Pick large random prime numbers $p$ and $q$ and keep them secret (2).&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Calculate $n=p\times q$. $n$ is released as part of the public key parameters.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Compute the value of [Euler&amp;#39;s totient function](https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Euler%27s_totient_function) $\phi(n)=(p-1)\times (q-1)$ and keep it secret (3).&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Choose an integer $1&amp;lt;e&amp;lt;\phi(n)$ which is coprime to $\phi (n)$ (that is, their only common divisor is 1). $65537=2^{16}+1$ is a typical choice since it offers rather fast encryption and security. Another popular choice is $3$, but it is known that this leads to insecure encryption in many settings.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Calculate $d=e^{-1} \mod{\phi(n)}$, that is, $d$ is the multiplicative inverse of $e$ modulo $\phi(n)$ (4). This can be done via taking powers of $e$ or in a faster way using the [extended Euclidean algorithm](https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Extended_Euclidean_algorithm).&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. Key distribution: If two people Alice and Bob want to communicate, each sends the other their public parameters $(e_A,n_A)$ and $(e_B,n_B)$. Of course, an obvious question arises, how do Bob and Alice know that they got each other&amp;#39;s public parameters and not someone else&amp;#39;s (the infamous man-in-the-middle)?&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. Encryption:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Convert the message $P$ into an integer $1&amp;lt;m&amp;lt;n$ by using an agreed padding scheme.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * $E(m)$ is calculated $E(m)\equiv m^e \pmod{n}$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. Decryption:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Compute the message $m$ by doing ${E(m)}^d\equiv m \pmod{n}$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Reverse the first step of encryption to convert $m$ to $P$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h3 id=&quot;example-of-the-calculations&quot;&gt;Example of the calculations&lt;&#x2F;h3&gt;
+&lt;p&gt;Let’s pick a toy model to illustrate how the calculations are done (of course, no real model uses these simple numbers, because it is rather easy to break, even by brute force attempts).&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. We choose two random primes 17 and 19.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. $n=17\times 19=323$&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. We evaluate $\phi(323)=288$ or $\lambda(323)=144=lcm(16,18)$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. We pick $e=5$ (remember, a small $e$ is not a good choice). We cannot pick $3$ because $3$ is not coprime to $\phi(n)=288=2^5 \times 3^2$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    5. $d=5^{11}\equiv 29 \pmod{144}$. (We use Carmichael&amp;#39;s totient function since it is faster). Let&amp;#39;s check we did right: $5\times 29=145\equiv 1 \pmod{144}$, since $145=1\times 144+1$. An even faster alternative would be using the extended Euclidean algorithm.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    6. Our message is $11$. Therefore $E(11)=11^5\equiv 197\pmod{323}$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    7. We now attempt to decrypt $197^{29}\equiv 11 \pmod{323}$&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h3 id=&quot;the-math-behind-the-scenes&quot;&gt;The math behind the scenes&lt;&#x2F;h3&gt;
+&lt;p&gt;The trick works because we have two numbers $d$ and $e$, such that $d\times e \equiv 1 \pmod{\phi(n)}$. In other words, $d\times e=k\phi(n)+1$. If we perform encryption, followed by decryption, we get&lt;br &#x2F;&gt;
+${(me)}d=m^{e\times d}=m^{1+k\phi(n)}=m\times (m{\phi(n)})k \equiv m \pmod{n}$&lt;br &#x2F;&gt;
+The last step is a consequence of Euler’s theorem, since&lt;br &#x2F;&gt;
+$a^{\phi(n)}\equiv 1 \pmod{n}$, given $a$ and $n$ are coprime.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;security-issues&quot;&gt;Security issues&lt;&#x2F;h3&gt;
+&lt;p&gt;There are several issues with RSA, especially when it is not implemented properly. When generating random prime numbers, these must be truly random (therefore, always use a pseudorandom generator that works for cryptographic applications). Many attacks depend on getting to the factorization of the public parameter $n$. If we can find $p$ or $q$, then we get the other and we can calculate $\lambda (n)$ or $\phi(n)$, the multiplicative inverse of $e$, which is none other than the private key. For example, if $p$ and $q$ are very similar in length, we know $p \approx q \approx \sqrt{n}$ and Fermat’s factorization as two squares $n=a2-b2$ is possible. It is easy to see that $a2-b2=(a+b)\times (a-b)$ and so we have both numbers. If we know many different $n$, we can try breaking the factorization by finding the least common divisor. For example, say we know for two people $n_1$ and $n_2$ and that they share a common factor $p$. Then we have $p=gcd(n_1,n_2)$ and the gcd can be found extremely fast (in polynomial time) thanks to Euclid’s algorithm. This way, we break the security of both accounts.&lt;&#x2F;p&gt;
+&lt;p&gt;Other methods work even if the factorization is not known. In the case of low exponents $e$ (such as $3$), it may happen that $M^3$ does not exceed the modulus $n$ and so it may be easily broken by taking the cubic root. On the other hand, if the private key is small, you can use &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Wiener%27s_attack&quot;&gt;Wiener’s&lt;&#x2F;a&gt; or &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;eprint.iacr.org&#x2F;2020&#x2F;1214.pdf&quot;&gt;Boneh-Durfree’s attacks&lt;&#x2F;a&gt; and get the key. A collection of several strategies is on the following &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;RsaCtfTool&#x2F;RsaCtfTool&quot;&gt;link&lt;&#x2F;a&gt;. You can build your own factorization methods or try using open source tools such as &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.sagemath.org&#x2F;&quot;&gt;SageMath&lt;&#x2F;a&gt; to try and see how easy is to perform the factorization of a composite number.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;implementing-some-of-the-key-functions&quot;&gt;Implementing some of the key functions&lt;&#x2F;h2&gt;
+&lt;p&gt;To be able to perform operations with RSA, we need to implement first some of the arithmetic operations and define field elements. We will show how to implement some of these in Rust.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;use::std::ops::{Add, Sub, Mul, Div};&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pub struct FieldPoint {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    num: u128,&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    prime: u128,&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The first line imports the standard library (in particular, the operations of addition, subtraction, multiplication, and division) which will allow us to override these operators with the expressions we need to use in modular arithmetic.&lt;&#x2F;p&gt;
+&lt;p&gt;In the second line, we define a public structure named &lt;code&gt;FieldPoint&lt;&#x2F;code&gt;, which has two fields: &lt;code&gt;num&lt;&#x2F;code&gt; (a number in the range 0 to prime) and &lt;code&gt;prime&lt;&#x2F;code&gt; (this will give us the size and we will perform all operations modulo prime). For practical applications, we need to replace the unsigned integers &lt;code&gt;u128&lt;&#x2F;code&gt; with appropriate variables that allow us to store large integers.&lt;&#x2F;p&gt;
+&lt;p&gt;We can now instantiate some methods over &lt;code&gt;FieldPoint&lt;&#x2F;code&gt;, such as how to create one or how to multiply or divide field elements.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;impl FieldPoint {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    pub fn new(num: u128, prime: u128) -&amp;gt; FieldPoint {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        if num &amp;gt; prime {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            panic!(&amp;quot;Not a valid input for a field point, num should be nonnegative and less than prime, obtained {}&amp;quot;, num);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        } else {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            FieldPoint {num:num, prime:prime}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Methods are defined following the keyword &lt;code&gt;impl&lt;&#x2F;code&gt; and the name of the &lt;code&gt;struct&lt;&#x2F;code&gt;. We have a constructor for the &lt;code&gt;FieldPoint&lt;&#x2F;code&gt;, which takes two unsigned &lt;code&gt;u128&lt;&#x2F;code&gt; integers.&lt;&#x2F;p&gt;
+&lt;p&gt;To define addition, we can implement the trait &lt;code&gt;Add&lt;&#x2F;code&gt; for &lt;code&gt;FieldPoint&lt;&#x2F;code&gt; in this way&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;impl Add for FieldPoint {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    type Output = Self;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    fn add(self, other: Self) -&amp;gt; Self {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        if self.prime == other.prime {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            FieldPoint {num: (self.num + other.num).rem_euclid(self.prime), prime: self.prime}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        } else {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            panic!(&amp;quot;Cannot add these field points, different prime values {},{}&amp;quot;,self.prime,other.prime);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The addition is simply adding the &lt;code&gt;num&lt;&#x2F;code&gt; fields and if the result exceeds the modulus &lt;code&gt;prime&lt;&#x2F;code&gt;, we take the remainder of the Euclidean division between the sum and the modulus.&lt;&#x2F;p&gt;
+&lt;p&gt;Multiplication works in a similar way&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;impl Mul for FieldPoint {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    type Output = Self;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    fn mul(self, other: Self) -&amp;gt; Self {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        if self.prime == other.prime {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            FieldPoint {num: (self.num*other.num).rem_euclid(self.prime), prime: self.prime}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        } else {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            panic!(&amp;quot;Cannot multiply these field points, different prime values, {},{}&amp;quot;,self.prime,other.prime);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We need to define the powers of &lt;code&gt;FieldElement&lt;&#x2F;code&gt;. We can do this in a rather efficient way by squaring and taking the remainder:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pub fn power(&amp;amp;self,index: u128) -&amp;gt; Self {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        if index == 0 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            FieldPoint {num: 1u128, prime: self.prime}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        } else {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            let mut aux=index.rem_euclid(self.prime-1u128);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            let mut acc: u128 = 1;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            let mut base: u128 =self.num;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            while aux &amp;gt;0{&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                if aux%2 == 0 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                    base = (base*base).rem_euclid(self.prime);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                    aux=aux&#x2F;2u128;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                } else {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                    acc = (acc*base).rem_euclid(self.prime);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                    aux=aux-1u128; &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            FieldPoint {num: acc, prime: self.prime}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The power function takes a &lt;code&gt;FieldElement&lt;&#x2F;code&gt; and &lt;code&gt;index&lt;&#x2F;code&gt;, a &lt;code&gt;u128&lt;&#x2F;code&gt;. If the index is $0$, the result is trivial and we output a &lt;code&gt;FieldElement&lt;&#x2F;code&gt; with &lt;code&gt;num&lt;&#x2F;code&gt; equal to $1$. In any other case, we first reduce &lt;code&gt;index&lt;&#x2F;code&gt; (if &lt;code&gt;index&lt;&#x2F;code&gt; exceeds &lt;code&gt;prime&lt;&#x2F;code&gt;, we can take the remainder of &lt;code&gt;index&lt;&#x2F;code&gt; by &lt;code&gt;prime-1&lt;&#x2F;code&gt; -this works when the modulus is prime since Euler’s theorem says that $a^{p-1}\equiv 1 \pmod{p}$-. A better version would reduce &lt;code&gt;index&lt;&#x2F;code&gt; by $\phi(n)$) and store it in &lt;code&gt;aux&lt;&#x2F;code&gt;. We also define a variable to calculate the result &lt;code&gt;acc&lt;&#x2F;code&gt; and &lt;code&gt;base&lt;&#x2F;code&gt;, where we will repeatedly square and take the remainder of the &lt;code&gt;num&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;We now focus on the squaring and the updating of the result:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;while aux &amp;gt;0{&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    if aux%2 == 0 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        base = (base*base).rem_euclid(self.prime);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        aux=aux&#x2F;2u128;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    } else {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        acc = (acc*base).rem_euclid(self.prime);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        aux=aux-1u128; &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We will go decreasing the index stored in &lt;code&gt;aux&lt;&#x2F;code&gt;: if it is even (the first condition -this could be checked much faster, by inspecting the last bit of &lt;code&gt;aux&lt;&#x2F;code&gt;-), we divide &lt;code&gt;aux&lt;&#x2F;code&gt; by two and update &lt;code&gt;base&lt;&#x2F;code&gt; to the remainder of its square. If it is odd, then we proceed to update the result in &lt;code&gt;acc&lt;&#x2F;code&gt; and decrease &lt;code&gt;aux&lt;&#x2F;code&gt; by one (which means that in the next step it will be even).&lt;&#x2F;p&gt;
+&lt;p&gt;To convince ourselves, let’s take a short numerical example, while we follow the instructions. Let’s take &lt;code&gt;prime&lt;&#x2F;code&gt; as 11, &lt;code&gt;num&lt;&#x2F;code&gt; as 4, and &lt;code&gt;index&lt;&#x2F;code&gt; as 39.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. We set `aux` equal to the remainder of 39 and 10 (which is also $\phi(11)$). We get `aux=9`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. Since $9&amp;gt;0$, we go inside the while loop. $9$ is odd, so `acc=9` and `aux=8`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. `aux` is even, so `base=4*4=16`; we have to reduce the number by taking the remainder by $11$, so `base=5` and `aux=4`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. `aux` is even, so `base=5*5=25` and we get `base=3` and `aux=2`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    5. `aux` is once again even, `base=9` and `aux=1`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    6. `aux` is odd, we get `acc=9*4=36-&amp;gt;3` and `aux=0`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    7. Since `aux=0`, we jump outside the while loop and the function returns the `FieldPoint` (`num`=3,`prime`=11).&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Another function that we need is the greatest common divisor. A very simple form of the algorithm looks like this&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pub fn gcd(a: u128,b: u128) -&amp;gt; u128 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut r0: u128=b;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut r1: u128=a;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    if a&amp;gt;b {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        r0 = b;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        r1 = a;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    } &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut r2: u128 = 1;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    while r2 &amp;gt;0 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        r2=r1.rem_euclid(r0);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        r1=r0;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        r0=r2;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    r1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We take two numbers $a$ and $b$ and we output their greatest common divisor. If $a$ is smaller than $b$ we initialize the dividend as $b$ and the divisor as $a$ (this makes us chop the larger number by the smaller one); otherwise we invert the selection. Next, we begin by reducing $r_1$ by $r_0$ and we change the roles (since $r_2$ is smaller then $r_0$). A numerical example helps illustrate the points:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. Take a=12, b=8 (we can immediately see that the right answer is 4, but this helps us see how the algorithm finds it).&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. $r_0=8$, $r_1=12$, $r_2=1$ so we immediately enter the while loop.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. $r_2=4$ since the remainder of $12$ divided by $8$ is 4.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. $r_1=8$ and $r_0=4$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    5. Since $r_2$ is not zero, we keep it inside the loop.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    6. $r_2=0$ (since $8$ is divisible by $4$), $r_1=4$ and $r_0=0$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    7. Now $r_2=0$ so we exit the loop and the function outputs $gcd=4$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Carmichael’s totient function can be easily calculated with the help from the previous function:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pub fn lambda(p: u128,q: u128) -&amp;gt; u128 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let greatest_div: u128=gcd(p-1,q-1);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    (p-1)*(q-1)&#x2F;greatest_div&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Inverses can be easily calculated with help from the extended Euclidean algorithm:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pub fn inversion(a:i128,b:i128) -&amp;gt; i128 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut t=0i128;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut r=b;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut t1=1i128;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut r1=a;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    while r1 != 0i128 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        let q=r.div_euclid(r1);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        (t,t1)=(t1,t-q*t1);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        (r,r1)=(r1,r-q*r1);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    if r != 1i128 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        return 0i128;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    if t&amp;lt;0{&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        t=t+b;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    t&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Let’s see how it works for a simple case: $a=3$, $b=5$; the inverse of $3$ (modulo 5) is $2$. The algorithm begins:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. $t=0$, $t_1=1$, $r=5$, $r_1=3$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. Since $r_1=3 \neq 0$ we loop: $q=1$, $t=1$, $t_1=0-1\times 1=-1$, $r=3$, $r_1=2$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. $r_1 \neq 0$, $q=1$, $t=-1$, $t_1=1-1\times (-1)=2$, $r=2$, $r_1=1$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. $r_1 \neq 0$, $q=2$, $t=2$, $t_1=-1-2\times 2=-5$, $r=1$ and $r_1=0$.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    5. $r_1 = 0$, so the function outputs $t=2$, which is the correct answer.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We can test primality using the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Miller%E2%80%93Rabin_primality_test&quot;&gt;Miller-Rabin test&lt;&#x2F;a&gt;. Given an odd number $n$, we can write it as $n=2^r\times d +1$, for some $r&amp;gt; 0$ and $d$ an odd number. If $d$ is prime, then:&lt;br &#x2F;&gt;
+$a^d \equiv 1 \pmod{n}$&lt;br &#x2F;&gt;
+$a{2r \times d}\equiv -1 \pmod{n}$&lt;br &#x2F;&gt;
+If $n$ is prime, then it satisfies Fermat’s little theorem and the only square roots of $1$ are $-1$ and $1$. If any of these conditions is not fulfilled, $n$ is not prime (if it passes, it could be composite, depending on the choice of $a$, known as the witness). Checking several $a$ allows us to make sure that the test passed for a composite number. The decomposition is easy to do:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pub fn decompose(n: u128) -&amp;gt; (u128,u128) {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        let mut d: u128=n-1;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        let mut r: u128=0;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        while d%2 == 0 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            d &#x2F;= 2;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            r += 1;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        (d,r)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Since $n-1$ is even, we can take factors of $2$ repeatedly, until $d$ is no longer divisible by $2$. The condition can be checked faster by looking at the last bit of $n-1$.&lt;&#x2F;p&gt;
+&lt;p&gt;The core of the Miller-Rabin test is (it yields true if it is probably prime):&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;fn miller_rabin(a: u128, n: u128, d: u128, r: u128) -&amp;gt; bool {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        let n_minus_one: u128 = n - 1u128;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        let field=FieldPoint::new(a,n);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        let mut x = field.power(d);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        let mut count: u128 =1;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        if x.num == 1 || x.num == n_minus_one {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            return true;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        while count &amp;lt; r {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            x = x.power(2u128);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            if x.num == n_minus_one {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                return true;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            count += 1u128;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        false&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;If you have a composite number and try several witnesses, it is very likely it will fail at least one (and stop at the first one) and so we can discard the number.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;&#x2F;h2&gt;
+&lt;p&gt;We covered the basics of RSA and discussed its mathematical foundations. We also gave some of the attacks it may subjected to, especially when the implementation is not done properly. Finally, we gave some of the basic functions to build RSA (such as modular powers, calculating inverses and checking for primality via the Rabin-Miller test). Even if you could build your own RSA from scratch, it is not advisable, since it could be vulnerable to several attacks (unless it is very well implemented, of course).&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;notes&quot;&gt;Notes&lt;&#x2F;h2&gt;
+&lt;p&gt;(1) Even if you can code it very fast, there is no guarantee that your implementation is useful for real-life. There are several things to check and one should try to follow the standards. Besides, you should know cryptography and understand some of the underlying math).&lt;br &#x2F;&gt;
+(2) For security reasons, $p$ and $q$ should have different number of digits (unless you want your system to be vulnerable to &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Fermat%27s_factorization_method&quot;&gt;Fermat’s factorization&lt;&#x2F;a&gt;) and the selection should be truly random (careful with pseudorandom generators which are not meant for cryptographic applications, they are part of the recipe for disaster).&lt;br &#x2F;&gt;
+(3) If you want something better, compute &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Carmichael_function&quot;&gt;Carmichael’s totient function&lt;&#x2F;a&gt; $\lambda (n)=lcm(q-1,p-1)$, where $lcm$ stands for least common multiple of $q-1$ and $p-1$. Whenever $\phi$ shows up, you can replace it with $\lambda$.&lt;br &#x2F;&gt;
+(4) This is the same as saying that $d\times e-1$ is divisible by $\phi(n)$ or $d\times e=k\phi(n)+1$ for some integer $k$. &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Euler%27s_theorem&quot;&gt;Euler’s theorem&lt;&#x2F;a&gt; states that $a^{\phi(m)}\equiv 1 \pmod{m}$ if $a$ and $n$ are coprime.&lt;br &#x2F;&gt;
+If we take $m=\phi(n)$ and $a=e$ we see that $e\times e^{\phi(\phi(n))-1}\equiv 1 \pmod{\phi(n)}$, $d=e^{\phi(\phi(n))-1}$, which means that $d$ can be calculated by performing powers of $e$.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

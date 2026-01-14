@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to get a true headache: brute forcing NTRU - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">How to get a true headache: brute forcing NTRU</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-04-24">April 24, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>Lattice cryptography is a type of cryptographic scheme that relies on the hardness of certain computational problems related to lattices, which are geometric structures formed by repeating a pattern of points in space. Lattice-based cryptography is considered a promising candidate for post-quantum cryptography, as it is believed to be resistant to attacks by quantum computers.</p>
+<p>The NTRU (N-th degree Truncated polynomial Ring Units) cryptosystem is a lattice-based public-key cryptosystem that was introduced in 1996. It is based on the properties of a specific type of lattice called an ideal lattice, a particular type constructed from the ideals of a polynomial ring. The NTRU cryptosystem uses polynomials with small coefficients to generate public and private keys, which are then used for encryption and decryption. For more details, see our <a href="/i-want-to-break-free-from-lattice-based-cryptography-but-not-even-a-quantum-computer-can-help-me/">previous post</a>. In this post, we will explain how finding the private key is equivalent to finding short vectors on a lattice and give bounds on brute-force attacks.</p>
+<h2 id="the-public-and-private-keys-in-ntru">The public and private keys in NTRU</h2>
+<p>In our <a href="/i-want-to-break-free-from-lattice-based-cryptography-but-not-even-a-quantum-computer-can-help-me/">previous post</a>, we discussed the NTRU encryption scheme. We now head to show how its keys are related to a specific lattice; the encryption and decryption processes are irrelevant for this purpose; hence they can be left aside.</p>
+<p>Recall from our previous post the ring $R = \mathbb Z[X]$ and the ring $R_q = \mathbb Z_q[X]$. The private key in NTRU consists of two polynomials $f,g \in R$ whose coefficients are somehow <em>small</em> : they are allowed to be only equal to 0, 1, or -1. These are called <em>ternary</em> polynomials.</p>
+<p>The polynomial $f$ must have an inverse $F \in R_q$. For example, let $N = 5, q = 37$ and<br />
+$$<br />
+f = 1 + x - x^2 + x^4.<br />
+$$ Letting $F \in R$ be the polynomial given by<br />
+$$<br />
+F = 29x^4 + 35x^3 + 22x^2 + 12x + 32,<br />
+$$ let’s show that $F$ is the inverse of $f$ in $R_q$.</p>
+<p>Recall that the product in $R_q$ is explained in our previous post: we multiply as usual, replacing the appearance of $x^N$. Then in our example, we have that<br />
+$$<br />
+\begin{align*}<br />
+fF &amp; = 29x^8 + 35x^7 + 30x^6 + 6x^5 + 8x^3 + 2x^2 + 7x + 32 \newline<br />
+&amp; = (29+8)x^3 + (35+2)x^2 + (30+7) x + (6+32) \newline<br />
+&amp; = 1.<br />
+\end{align*}<br />
+$$ This example shows that the inverse of $f$ can have arbitrarily large coefficients, even though $f$ is small.</p>
+<p>The public key is the polynomial $h \in R_q$ given by $h = Fg$. In our example, if we let<br />
+$$<br />
+g = x - x^3 - x^4<br />
+$$ We have that<br />
+$$<br />
+h = 28x^4 + 35x^3 + 22x^2 + 12x + 32.<br />
+$$ We see that though $h$ is constructed from ternary polynomials, it is far from being ternary.</p>
+<h2 id="the-convolution-ring-revisited">The convolution ring revisited</h2>
+<p>By replacing every appereance of $x^N$ with 1, we can write every polynomial $h \in R$ as $h = h_0+\cdots+h_{N-1}x^{N-1}$. Moreover, we will identify the polynomial $h$ with the vector $\mathbf h = (h_0,\dots,h_{N-1})$.</p>
+<p>In these terms, the multiplication in $R$ can be stated in matrix form. More precisely, let $M_\mathbf{h} \in \mathbb Z^{N\times N}$ be the matrix given by.<br />
+$$<br />
+M_h = \left(\begin{array}{cccc}h_0 &amp; h_1 &amp; \cdots &amp; h_{N-1} \newline h_{N-1} &amp; h_0 &amp; \cdots &amp; h_{N-2} \newline \vdots &amp; \vdots &amp; \ddots &amp; \vdots \newline h_1 &amp; h_2 &amp; \cdots &amp; h_0\end{array}\right).<br />
+$$<br />
+Then, given a polynomial $f \in R$ and letting $g = fh$, it is not hard to see that we have the equality of vectors<br />
+$$\mathbf{g} = \mathbf{f} \cdot M_{\mathbf h}.$$ Regarding the example above, the reader can verify that modulo 37, we have that</p>
+<p>$$<br />
+(0, 1, 0, -1, -1) =<br />
+(1, 1, -1, 0, 1)\cdot \left(\begin{array}{rrrrr}<br />
+32 &amp; 12 &amp; 22 &amp; 35 &amp; 28 \newline<br />
+28 &amp; 32 &amp; 12 &amp; 22 &amp; 35 \newline<br />
+35 &amp; 28 &amp; 32 &amp; 12 &amp; 22 \newline<br />
+22 &amp; 35 &amp; 28 &amp; 32 &amp; 12 \newline<br />
+12 &amp; 22 &amp; 35 &amp; 28 &amp; 32<br />
+\end{array}\right).$$</p>
+<h2 id="the-ntru-lattice">The NTRU lattice</h2>
+<p>The natural attack involves looking for ternary polynomials $f,g \in R$ such that $fh = g \in R_q$. Equivalently, such that there exists $k \in R$ such that<br />
+$$ fh = g + qk \quad \in R.$$</p>
+<p>To use the matrix formulation from above, we introduce the block matrix $M_{\mathbf h,q}$ given by<br />
+$$<br />
+M_{\mathbf h,q} = \left(\begin{array}{cc}I_N &amp; M_{\mathbf h} \newline 0 &amp; qI_N \end{array}\right).<br />
+$$ Note that it has a nonzero determinant. This means that its rows form a basis of $\mathbb R ^{2N}$. In particular, they span a (public) lattice, which we will denote by $L_{h,q}$.</p>
+<p>Considering block multiplication, we see that the equality above is rewritten as<br />
+$$ (\mathbf f,-\mathbf k) \cdot M_{\mathbf h,q} = (\mathbf f,\mathbf g).$$ From here on, we can leave polynomials aside.</p>
+<p>Note that the vector on the left-hand side is obtained by linearly combining the rows from $M_{\mathbf h,q}$ with the coefficients of $(\mathbf f,- \mathbf k)$, which are integers. In other words, this is a vector in the lattice $L_{h,q}$.</p>
+<p>The vector on the right-hand side, being $f$ and $g$ ternary, is a small (or <em>short</em>) vector. Thus, breaking NTRU is equivalent to finding short vectors in the lattice $L_{h,q}$ given by the public key.</p>
+<h2 id="finding-short-vectors-the-rough-way">Finding short vectors, the rough way</h2>
+<h3 id="lattices-recalling-the-basics">Lattices: recalling the basics</h3>
+<p>Recall that given a basis $v_1 , \dots , v_n$ of $\mathbb R^n$, the lattice $L$ defined by this basis is<br />
+$$ L = \{ \sum_{ i = 1 }^n k_i v_i : k_i \in \mathbb Z \}.$$</p>
+<p>It is easy to see that if we apply to the given basis a base change given by a matrix with integral coefficients and determinant 1 or -1 (a <em>unimodular</em> matrix), we obtain a different basis for $L$. Moreover, every other basis for $L$ is obtained in this way.</p>
+<p>For example, the lattice in the plane defined by the canonical basis $e_1 = (1,0), e_2 = (0,1)$ can also be defined by the basis<br />
+$$ v = (-7226, 23423),\quad w = (379835, -1231231). $$ In fact,$$-1231231 v - 379835 w = e_1, \quad -23432 v - 7226 w = e_2,$$ which shows that $e_1$ and $e_2$ (and hence every integral combination of them) can be written as an integral combination of $v$ and $w$.</p>
+<p>As we see, the same lattice can have more and less complicated bases.</p>
+<h3 id="the-volume">The volume</h3>
+<p>The most important invariant of a lattice $L$ is its <em>volume</em> , which is the size of the parallelepiped $\mathcal F$ generated by a basis $\mathcal B$ of $L$.</p>
+<p><img src="/images/external/srRCpaD.png" alt="" /></p>
+<p>It can be computed as $$vol (L) = |\det(C)|$$ where $C$ is the matrix having the vectors in $\mathcal B$ as columns (the reader interested in understanding why this computes the volume should consider the case $n = 2$). This number is independent of the chosen basis (i.e., an <em>invariant</em> of $L$) since changing $\mathcal B$ resorts to multiply $C$ by a unimodular matrix.</p>
+<p>The volume is essential for our cryptographic interests since it gives a bound for the size of the shortest vector.</p>
+<h3 id="short-vectors-brute-force">Short vectors: brute force</h3>
+<p>Every lattice $L$ contains the zero vector, which is naturally discarded when discussing short vectors. More precisely, a _shortest vector in $L$ is a nonzero vector $v \in L$ such that $\Vert v\Vert$ is minimum. Such a vector exists, though it is not unique: for example, because $\Vert v\Vert = \Vert- v\Vert$.</p>
+<p>From a XIX century result due to Hermite, we know that</p>
+<blockquote>
+<p>The lattice $L$ contains a shortest vector $v$ such that $|v_i| \leq vol(L)^{1/n}$ for every $1 \leq i \leq n$.</p>
+</blockquote>
+<p>This gives us a box $B$ where we can, by brute force, perform a search for shortest vectors.</p>
+<p>How expensive would this be? Roughly, $ L \cap B$ should be the number of times $\mathcal F$ fits in $B$. Hence from the result of Hermite, we get that<br />
+$$ L \cap B \sim vol(B) / vol(L) = ( 2 vol(L)^{ 1/n } )^n / vol(L) = 2^n,$$ which shows that brute force is impractical for large $n$, independently of $L$. This continues to hold for the slight improvements available for Hermite’s result.</p>
+<h2 id="summary">Summary</h2>
+<p>In this post, we described how to transform the problem of finding the key in NTRU involving polynomials into a matrix problem. We explained the lattice behind the NTRU public key and how finding the private key can be reduced to finding short vectors in that lattice. We also provided some bounds on how hard it is to find short vectors, in general, using brute force attacks, showing that it is impractical for sufficiently large values of $n$, that is, polynomials of very large degrees. In upcoming posts, we will cover the fundamentals of other lattice schemes, such as CRYSTALS Kyber, and those related to fully homomorphic encryption, as well as more efficient lattice reduction techniques.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

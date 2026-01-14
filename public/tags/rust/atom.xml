@@ -1,0 +1,863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>LambdaClass Blog - Rust</title>
+    <subtitle>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://blog.lambdaclass.com/tags/rust/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2023-02-03T00:00:00+00:00</updated>
+    <id>https://blog.lambdaclass.com/tags/rust/atom.xml</id>
+    <entry xml:lang="en">
+        <title>What is property-based testing?  Two examples in Rust</title>
+        <published>2023-02-03T00:00:00+00:00</published>
+        <updated>2023-02-03T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/what-is-property-based-testing/"/>
+        <id>https://blog.lambdaclass.com/posts/what-is-property-based-testing/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/what-is-property-based-testing/">&lt;p&gt;This article will explore property-based tests and demonstrate their use in two of our open-source projects.&lt;br &#x2F;&gt;
+First, let’s explain what a property-based test (PBT) is: If a picture is worth a thousand words, a PBT is worth a thousand unit tests (although this is tunable, as we will see later).&lt;br &#x2F;&gt;
+It was born in the functional programming community and is very different from conventional methods. It’s a great tool to consider when testing the correctness of our programs.&lt;&#x2F;p&gt;
+&lt;p&gt;As its name suggests, it is based on testing the properties of our code. In other words, invariants or behavior that we expect to be consistent across inputs. When we write a unit test, we test a function&#x2F;method for a specific set of parameters. So, we usually test with a representative (but small) number of inputs where we think the code may hide bugs. In contrast, a property-based test generates many random inputs and checks that the property is met for all of them. If it finds an unsatisfied value, it proceeds with a shrinking process to find the smallest input that breaks the property. That way, it is easier to reproduce the issue.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;a-first-example&quot;&gt;A First Example&lt;&#x2F;h2&gt;
+&lt;p&gt;Enough talk; let us use a simple example to show how it works in practice. We’ll work with Rust to illustrate the benefits of this way of testing.&lt;&#x2F;p&gt;
+&lt;p&gt;There are several libraries for doing property-based tests in Rust, but we chose &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;proptest-rs&#x2F;proptest&quot;&gt;proptest&lt;&#x2F;a&gt; because it’s straightforward to use and is being actively maintained.&lt;&#x2F;p&gt;
+&lt;p&gt;In this example, we create a test for a function that adds two positive numbers. The test checks a property of positive number addition: the result is greater than each of the individual parts. We use the &lt;code&gt;prop_assert!&lt;&#x2F;code&gt; macro to verify that the property holds.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;use proptest::prelude::*;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;fn add(a: i32, b: i32) -&amp;gt; i32 {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;	a + b&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}  &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;proptest! {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;	&#x2F;&#x2F; Generate 1000 tests.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;	#![proptest_config(ProptestConfig::with_cases(1000))]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;	#[test]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;	fn test_add(a in 0..1000i32, b in 0..1000i32) {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;		let sum = add(a, b);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;		prop_assert!(sum &amp;gt;= a);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;		prop_assert!(sum &amp;gt;= b);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;		prop_assert_eq!(a + b, sum);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;	}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Let us see what happens if we change the first property to an incorrect one:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;&#x2F;&#x2F; prop_assert!(sum &amp;gt;= a); previous line&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;prop_assert!(sum &amp;lt;= a)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We will receive a report with the smallest instance that breaks the property.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;---- test_add stdout ----&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;thread &amp;#39;test_add&amp;#39; panicked at &amp;#39;Test failed: assertion failed: sum &amp;lt;= a at src&#x2F;lib.rs:13; minimal failing input: a = 0, b = 1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        successes: 0&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        local rejects: 0&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        global rejects: 0&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;&amp;#39;, src&#x2F;lib.rs:7:1&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;To build tests for more complex structures, we can use regular expressions (if we have a way of building our data type from a string) or use &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;docs.rs&#x2F;proptest&#x2F;latest&#x2F;proptest&#x2F;strategy&#x2F;trait.Strategy.html&quot;&gt;Strategies&lt;&#x2F;a&gt;, which are used to control how values are generated and how the shrinking process is done.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;case-studies&quot;&gt;Case studies&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;case-study-1-cairo-rs&quot;&gt;Case study 1: cairo-rs&lt;&#x2F;h3&gt;
+&lt;p&gt;Let’s start with a more practical example. At LambdaClass, we developed a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;cairo-rs&quot;&gt;Rust implementation of the Cairo virtual machine&lt;&#x2F;a&gt;. Cairo stands for CPU Algebraic Intermediate Representation. It’s a programming language for writing provable programs, where one party can prove to another that a computation was executed correctly by producing a zero-knowledge proof.&lt;&#x2F;p&gt;
+&lt;p&gt;Executing a program made in Cairo involves operating with a lot of field elements (i.e., numbers between 0 and a huge prime number). So every operation (addition, subtraction, multiplication, and division) needs to evaluate to a felt (field element) in the range [0; PRIME -1].&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;proptest! {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  #[test]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Property-based test that ensures, for 100 felt values that are randomly generated each time tests are run, that a new felt doesn&amp;#39;t fall outside the range  [0, PRIME-1].&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; In this and some of the following tests, The value of {x} can be either [0]  or a huge number to try to overflow the value of {p} and thus ensure the modular arithmetic is working correctly.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  fn new_in_range(ref x in &amp;quot;(0|[1-9][0-9]*)&amp;quot;) {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let x = &amp;amp;Felt::parse_bytes(x.as_bytes(), 10).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let p = &amp;amp;BigUint::parse_bytes(PRIME_STR[2..].as_bytes(), 16).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    prop_assert!(&amp;amp;x.to_biguint() &amp;lt; p);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  #[test]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Property-based test that ensures, for 100 felt values that are randomly generated each time tests are run, that the negative of a felt doesn&amp;#39;t fall outside the range [0, PRIME-1].&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  fn neg_in_range(ref x in &amp;quot;(0|[1-9][0-9]*)&amp;quot;) {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let x = &amp;amp;Felt::parse_bytes(x.as_bytes(), 10).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let neg = -x;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let as_uint = &amp;amp;neg.to_biguint();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let p = &amp;amp;BigUint::parse_bytes(PRIME_STR[2..].as_bytes(), 16).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    prop_assert!(as_uint &amp;lt; p);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  #[test]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Property-based test that ensures, for 100 {x} and {y} values that are randomly generated each time tests are run, that multiplication between two felts {x} and {y} and doesn&amp;#39;t fall outside the range [0, PRIME-1]. The values of {x} and {y} can be either [0] or a very large number.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  fn mul_in_range(ref x in &amp;quot;(0|[1-9][0-9]*)&amp;quot;, ref y in &amp;quot;(0|[1-9][0-9]*)&amp;quot;) {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let x = &amp;amp;Felt::parse_bytes(x.as_bytes(), 10).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let y = &amp;amp;Felt::parse_bytes(y.as_bytes(), 10).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let p = &amp;amp;BigUint::parse_bytes(PRIME_STR[2..].as_bytes(), 16).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let prod = x * y;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let as_uint = &amp;amp;prod.to_biguint();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    prop_assert!(as_uint &amp;lt; p, &amp;quot;{}&amp;quot;, as_uint);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We already found two hard-to-find bugs by using a suite of property-based tests for each arithmetical operation. Also, it helped us easily change our field elements’ internal implementation to a more performant one and be confident that we didn’t break anything.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;case-study-2-patricia-merkle-tree&quot;&gt;Case study 2: Patricia Merkle Tree&lt;&#x2F;h3&gt;
+&lt;p&gt;At LambdaClass, we are also developing a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;merkle_patricia_tree&quot;&gt;Merkle Patricia tree library&lt;&#x2F;a&gt; (like those used in Ethereum and many other cryptography-related projects). To test the correctness of the implementation, we decided to make property-based tests by comparing the results of our library’s operations against the results of a reference implementation, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;citahub&#x2F;cita-trie&quot;&gt;cita-trie&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;For testing, let’s generate some inputs for creating two trees: one using the reference implementation and one using our library.&lt;br &#x2F;&gt;
+This time the property that we want to test is that for every generated tree from our library, its root hash matches the root hash of the reference implementation.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;fn proptest_compare_root_hashes(path in vec(any::&amp;lt;u8&amp;gt;(), 1..32), value in vec(any::&amp;lt;u8&amp;gt;(), 1..100)) {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  use cita_trie::MemoryDB;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  use cita_trie::{PatriciaTrie, Trie};&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  use hasher::HasherKeccak;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Prepare the data for inserting it into the tree&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  let data: Vec&amp;lt;(Vec&amp;lt;u8&amp;gt;, Vec&amp;lt;u8&amp;gt;)&amp;gt; = vec![(path, value)];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Creates an empty patricia Merkle tree using our library and &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Keccak256 as the hashing algorithm.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  let mut tree = PatriciaMerkleTree::&amp;lt;_, _, Keccak256&amp;gt;::new();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; insert the data into the tree.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  for (key, val) in data.clone().into_iter() {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    tree.insert(key, val);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; computes the root hash using our library&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  let root_hash = tree.compute_hash().as_slice().to_vec();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Creates a cita-trie implementation of the&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Patricia Merkle tree.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  let memdb = Arc::new(MemoryDB::new(true));&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  let hasher = Arc::new(HasherKeccak::new());&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  let mut trie = PatriciaTrie::new(Arc::clone(&amp;amp;memdb), Arc::clone(&amp;amp;hasher));&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Insert the data into the cita-trie tree.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  for (key, value) in data {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    trie.insert(key.to_vec(), value.to_vec()).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  &#x2F;&#x2F; Calculates the cita-tree&amp;#39;s root hash.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  let reference_root = trie.root().unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  prop_assert_eq!(&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    reference_root,&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    root_hash&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  );&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Using this technique, we can ensure that our implementation behaves the same way as the reference one.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;closing-words&quot;&gt;Closing words&lt;&#x2F;h2&gt;
+&lt;p&gt;In conclusion, property-based testing is a powerful and effective way to test the correctness of our programs. Testing properties helps find bugs and ensure that our program meets invariants across a wide range of inputs. In this article, we demonstrated property-based testing in two open-source projects. We hope you consider it in your testing practices.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;related-resources&quot;&gt;Related Resources&lt;&#x2F;h2&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    1. QuickCheck original paper &amp;lt;https:&#x2F;&#x2F;www.cs.tufts.edu&#x2F;~nr&#x2F;cs257&#x2F;archive&#x2F;john-hughes&#x2F;quick.pdf&amp;gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    2. _Property-Based Testing with PropEr, Erlang, and Elixir_ by Fred Hebert &amp;lt;https:&#x2F;&#x2F;propertesting.com&#x2F;&amp;gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    3. Rust port of QuickCheck &amp;lt;https:&#x2F;&#x2F;github.com&#x2F;BurntSushi&#x2F;quickcheck&amp;gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    4. proptest book &amp;lt;https:&#x2F;&#x2F;altsysrq.github.io&#x2F;proptest-book&#x2F;intro.html&amp;gt;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Secure computation in Rust: Using Intel&#x27;s SGX instructions with Teaclave and Fortanix</title>
+        <published>2022-05-05T00:00:00+00:00</published>
+        <updated>2022-05-05T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/secure-computation-in-rust-using-intels-sgx-instructions-with-teaclave-and-fortanix/"/>
+        <id>https://blog.lambdaclass.com/posts/secure-computation-in-rust-using-intels-sgx-instructions-with-teaclave-and-fortanix/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/secure-computation-in-rust-using-intels-sgx-instructions-with-teaclave-and-fortanix/">&lt;p&gt;If you have been following this blog you should already know that I am a distributed system and Rust zealot.&lt;br &#x2F;&gt;
+I started playing with Rust 2014 since it was implemented in OCaml, a language I love, and because it had green threads similar to the ones of Erlang. At the end of 2014, start of 2015 Rust’s runtime system and green-threading model was removed. I continued using Rust because of its great community and its C + ML roots. In addition to this it is a great complement to Erlang since it is has almost opposite semantics, specially in its error handling philosophy.&lt;&#x2F;p&gt;
+&lt;p&gt;At the end of 2017 I started working on the crypto space, mostly because I needed the money. I’ve not been very public about it since I was skeptical of the whole movement. Even if I liked working on the technical problems that appeared on the space I thought that most crypto projects were ponzi-scheme or completely useless for users.&lt;&#x2F;p&gt;
+&lt;p&gt;In these years I’ve met great engineers and technologies that made me believe more in the movement. That is one of the reasons why we started working on the zero knowledge proof space. One of this projects we are working with requires high standards of data security and privacy. For this we need to abstract ourselves from potential OS security vulnerabilities hosted in third party servers.&lt;br &#x2F;&gt;
+The following blog post follows our journey discovering Intel SGX and it’s integration in the development of Rust applications.&lt;&#x2F;p&gt;
+&lt;p&gt;As you can already guess this is a project full of challenges, from performance ones to potential security issues. So we would like to abstract ourselves from potential OS security vulnerabilities that the host devices might have, more so when you deploy your application in the cloud. So we’ve been tasked with deploying essential parts of the project in a specific Trusted Execution Environments (or TEEs for short), Intel’s SGX.&lt;&#x2F;p&gt;
+&lt;p&gt;The following blog post follows our journey discovering Intel SGX and its integration in the development of Rust applications.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;em&gt;Subscribe to our&lt;&#x2F;em&gt;&lt;a href=&quot;&#x2F;#&#x2F;portal&#x2F;signup&quot;&gt; &lt;em&gt;newsletter&lt;&#x2F;em&gt;&lt;&#x2F;a&gt; &lt;em&gt;to receive news and updates from Not a Monad Tutorial delivered directly to your inbox.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;&#x2F;h2&gt;
+&lt;p&gt;Imagine you are building a piece of software which handles sensitive information. And that you decided to deploy your application in the cloud.&lt;&#x2F;p&gt;
+&lt;p&gt;Since our project handles private keys used to access transactions and e-wallets, we need to ensure enhanced confidentiality and integrity, even in the presence of privileged malware at the OS, BIOS, VMM, or SMM layers.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;tees&quot;&gt;TEEs&lt;&#x2F;h3&gt;
+&lt;p&gt;TEEs can be thought of as processes that are running “isolated” from the OS and upper layers in a secure part of the CPU. The idea of this is to help to significantly reduce the attack surface. TEEs aim to ensure a subset of data integrity, code integrity and data privacy, which fits our sensitive data manipulation needs. Each CPU vendor has their own implementation, some of which are:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Intel SGX&lt;&#x2F;li&gt;
+&lt;li&gt;ARM TrustZone&lt;&#x2F;li&gt;
+&lt;li&gt;AMD Secure Encrypted Virtualization&lt;&#x2F;li&gt;
+&lt;li&gt;ZAYA TEE for RiscV&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;From now on we’ll be focusing on Intel SGX.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;intel-sgx&quot;&gt;Intel SGX&lt;&#x2F;h3&gt;
+&lt;p&gt;SGX is an Intel ISA extension with TEEs support. The environments are called &lt;strong&gt;enclaves&lt;&#x2F;strong&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Some important aspects:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;It’s not possible to read nor write the enclave’s memory space from outside the enclave&lt;&#x2F;strong&gt; , regardless of the privilege level and CPU mode.&lt;&#x2F;li&gt;
+&lt;li&gt;In production, it’s not possible to debug enclaves by software nor hardware.&lt;&#x2F;li&gt;
+&lt;li&gt;Entering the enclave via function calls, jumps or stack&#x2F;register manipulation is not possible. To do so you have to use a specific CPU instruction which also does some safety checks ([E]call, [O]call).&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Enclave’s memory is encrypted&lt;&#x2F;strong&gt; , and the key used changes on every power cycle. It’s stored within the CPU and is not accessible.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;Lb332Bp.png&quot; alt=&quot;&quot; &#x2F;&gt;Source: Microsoft Azure Confidential Computing &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;docs.microsoft.com&#x2F;en-us&#x2F;azure&#x2F;confidential-computing&#x2F;confidential-computing-enclaves&quot;&gt;Documentation&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Warning&lt;&#x2F;strong&gt; : if you are considering developing an SGX application, we’d highly suggest &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;ayeks&#x2F;SGX-hardware#desktop-cpus-affected-by-the-product-change-notification-from-2015&quot;&gt;checking your CPU&lt;&#x2F;a&gt; and whether it has SGX support. Intel’s C++ SDK has some simulation capabilities (as we’ll see later), but those aren’t fully fleshed out. We managed to run in a Macbook Pro some sample projects using Teclave’s simulation mode… but at what cost? So, only if you like stepping on Legos for fun try running SGX in your M1.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;hqeSchG.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;sgx-rust-development&quot;&gt;SGX Rust Development&lt;&#x2F;h2&gt;
+&lt;p&gt;The Intel SGX’s SDK is implemented on C++, so usually you’ll implement your application using C&#x2F;C++ and their &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.intel.com&#x2F;content&#x2F;www&#x2F;us&#x2F;en&#x2F;developer&#x2F;tools&#x2F;software-guard-extensions&#x2F;get-started.html&quot;&gt;toolkit&lt;&#x2F;a&gt;.&lt;br &#x2F;&gt;
+As a starting point Intel gives a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;intel&#x2F;linux-sgx&#x2F;tree&#x2F;master&#x2F;SampleCode&quot;&gt;couple of code examples&lt;&#x2F;a&gt; for different implementations.&lt;br &#x2F;&gt;
+But, are there any developers worth their salt that want to develop a solid blockchain project in those languages when you’ve got the hip and cool option that is Rust? (in fact, yes) &lt;em&gt;We don’t look forward to that.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;Whhj2XE.png&quot; alt=&quot;&quot; &#x2F;&gt; Recreation of what the Rust SDK developers may have thought&lt;&#x2F;p&gt;
+&lt;p&gt;Since our source code is already written in Rust we looked for crates that allow us an easy and seamless integration of our code with the SGX enclaves.&lt;br &#x2F;&gt;
+We found 2 alternatives for this, which use different approaches. Both are open source:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Teaclave SGX SDK&lt;&#x2F;li&gt;
+&lt;li&gt;Fortanix Enclave Development Platform&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;teaclave&quot;&gt;Teaclave&lt;&#x2F;h2&gt;
+&lt;p&gt;It wraps the Intel SGX’s SDK. You can check their &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;incubator-teaclave-sgx-sdk&quot;&gt;GitHub repo&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;Bd8I1r5.png&quot; alt=&quot;&quot; &#x2F;&gt;Source: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.trentonsystems.com&#x2F;blog&#x2F;what-is-intel-sgx&quot;&gt;https:&#x2F;&#x2F;www.trentonsystems.com&#x2F;blog&#x2F;what-is-intel-sgx&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;With Teaclave SDK you will split your application into two:&lt;br &#x2F;&gt;
+- Trusted, also called the &lt;em&gt;enclave&lt;&#x2F;em&gt;.&lt;br &#x2F;&gt;
+- Untrusted, called the &lt;em&gt;app&lt;&#x2F;em&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Remember, under the hood you’re still using Intel SDK library.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;ixchGF6.png&quot; alt=&quot;&quot; &#x2F;&gt;Source: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.infoq.com&#x2F;presentations&#x2F;intel-sgx-enclave&#x2F;&quot;&gt;https:&#x2F;&#x2F;www.infoq.com&#x2F;presentations&#x2F;intel-sgx-enclave&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The Untrusted code is in charge of initializing and shutting down the enclave, and you have to define an interface for the app and the enclave to communicate with each other. During compilation, those interfaces get transformed into [E]calls and [O]calls. In the end you would end up with something like this:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;rzWrjSw.png&quot; alt=&quot;&quot; &#x2F;&gt;Source: Slide from Yu Ding’s &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.infoq.com&#x2F;presentations&#x2F;intel-sgx-enclave&#x2F;&quot;&gt;talk&lt;&#x2F;a&gt; at infoq about Intel SGX enclaves on Rust&lt;&#x2F;p&gt;
+&lt;p&gt;But as the saying goes, not everything that shines is gold. The enclave will run under &lt;code&gt;#[no_std]&lt;&#x2F;code&gt;, so keep in mind that your favorite crates might not be supported. However, the maintainers have been porting and developing a bunch of useful crates to work with and of course you can also port the ones you want as well. Among them there’s the &lt;code&gt;libc&lt;&#x2F;code&gt;, the &lt;code&gt;std&lt;&#x2F;code&gt; (or part of it), synchronization primitives (e.g. &lt;code&gt;SgxMutex&lt;&#x2F;code&gt;, &lt;code&gt;SgxRWLock&lt;&#x2F;code&gt;) and more. However, there is not support for async Rust yet.&lt;&#x2F;p&gt;
+&lt;p&gt;The repo is populated with some sample projects, which are great to start learning how to structure the project works and some conventions you need to follow and it’s also where you can take some as templates for your own application.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;simulation-mode&quot;&gt;Simulation Mode&lt;&#x2F;h3&gt;
+&lt;p&gt;Since under the hood it uses Intel’s SDK, you still need to meet the necessary requirements. However, Intel also has simulation libraries (although those don’t have all the features implemented) which might come in handy to test your enclave locally despite not having an Intel processor.&lt;br &#x2F;&gt;
+You also have available a docker image and you can check the details on how to run it &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;incubator-teaclave-sgx-sdk#running-without-intel-sgx-drivers&quot;&gt;here&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;fortanix-edp&quot;&gt;Fortanix EDP&lt;&#x2F;h2&gt;
+&lt;p&gt;Fortanix EDP is developed by a company named &lt;em&gt;Fortanix&lt;&#x2F;em&gt;. From their website we read:&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Fortanix secures sensitive data across public, hybrid, multicloud and private cloud environments, enabling customers to operate even the most sensitive applications in any environment.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;They came up with a different solution to running Rust code on Intel enclaves.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;M5pt0Zd.png&quot; alt=&quot;&quot; &#x2F;&gt;Source: Fortanix EDP &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;edp.fortanix.com&#x2F;docs&#x2F;concepts&#x2F;architecture&#x2F;&quot;&gt;architecture documentation&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;First, instead of building an &lt;em&gt;app&lt;&#x2F;em&gt; and an &lt;em&gt;enclave&lt;&#x2F;em&gt; Fortanix EDP helps you build only the enclave and the way of communicating between the app and the enclave is up to you.&lt;&#x2F;p&gt;
+&lt;p&gt;The enclave runner is responsible for initializing and shutting down enclaves and handling via a usercall interface the enclave’s needs.&lt;&#x2F;p&gt;
+&lt;p&gt;Since it avoids this interfacing between app and enclave, it greatly reduces a lot of bureaucracy regarding project structure and setup. This was one of the benefits considered when &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;tvm&#x2F;issues&#x2F;2887&quot;&gt;TVM swapped Teaclave for Fortanix&lt;&#x2F;a&gt;. You can also see from this Fortanix &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;fortanix&#x2F;rust-sgx&#x2F;tree&#x2F;master&#x2F;examples&#x2F;mpsc-crypto-mining&quot;&gt;example crate&lt;&#x2F;a&gt; that only a few lines were added to the &lt;code&gt;Cargo.toml&lt;&#x2F;code&gt;, and the rest is a standard pure Rust project.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;supported-crates-and-std-caveats&quot;&gt;Supported crates and std Caveats&lt;&#x2F;h3&gt;
+&lt;p&gt;Of course most of the time there’s going to be a catch. You might sometimes need to create an implementation of a crate for the SGX target. The process is &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;edp.fortanix.com&#x2F;docs&#x2F;tasks&#x2F;dependencies&#x2F;&quot;&gt;documented&lt;&#x2F;a&gt; as well. Also some crates have been adding SGX support for the &lt;code&gt;x86_64-fortanix-unknown-sgx&lt;&#x2F;code&gt; target, such as the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;rust-random&#x2F;rand&#x2F;pull&#x2F;680&#x2F;files&quot;&gt;rand&lt;&#x2F;a&gt; crate.&lt;&#x2F;p&gt;
+&lt;p&gt;This project is already a tier 2 target for the Rust compiler (more on &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;rustc&#x2F;platform-support.html#tier-2&quot;&gt;Rust tiers&lt;&#x2F;a&gt;), and that’s great news! It’s based on &lt;code&gt;libstd&lt;&#x2F;code&gt;, practice which may have its drawbacks since it assumes &lt;code&gt;time&#x2F;net&#x2F;env&#x2F;thread&#x2F;process&#x2F;fs&lt;&#x2F;code&gt; are implemented. Some of those are still not implemented (&lt;code&gt;fs&lt;&#x2F;code&gt; for example) and will throw a runtime panic instead of a compile error, breaking the Rust’s philosophy of “if it compiles it works”. More info on &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;edp.fortanix.com&#x2F;docs&#x2F;concepts&#x2F;rust-std&#x2F;&quot;&gt;Rust std support&lt;&#x2F;a&gt; on Fortanix’s documentation.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;i-o&quot;&gt;I&#x2F;O&lt;&#x2F;h3&gt;
+&lt;p&gt;The recommended way of handling input&#x2F;output in the enclave is via byte streams, particularly using &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;edp.fortanix.com&#x2F;docs&#x2F;concepts&#x2F;rust-std&#x2F;#stream-networking&quot;&gt;&lt;code&gt;TcpStream&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; and using TLS (Transport Layer Security is a protocol used to provide secure communications to a network and mostly known for its use on &lt;em&gt;https&lt;&#x2F;em&gt;) on top of that is strongly suggested.&lt;br &#x2F;&gt;
+There are primitives for dealing with pointers to user space as well. These primitives use Rust’s borrowing and ownership mechanism to avoid data races among other issues, and also prevent creating dangerous Rust references to user memory. Still, using &lt;code&gt;TcpStream&lt;&#x2F;code&gt; is preferred.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;an-example-using-both-fortanix-and-teaclave&quot;&gt;An example using both Fortanix and Teaclave&lt;&#x2F;h2&gt;
+&lt;p&gt;We’re going to show a simplified of the hello-world &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;incubator-teaclave-sgx-sdk&#x2F;tree&#x2F;master&#x2F;samplecode&#x2F;hello-rust&quot;&gt;example&lt;&#x2F;a&gt; from the Teaclave repo and see how we would do a similar thing using Fortanix’s EDP.&lt;&#x2F;p&gt;
+&lt;p&gt;We’ll be omitting some details, so if you’re interested in getting them we suggest that you check out Teaclave’s repo.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;teaclave-1&quot;&gt;Teaclave&lt;&#x2F;h3&gt;
+&lt;p&gt;The project structure is:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;mm0n8rE.png&quot; alt=&quot;&quot; &#x2F;&gt;Example of project structure using Teaclave&lt;&#x2F;p&gt;
+&lt;p&gt;Notice that we have the &lt;code&gt;app&#x2F;&lt;&#x2F;code&gt; and the &lt;code&gt;enclave&#x2F;&lt;&#x2F;code&gt; directories. First let’s see the app’s code:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;extern {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    fn say_something(eid: sgx_enclave_id_t, retval: *mut sgx_status_t,&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                     some_string: *const u8, len: usize) -&amp;gt; sgx_status_t;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We define the function that we want to run in the enclave as an external function, notice that we are not using Rust’s &lt;code&gt;String&lt;&#x2F;code&gt; here, we need to pass the raw parts instead.&lt;&#x2F;p&gt;
+&lt;p&gt;You need to initialize the enclave with a &lt;code&gt;SgxEnclave::create&lt;&#x2F;code&gt; call before running code on it. Remember to &lt;strong&gt;always initialize&lt;&#x2F;strong&gt; the enclave first.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;&#x2F;&#x2F; Initialize the enclave - proceed on success&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;let enclave = match init_enclave() {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    Ok(r) =&amp;gt; {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        println!(&amp;quot;[+] Init Enclave Successful {}!&amp;quot;, r.geteid());&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        r&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    },&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    Err(x) =&amp;gt; {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        println!(&amp;quot;[-] Init Enclave Failed {}!&amp;quot;, x.as_str());&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        return;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    },&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;};&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;let input_string = String::from(&amp;quot;This is a normal world string passed into Enclave!\n&amp;quot;);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;let mut retval = sgx_status_t::SGX_SUCCESS;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Then we make the &lt;code&gt;[E]call&lt;&#x2F;code&gt; into the enclave. This needs to be wrapped with an unsafe block and we need to split the String into its pointer and length.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;let result = unsafe {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    say_something(enclave.geteid(),&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                  &amp;amp;mut retval,&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                  input_string.as_ptr() as * const u8,&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                  input_string.len())&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;};&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The &lt;code&gt;[E]call&lt;&#x2F;code&gt; will return with a &lt;code&gt;sgx_status_t&lt;&#x2F;code&gt; we can check against to see if the enclave ran successfully.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;match result {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    sgx_status_t::SGX_SUCCESS =&amp;gt; {},&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    _ =&amp;gt; {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        println!(&amp;quot;[-] ECALL Enclave Failed {}!&amp;quot;, result.as_str());&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        return;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;println!(&amp;quot;[+] say_something success...&amp;quot;);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;You have to destroy the enclave before exiting. From the documentation it reads:&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;It is highly recommended that the sgx_destroy_enclave function be called after the application has finished using the enclave to avoid possible deadlocks.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;enclave.destroy();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now into the enclave’s code:&lt;&#x2F;p&gt;
+&lt;p&gt;Each &lt;code&gt;[E]call&lt;&#x2F;code&gt; should follow the signature &lt;code&gt;#[no_mangle] pub extern &quot;C&quot; fn func_name(args) -&amp;gt; sgx_status_t&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;#[no_mangle]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;pub extern &amp;quot;C&amp;quot; fn say_something(some_string: *const u8, some_len: usize) -&amp;gt; sgx_status_t &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Again, we need the unsafe block to call &lt;code&gt;from_raw_parts&lt;&#x2F;code&gt; and we get our string slice back.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;let str_slice = unsafe { slice::from_raw_parts(some_string, some_len) };&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;&#x2F;&#x2F; A sample &amp;amp;&amp;#39;static string&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;let rust_raw_string = &amp;quot;This is a in-Enclave &amp;quot;;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;&#x2F;&#x2F; Construct a string from &amp;amp;&amp;#39;static string&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;let mut hello_string = String::from(rust_raw_string);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;&#x2F;&#x2F; Ocall to normal world for output&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;println!(&amp;quot;{}&amp;quot;, &amp;amp;hello_string);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;sgx_status_t::SGX_SUCCESS&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;And there’s even more. You need to define the &lt;code&gt;[E]call&#x2F;[O]call&lt;&#x2F;code&gt; interface in the enclave subdirectory in an &lt;code&gt;Enclave.edl&lt;&#x2F;code&gt; file.&lt;&#x2F;p&gt;
+&lt;p&gt;It would look something like:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;enclave {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    from &amp;quot;sgx_tstd.edl&amp;quot; import *;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    &#x2F;&#x2F; you would have other imports here&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    trusted {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        &#x2F;* define ECALLs here. *&#x2F;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        public sgx_status_t say_something([in, size=len] const uint8_t* some_string, size_t len);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    };&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    untrusted {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        &#x2F;* define OCALLs here. *&#x2F;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;};&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;There are even more files we haven’t touched yet. But this is enough to show that while Teaclave might give you a lot of control of what’s going on, it’s not easy and increases the overall complexity of your project.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;same-implementation-using-fortanix-edp&quot;&gt;Same implementation using Fortanix EDP&lt;&#x2F;h3&gt;
+&lt;p&gt;As Fortanix’s documentation says:&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;EDP applications should be thought of as providing a service to other parts of your system. An EDP application might interact with other services which themselves might be EDP applications. The service may be implemented as a gRPC server, an HTTPS server with REST APIs, or any other service protocol.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Disclaimer&lt;&#x2F;strong&gt; : we haven’t been able to get our hands into an Intel SGX capable machine, hence we weren’t able to test this example. However, we think this serves as a good illustration example and gives some credit to Teaclave and Intel for the simulation capabilities.&lt;&#x2F;p&gt;
+&lt;p&gt;Let’s see how can we accomplish our hello world using Fortanix EDP. Our final project looks like this:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;8Wh6Nk4.png&quot; alt=&quot;&quot; &#x2F;&gt;Example of a project structure using Fortanix&lt;&#x2F;p&gt;
+&lt;p&gt;Let’s look at what the &lt;code&gt;main.rs&lt;&#x2F;code&gt; has to offer:&lt;&#x2F;p&gt;
+&lt;p&gt;We needed to add this two lines to the &lt;code&gt;.cargo&#x2F;config&lt;&#x2F;code&gt; file:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;[target.x86_64-fortanix-unknown-sgx]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;runner=&amp;#39;ftxsgx-runner-cargo&amp;#39;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;And that’s the only setup we needed (besides the Rust code).&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;use std::net::{TcpListener, TcpStream};&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;use std::io::Read;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;fn main() {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let listener = TcpListener::bind(&amp;quot;127.0.0.1:7878&amp;quot;).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let (mut stream, _addr) = listener.accept().unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let mut message = [0; 128];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    stream.read(&amp;amp;mut message).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    println!(&amp;quot;new client: {:?}&amp;quot;, std::str::from_utf8(&amp;amp;message).unwrap());&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Pretty much like good ol’ Rust code right? In fact, we’re able to compile it without the Fortanix runner and have it running.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;GPPD8IR.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;This only constitutes the enclave, but an easy way to test it is by making the TCP request, so it should be enough to run the following command:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;echo &amp;quot;Hello World!&amp;quot; | nc 127.0.0.1 7878&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The way this is built means that you could call this from another language as long as you can make the TPC connection.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;sgx_with_rust_blog_post&quot;&gt;&lt;em&gt;Full code here&lt;&#x2F;em&gt;&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;teaclave-vs-fortanix&quot;&gt;Teaclave vs. Fortanix&lt;&#x2F;h2&gt;
+&lt;p&gt;One significant difference between the two is their size: Teaclave’s repo contains ~80K lines of Rust code while Fortanix’s one has ~18K lines of code, which is about 4 times less. Some of these could be atributed to the amount of examples Teaclave has in their repo but still that doesn’t make up for the whole difference.&lt;br &#x2F;&gt;
+Also, Fortanix is mostly written using Rust code, while Teaclave has another 80K more lines of non Rust code… yikes!&lt;&#x2F;p&gt;
+&lt;p&gt;In terms of community activity we ran a comparison of both thru &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;vesoft-inc.github.io&#x2F;github-statistics&#x2F;&quot;&gt;github-statistics&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;bejTcAq.png&quot; alt=&quot;&quot; &#x2F;&gt;Comparison between Fortanix and Teaclave repos stats&lt;&#x2F;p&gt;
+&lt;p&gt;Teaclave seems to have more traction based on the amount of stars and forks. Nevertheless, during 2021 there is a clear increase of the activity in the Fortanix’s EDP repository. So it seems like Teaclave is more widely used but it’s development has stagnated somewhat while Fortanix is taking the lead, a dynamic that has been reinforced since attaining &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;users.rust-lang.org&#x2F;t&#x2F;sgx-target-is-now-a-rust-tier-2-platform&#x2F;24779&quot;&gt;Rust tier 2 in january on 2019&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;weighting-pros-and-cons&quot;&gt;Weighting pros and cons&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;teaclave-2&quot;&gt;Teaclave&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;✅ Uses Intel’s libs, and they’re supposed to be the experts on that.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ There are simulation libraries which expand the support a bit.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ Already solves connecting the app and the enclave.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ There are a few more examples available (&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;incubator-teaclave-sgx-sdk&#x2F;tree&#x2F;master&#x2F;samplecode&quot;&gt;Teaclave SGX SDK repo&lt;&#x2F;a&gt; and &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;glassonion1&#x2F;rust-101&#x2F;tree&#x2F;main&#x2F;sgx-sdk&quot;&gt;Rust 101 repo&lt;&#x2F;a&gt;).&lt;&#x2F;li&gt;
+&lt;li&gt;❌ Uses Intel’s libs, and they’re supposed to be the experts on that. This might not be a bad thing by itself, but you could think of this as adding an extra dependency with a centralized entity such as Intel. Which is why in a decentralized environment might not be ideal (debatable).&lt;&#x2F;li&gt;
+&lt;li&gt;❌ Integrating SGX to an existing system using this SDK is a bit tedious, since you need to restructure your application, use some Makefiles to handle linking the enclave with the application, declaring the interface connecting your applications in a separate &lt;code&gt;.edl&lt;&#x2F;code&gt; file with its own syntax and more.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;vMOMK15.png&quot; alt=&quot;&quot; &#x2F;&gt;Enclave folder using Teaclave vs Fortanix&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;fortanix&quot;&gt;Fortanix&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;✅ You can write all Rust code.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ Officially target tier 2 of the Rust compiler.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ Add a few lines to your &lt;code&gt;Cargo.toml&lt;&#x2F;code&gt; and you are set.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ We trust the fact that it is open source and therefore audited by many users, and being included as a tier 2 target for the Rust compiler means that it has earned some respect from the Rust community as well.&lt;&#x2F;li&gt;
+&lt;li&gt;❌ Well, sometimes it’s not that easy. Not all crates have support for SGX although you can add your own implementation for the Fortanix target.&lt;&#x2F;li&gt;
+&lt;li&gt;❌ since it uses &lt;code&gt;libstd&lt;&#x2F;code&gt; it assumes that you have implementations for &lt;code&gt;time&#x2F;net&#x2F;env&#x2F;thread&#x2F;process&#x2F;fs&lt;&#x2F;code&gt;, which SGX does not entirely support. This will generate runtime panics when used and you won’t be getting compilation errors.&lt;&#x2F;li&gt;
+&lt;li&gt;❌ It’s easier to develop on, but that is because it hides some of the complexity away and you may ask yourself if we can trust on its security when many things are hidden away from the developer.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;conclusions&quot;&gt;Conclusions&lt;&#x2F;h2&gt;
+&lt;p&gt;We don’t find a clear winner between Teaclave and Fortanix, as both have their pros and cons.&lt;&#x2F;p&gt;
+&lt;p&gt;Having to make a choice we tend to go with Fortanix as its easier to develop in pure Rust. Also as Fortanix is endorsed as Tier 2 we can have a high confidence about its compatilibity with our software allowing for a seamless implementation. As an added bonus this level of trust from the Rust developers gives us a somewhat indirect clue that there aren’t blatant security issues hidden in the code that are meaningful enough to make us to doubt it.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;further-readings&quot;&gt;Further readings&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.intel.com&#x2F;content&#x2F;dam&#x2F;develop&#x2F;public&#x2F;us&#x2F;en&#x2F;documents&#x2F;intel-sgx-product-brief-2019.pdf&quot;&gt;SGX product brief&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.intel.com&#x2F;content&#x2F;www&#x2F;us&#x2F;en&#x2F;developer&#x2F;library.html?s=Newest&amp;amp;f:@stm_10309_en=%5BIntel%C2%AE%20Software%20Guard%20Extensions%20(Intel%C2%AE%20SGX)%5D&quot;&gt;Intel technical library - Software Guard Extensions&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;fortanix.com&#x2F;intel-sgx&#x2F;&quot;&gt;Fortanix resources&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;teaclave.apache.org&#x2F;docs&#x2F;&quot;&gt;Teaclave documentation&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Benchmarking and analyzing Rust code performance with Criterion and Iai</title>
+        <published>2022-04-30T00:00:00+00:00</published>
+        <updated>2022-04-30T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/benchmarking-and-analyzing-rust-performance-with-criterion-and-iai/"/>
+        <id>https://blog.lambdaclass.com/posts/benchmarking-and-analyzing-rust-performance-with-criterion-and-iai/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/benchmarking-and-analyzing-rust-performance-with-criterion-and-iai/">&lt;p&gt;At &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;ClassLambda&quot;&gt;LambdaClass&lt;&#x2F;a&gt; we are big fans of reading, discussing and implementing distributed systems, compilers, drivers. The last few years we also got our hands dirty with reverse engineering and embedded systems development. Based on our interests it shouldn’t be a surprise that we have been using Rust for quite some time. Rust is one of a kind.&lt;&#x2F;p&gt;
+&lt;p&gt;Correctness and performance are the main reasons we choose Rust for developing many of our applications. Rust’s compiler is a great tool to find bugs. The compiler can help a lot on the performance front but at the end you need to measure your running code. You need to know the bottlenecks that your code has in order to solve them.&lt;&#x2F;p&gt;
+&lt;p&gt;In this post, we’ll talk about our experience doing benchmarks in Rust, what tools we used and why it was important for us. Usually a fully optimized function is harder to read than a simpler and slower one. Optimization is something that you’ll have to balance with readability and maintenance costs: sadly we can’t have the cake and eat it too in this case.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;why-benchmarking&quot;&gt;Why Benchmarking?&lt;&#x2F;h2&gt;
+&lt;p&gt;A lot of new developers are starting to use Rust and they have not been exposed to benchmarking before. Just because Rust is fast and memory-efficient doesn’t mean that your code will be fast as well. The features that make Rust what it is, comes with a great cost if we don’t know how to properly use them. With great power comes great responsibility. These are mostly performance costs.&lt;&#x2F;p&gt;
+&lt;p&gt;In our specific case, we worked with a function that iterates over a range of numbers and use them to create some data structures that would be used in another process. Sometimes this number range could be pretty big, so we wanted this function to be very efficient.&lt;&#x2F;p&gt;
+&lt;p&gt;But how to know if this function is fast enough or at least takes the expected amount of time for our process?&lt;&#x2F;p&gt;
+&lt;p&gt;Well, that’s the reason why we started benchmarking. We needed to know how much time it was taking to iterate and create all the structures, so we started researching benchmarking and how we could do that in Rust.&lt;&#x2F;p&gt;
+&lt;p&gt;Probably, if you search how to benchmark in Rust the first result that you’ll get is “Criterion”. Recently Rust published a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;blog.rust-lang.org&#x2F;inside-rust&#x2F;2022&#x2F;04&#x2F;04&#x2F;lang-roadmap-2024.html&quot;&gt;roadmap for 2024&lt;&#x2F;a&gt; where they mentioned the possibility to adopt Criterion officially.&lt;&#x2F;p&gt;
+&lt;p&gt;It’s worth mentioning that Rust comes with a benchmarking feature but is currently unstable as it says in &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;cargo&#x2F;commands&#x2F;cargo-bench.html?highlight=feature&quot;&gt;Rust documentation&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;what-is-criterion&quot;&gt;What is Criterion?&lt;&#x2F;h2&gt;
+&lt;p&gt;Criterion is an Open-Source library, ported from the original &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;haskell&#x2F;criterion&quot;&gt;Haskell’s Criterion library&lt;&#x2F;a&gt;, with some sophisticated tools to do micro-benchmarks in Rust. By micro-benchmarking, we refer to measuring the performance of small parts of our process, like one or two functions (more on &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;stackoverflow.com&#x2F;a&#x2F;2842707&quot;&gt;micro-benchmarking&lt;&#x2F;a&gt;). Benchmarking with Criterion gives you a general overview of the time that is spent on a task. This is known as &lt;strong&gt;Wall-time&lt;&#x2F;strong&gt; and it’s the time interval between the moment when the task started and when it’s finished. We’ll get on this later.&lt;br &#x2F;&gt;
+We started playing with Criterion and we discovered some awesome features for our analysis:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Criterion makes some graphics to help you visualize the time that your function takes and make generates a report with those graphics.&lt;&#x2F;li&gt;
+&lt;li&gt;It gives automatic comparisons between the last run of the benchmark and a new run with your new changes to see if your function improves in performance or if has regressed.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Furthermore, Criterion is pretty programmer-friendly. So you don’t need any external tools or a hard setup to start.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;analyzing-criterion-results&quot;&gt;Analyzing Criterion results&lt;&#x2F;h2&gt;
+&lt;p&gt;We’ve mentioned graphic tools, visualizations, and comparisons that Criterion makes to help us understand the results but, how does that look?&lt;&#x2F;p&gt;
+&lt;p&gt;Well, you have two ways to read the results provided by Criterion, one is the Command-Line Output and the other one is the generated &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;bheisler.github.io&#x2F;criterion.rs&#x2F;book&#x2F;user_guide&#x2F;html_report.html&quot;&gt;HTML report&lt;&#x2F;a&gt; with distribution plots and other resources.&lt;&#x2F;p&gt;
+&lt;p&gt;The CLI output looks like this:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Benchmarking Get Blocks Function&#x2F;benches&#x2F;samples&#x2F;.ledger-2-4: Warming up for 3.0000 s&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Get Blocks Function&#x2F;benches&#x2F;samples&#x2F;.ledger-2-4                                                                          &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;                        time:   [55.239 s 55.443 s 55.653 s]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Found 1 outliers among 10 measurements (10.00%)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;  1 (10.00%) high mild&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;slowpoke-slow.gif&quot; alt=&quot;&quot; &#x2F;&gt;Graphic depiction of our results&lt;&#x2F;p&gt;
+&lt;p&gt;Here is what we first saw when we ran &lt;code&gt;cargo bench&lt;&#x2F;code&gt;. We have information about the mean time, some other measurements, and the outliers encountered among the runs.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;KTm8I6O.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;htmlpreview.github.io&#x2F;?https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;how_to_benchmark_blogpost&#x2F;blob&#x2F;main&#x2F;report&#x2F;first_report_example.html&quot;&gt;HTML report example of our function&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Here we have an example of the HTML report that we also obtained when we used &lt;code&gt;cargo bench&lt;&#x2F;code&gt;. You can find this report on &lt;code&gt;target&#x2F;criterion&#x2F;report&#x2F;index.html&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Surely you noticed that the first output says “10 measurements”, the reason for this is that Criterion executes the function that we want to benchmark several times and the final result is the mean time among all of that results. Criterion has a default sample size value of 100. We’ve changed it to 10 because our function takes a lot of time on its own, and doing 100 samples of it would take a lot of time.&lt;&#x2F;p&gt;
+&lt;p&gt;This was the report for our function creating 400 of these structures, this was pretty bad from what we were expecting.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;well-what-s-next&quot;&gt;Well, what’s next?&lt;&#x2F;h2&gt;
+&lt;p&gt;So far, Criterion helped us measure how much execution time that function takes (on average). Is this enough to improve our implementation? Criterion tells us how long a function takes to run but we still don’t know how to improve our function. This is when we started to think about Profiling.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;start-profilling-and-beyond-criterion&quot;&gt;Start Profilling and beyond Criterion&lt;&#x2F;h2&gt;
+&lt;p&gt;Profiling tells us more about the actual implementation of the function that we want to improve. There are different ways and tools that help profile our code.&lt;&#x2F;p&gt;
+&lt;p&gt;We wanted a graphical way to understand the performance issues of our code so we started researching &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.brendangregg.com&#x2F;flamegraphs.html&quot;&gt;FlameGraphs&lt;&#x2F;a&gt; that use the &lt;code&gt;perf&lt;&#x2F;code&gt; tool. &lt;code&gt;perf&lt;&#x2F;code&gt; is a Linux command tool to obtain performance analysis of our applications. It was written by the master of all masters in computing performance analysis: Brendan Gregg.&lt;&#x2F;p&gt;
+&lt;p&gt;Thankfully Rust has a crate called &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;flamegraph-rs&#x2F;flamegraph&quot;&gt;&lt;code&gt;flamegraph&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; that works with &lt;code&gt;cargo&lt;&#x2F;code&gt; and it’s pretty easy to use.&lt;&#x2F;p&gt;
+&lt;p&gt;In this flamegraph, you can see all the function calls and how much time consumes in the whole process, including calls from the Rust standard library.&lt;br &#x2F;&gt;
+FlameGraph in specific looks a little bit like this:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;PvYguTf.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;a href=&quot;&#x2F;images&#x2F;external&#x2F;first_flamegraph_example.svg&quot;&gt;Flamegraph of our function&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I know, right?&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;calculating-meme-template-047hp.jpg&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;analyzing-flamegraph-results&quot;&gt;Analyzing flamegraph results&lt;&#x2F;h2&gt;
+&lt;p&gt;Each box represents a function in the stack. The x-axis spans the sample population, &lt;strong&gt;it does not show the passing of time from left to right&lt;&#x2F;strong&gt;. The width of the box shows a proportion of the total of time it was on-CPU or part of ancestry that was on-CPU (wider rectangles mean more time spent). And if you are wondering if the colors have some meaning the answer is no, only to give the flame aspect to the graphic.&lt;&#x2F;p&gt;
+&lt;p&gt;It’s worth mentioning that flamegraph orders the function calls in the x-axis in alphabetical order by default, you can change this if you want but it wasn’t so important for us to know when the function was called, we wanted to know how much time each one took. The flamegraph groups all the different calls to show you the final time that this function spent in that call stack.&lt;&#x2F;p&gt;
+&lt;p&gt;Profiling it’s important because we didn’t want to do changes without knowing that something was a real performance issue. This helped us discover those specific things that were making our function slower.&lt;&#x2F;p&gt;
+&lt;p&gt;So now we have information about the bottlenecks! We only have to look at the call stacks and try to reduce that time when it’s possible.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;gotta-go-fast&quot;&gt;Gotta go fast!&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;f64ca7d4beb9865d2ed5145d120f0c56.gif&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Now we have some information to speed up our function. The first thing that we thought of was to integrate &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;rayon-rs&#x2F;rayon&quot;&gt;Rayon&lt;&#x2F;a&gt; into this part. Rayon is a Rust library to make sequential computations into parallel. We started with that.&lt;&#x2F;p&gt;
+&lt;p&gt;When we do a change the first thing that we want to check is if the time it’s better, so we go back to Criterion again.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Benchmarking Get Blocks Function&#x2F;benches&#x2F;samples&#x2F;.ledger-2-4: Warming up for 3.0000 s&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Get Blocks Function&#x2F;benches&#x2F;samples&#x2F;.ledger-2-4                                                 &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            time:   [15.985 s 16.246 s 16.482 s]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;            change: [-70.886% -70.401% -69.951%]&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;Performance has improved.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;So here we have the Command-line output with a new line. That &lt;strong&gt;change&lt;&#x2F;strong&gt; line shows us the improvement or regression compared to the last benchmark and we see that is 70% better so we have the happy case. Let’s take a look at the new reports.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;4pFWn55.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;htmlpreview.github.io&#x2F;?https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;how_to_benchmark_blogpost&#x2F;blob&#x2F;main&#x2F;report&#x2F;comparison_report_example.html&quot;&gt;HTML comparison report with our new implementation&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Here we have the new graph. Criterion automatically merged the last two plots and did one with the comparison. It’s easy for us to show these new results.&lt;&#x2F;p&gt;
+&lt;p&gt;With a relatively small change, we made an important difference so this was enough for us at least for now. If you think that is not fast enough the good thing is that you can repeat these steps, do flamegraph again, see the slow part of the process, correct it and go with Criterion again.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;problems-with-rayon-and-criterion&quot;&gt;Problems with Rayon and Criterion&lt;&#x2F;h2&gt;
+&lt;p&gt;One thing we encountered is that benchmarking with Rayon and parallel code comes with an extra step. Rayon works with an internal ThreadPool to run paralel code and it has a default number of threads to use.&lt;br &#x2F;&gt;
+Sometimes for benchmarking this threadpool needs to be bigger so we had to include a custom global ThreadPool using&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;rayon::ThreadPoolBuilder::new()&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        .stack_size(size)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        .num_threads(number_of_threads)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        .build_global()&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This solved our problem and hopefully will solve yours too.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;criterion-and-ci-integration&quot;&gt;Criterion and CI Integration&lt;&#x2F;h2&gt;
+&lt;p&gt;At some point, we wanted to check regression or improvements with every PR done to our Repo to keep track and make sure that future changes won’t affect our performance. In summary, the idea was to integrate our Criterion benchmarks with CI tools. It turned out that Criterion is not a good option if we want to do continuous integration. This is because the virtualization used by all these CI tools &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;bheisler.github.io&#x2F;criterion.rs&#x2F;book&#x2F;faq.html&quot;&gt;introduces noise into the benchmarking process&lt;&#x2F;a&gt;. For Criterion the result may be affected by this and the results would show changes in performance without touching that part of our code.&lt;&#x2F;p&gt;
+&lt;p&gt;We’ll dig next in how we can make this possible with another tool .&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;next-steps-and-how-to-improve-our-benchmarks&quot;&gt;Next steps and how to improve our benchmarks&lt;&#x2F;h2&gt;
+&lt;p&gt;At this point, we already used Criterion to set our first-time baseline, and then we introduced flamegraph to identify bottlenecks in our code. Maybe this is enough but, what if we want to go a little further? It was at this point that we found &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;bheisler.github.io&#x2F;criterion.rs&#x2F;book&#x2F;iai&#x2F;iai.html&quot;&gt;&lt;strong&gt;Iai&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Iai&lt;&#x2F;strong&gt; is an experimental Framework designed for One-shot benchmarking. This framework provides a tool for making benchmarks. All these tools work on Valgrind and use &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.cs.cmu.edu&#x2F;afs&#x2F;cs.cmu.edu&#x2F;project&#x2F;cmt-40&#x2F;Nice&#x2F;RuleRefinement&#x2F;bin&#x2F;valgrind-3.2.0&#x2F;docs&#x2F;html&#x2F;cg-manual.html#:~:text=Cachegrind%20is%20a%20tool%20for,misses%2C%20writes%20and%20writes%20misses.&quot;&gt;Cachegrind&lt;&#x2F;a&gt; for profiling our code. The profiling gives us another kind of information like the number of instructions of our function, the access to the different Cache memories, access to RAM, and Estimated cycles.&lt;br &#x2F;&gt;
+All of this comes with some pros and cons to consider:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;✅ High-precision measurements and better performance since Iai executes the benchmark only once.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ Making a benchmark in Iai works in a very similar way compared to Criterion, it’s easy to set up and the code structure is almost the same.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ Like flamegraph, Iai works as a complement of Criterion and not a competitor.&lt;&#x2F;li&gt;
+&lt;li&gt;✅ Iai uses an abstraction to prevent optimizations to be made by the compiler.&lt;&#x2F;li&gt;
+&lt;li&gt;❌ Needs Valgrind to work so it won’t be possible to use it on a platform that doesn’t support Valgrind. We can use it with docker but this definitely will slow things down.&lt;&#x2F;li&gt;
+&lt;li&gt;❌ It’s not good for test change from sequential code to paralel code.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;One of the best things that we can solve with Iai is the possibility of integrating benchmarks with our CI tools. We mentioned that Criterion is not a good option for this. Iai runs all the benchmarks inside Valgrind&#x2F;Cachegrind so the virtual machine measurements won’t be affected by external noise.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;that-s-all-folks&quot;&gt;That’s all, folks!&lt;&#x2F;h2&gt;
+&lt;p&gt;We introduced you to the benchmark world with Rust exploring some tools and showing you how to interpret all the results that this tool gave us. The world of benchmarking is expansive and exciting and Criterion is the biggest thing since the invention of sliced bread. Thanks to the Flamegraph profiling tool we learned a lot about the inner workings of the calls to the machine that Rust generates.&lt;&#x2F;p&gt;
+&lt;p&gt;As a result of this journey our code improved a lot without losing code readability. Although we spent &lt;strong&gt;a lot of time&lt;&#x2F;strong&gt; in subsequent iterations of the function to achieve this. So you have to take into account that benchmarking and profiling should only be used when performance gains are crucial to your project. Don’t lose sleep over functions that don’t use too many resources, you should trust us on this one.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Ballista, a distributed compute platform made with Rust and Apache Arrow</title>
+        <published>2021-01-28T00:00:00+00:00</published>
+        <updated>2021-01-28T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/ballista-a-distributed-compute-platform-made-with-rust-and-apache-arrow/"/>
+        <id>https://blog.lambdaclass.com/posts/ballista-a-distributed-compute-platform-made-with-rust-and-apache-arrow/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/ballista-a-distributed-compute-platform-made-with-rust-and-apache-arrow/">&lt;h4 id=&quot;an-interview-with-its-creator-andy-grove&quot;&gt;An interview with its creator, Andy Grove&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-L6SAuZiiRQ4bBaCCiDaP_w.png&quot; alt=&quot;&quot; &#x2F;&gt;Ballista demo. Source: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;andygrove.io&#x2F;2020&#x2F;07&#x2F;ballista-one-year-on&#x2F;&quot;&gt;Andy Grove&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;“I have become frustrated over the years with the proliferation of Big Data tools built in JVM languages. I understand the reasons for this — Java, and especially Kotlin and Scala, are productive languages to work in, the ecosystem is very mature, and skills are widespread. However, it really isn’t the best language for these platforms. The most obvious alternative has been C++ for a long time, but I thought it would be really interesting to see what was possible with Rust.” — Andy Grove&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;As distributed computing platforms continue to become more relevant and new programming languages emerge with a modern approach and a focus on features that more traditional languages aren’t suited for, new and interesting technologies start appearing. In this interview, Andy Grove, software engineer and creator of &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;ballista-compute&#x2F;ballista&quot;&gt;Ballista&lt;&#x2F;a&gt;, a fresh distributed computing platform built primarily on Rust and powered by Apache Arrow technologies, provides some insight on the motivations behind the project as well as the technical details and features that make Ballista different.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-kYa4OnwY6NrvClA6wPpjZQ.png&quot; alt=&quot;&quot; &#x2F;&gt;Ballista is a work in progress. Once completed, its integrations will work like this. (Source: official documentation)&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h4 id=&quot;what-is-ballista-and-what-kind-of-problems-does-it-solve&quot;&gt;What is Ballista and what kind of problems does it solve?&lt;&#x2F;h4&gt;
+&lt;p&gt;Ballista is a distributed compute platform with a current focus on executing ETL (extract, transform, and load) jobs based on queries which are defined using either a DataFrame API, SQL, or a combination of both.&lt;&#x2F;p&gt;
+&lt;p&gt;Ballista is implemented in Rust and powered by Apache Arrow.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-are-the-main-advantages-of-using-apache-arrow-technologies&quot;&gt;What are the main advantages of using Apache Arrow technologies?&lt;&#x2F;h4&gt;
+&lt;p&gt;In my opinion, there are quite a few advantages in using Apache Arrow for this project.&lt;&#x2F;p&gt;
+&lt;p&gt;The Arrow memory format is optimized to support vectorized processing of columnar data and therefore enables significant performance improvements over row-based processing, especially when taking advantage of hardware that natively supports vectorized processing, such as SIMD and GPU.&lt;&#x2F;p&gt;
+&lt;p&gt;Arrow also provides a “Flight” protocol, designed to enable Arrow data to be streamed efficiently (without &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;docs.serde.rs&#x2F;serde&#x2F;&quot;&gt;serde&lt;&#x2F;a&gt; overhead) between processes, and Ballista’s executors implement this protocol.&lt;&#x2F;p&gt;
+&lt;p&gt;In addition to these benefits, Arrow is a standard that is becoming adopted more widely over time, so designing Ballista from the ground-up to be Arrow-native helps ensure compatibility with other projects in the ecosystem.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-are-advantages-of-an-implementation-based-on-apache-arrow-over-native-data-structures&quot;&gt;What are advantages of an implementation based on Apache Arrow over native data structures?&lt;&#x2F;h4&gt;
+&lt;p&gt;Arrow offers a mature type system and in-memory format for representing columnar data that has been tested and refined over many years, so I think this helps accelerate the development of the Ballista platform since there is no need to reinvent the wheel. It also ensures efficient compatibility with other projects that have also adopted Apache Arrow.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;can-you-tell-us-more-about-the-ballista-query-engine&quot;&gt;Can you tell us more about the Ballista query engine?&lt;&#x2F;h4&gt;
+&lt;p&gt;Sure. Ballista is based on the Volcano design but has less overhead as a result of being designed to process batches of columnar data. Its design is very much inspired by Apache Spark but with a focus on being language-agnostic so that it can efficiently support popular programming languages such Python, Java, and C++.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;ballista-has-a-very-similar-usage-to-apache-spark-what-are-the-main-advantages-of-ballista-over-it&quot;&gt;Ballista has a very similar usage to Apache Spark, what are the main advantages of Ballista over it?&lt;&#x2F;h4&gt;
+&lt;p&gt;The main advantages of Ballista (at least, once it is more mature) are:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Columnar Design&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Although Apache Spark does have some support for columnar processing, it is still largely row-based. Because Ballista is natively columnar and is implemented in a systems level language, it can take advantage of vectorized processing with SIMD and GPU.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Language Agnostic&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Apache Spark is implemented in Scala and tends to have a Scala-first approach, with other languages paying a penalty to interact with Spark due to overheads of serde. Ballista has been architected to use language-agnostic protocols and serialization formats to avoid this.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Memory Efficiency&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Because Ballista is implemented in Rust, there are no GC pauses, and performance is very consistent and predictable. The combination of Rust and Arrow also results in much lower memory usage than Apache Spark — up to 5x lower memory usage in some cases. This means that more processing can fit on a single node, reducing the overhead of distributed compute.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;how-does-it-compare-to-dask&quot;&gt;How does it compare to Dask?&lt;&#x2F;h4&gt;
+&lt;p&gt;I actually do not have any experience with Dask yet, although it has been on my “to do” list for a while now. I have heard a lot of positive things about Dask and I am sure that I could learn a lot from this project.&lt;&#x2F;p&gt;
+&lt;p&gt;Dask is obviously Python-centric, so I suspect that is going to be the main differentiator. Although the Ballista scheduler is being implemented in Rust, it is designed to work with executors implemented in any language due to the use of Arrow’s Flight protocol, and Google Protocol Buffers to represent query plans and scheduler tasks.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-are-the-reasons-behind-the-choice-of-rust-as-the-main-execution-language&quot;&gt;What are the reasons behind the choice of Rust as the main execution language?&lt;&#x2F;h4&gt;
+&lt;p&gt;The reason that I started this project (first with DataFusion at the start of 2018, and now with Ballista) is that I have become frustrated over the years with the proliferation of Big Data tools built in JVM languages. I understand the reasons for this — Java, and especially Kotlin and Scala, are productive languages to work in, the ecosystem is very mature, and skills are widespread. However, it really isn’t the best language for these platforms. The most obvious alternative has been C++ for a long time, but I thought it would be really interesting to see what was possible with Rust.&lt;&#x2F;p&gt;
+&lt;p&gt;I see Rust as being a good compromise between Java and C++. It has the memory-safety of Java (but implemented in a very different way) and the performance and predictability of C++.&lt;&#x2F;p&gt;
+&lt;p&gt;The cost of compute can be very high with Big Data platforms, so it makes sense to use a language that can make efficient use of the available memory and processing power on each node. In some cases, Ballista uses a fraction of the memory of an equivalent Apache Spark job, and this means that each node in a cluster can process a multiple of the amount of data that Spark can support, resulting in smaller clusters that are utilized more effectively.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;apache-spark-has-mllib-a-library-for-handling-machine-learning-projects-what-features-does-ballista-offer-for-these-tasks&quot;&gt;Apache Spark has MLlib, a library for handling Machine Learning projects. What features does Ballista offer for these tasks?&lt;&#x2F;h4&gt;
+&lt;p&gt;So far, the focus of Ballista has very much been on ETL workloads. There have been some discussions about supporting ML workloads but this is an area that I do not have experience with so I am hoping that once Ballista is a little more mature in terms of ETL processing then we can start to look at other areas like ML and listen to what the current pain points are.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-will-be-the-main-areas-of-focus-for-future-releases&quot;&gt;What will be the main areas of focus for future releases?&lt;&#x2F;h4&gt;
+&lt;p&gt;The main focus now is getting the platform to a level of maturity where users can run real-world ETL workloads, using the TPC-H benchmarks to measure progress.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;beyond-performance-what-are-the-next-goals-for-the-ballista-project&quot;&gt;Beyond performance, what are the next goals for the Ballista project?&lt;&#x2F;h4&gt;
+&lt;p&gt;Personally, I think that the most important goal for the Ballista project is to build a community around it. It started out as a personal side-project but I can only commit a relatively small number of hours each weekend to work on the project, and that time is better spent on writing requirements and building a community than trying to code everything myself.&lt;&#x2F;p&gt;
+&lt;p&gt;To this end, I have started a weekly newsletter, named &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;ballistacompute.org&#x2F;this-week-in-ballista&#x2F;&quot;&gt;“This Week in Ballista”,&lt;&#x2F;a&gt; to share news about progress and where help is needed. I am mostly spending my time on the project on tasks such as filing issues and responding to questions in Discord. I am also prototyping new features and then asking for help from the community to complete them.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;do-you-have-any-book-recommendations-on-distributed-computing&quot;&gt;Do you have any book recommendations on distributed computing?&lt;&#x2F;h4&gt;
+&lt;p&gt;Last year, I wrote &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.andygrove.io&#x2F;2020&#x2F;02&#x2F;how-query-engines-work&#x2F;&quot;&gt;“How Query Engines Work”&lt;&#x2F;a&gt;, which is an introductory guide to query engines and it does cover distributed computing at a high level. I would be hesitant in recommending this book specifically to learn about distributed computing though, since it doesn’t have very much content on this subject yet, although I do plan on extending the content once Ballista is farther along.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>NuShell: the shell where traditional Unix meets  modern development, written in Rust</title>
+        <published>2020-05-14T00:00:00+00:00</published>
+        <updated>2020-05-14T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/nushell-the-shell-where-traditional-unix-meets-modern-development-written-in-rust/"/>
+        <id>https://blog.lambdaclass.com/posts/nushell-the-shell-where-traditional-unix-meets-modern-development-written-in-rust/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/nushell-the-shell-where-traditional-unix-meets-modern-development-written-in-rust/">&lt;h4 id=&quot;we-interviewed-its-creators&quot;&gt;We interviewed its creators&lt;&#x2F;h4&gt;
+&lt;p&gt;Shells have been around forever and, for better or for worse, haven’t changed much since their inception. Until &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.nushell.sh&#x2F;&quot;&gt;NuShell&lt;&#x2F;a&gt; appeared to reinvent shells and defy our muscle memory. It brought some big changes, which include rethinking how pipelines work, structured input&#x2F;output, and plugins.&lt;&#x2F;p&gt;
+&lt;p&gt;We wanted to learn more about NuShell so we interviewed both of its creators: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;jntrnr&quot;&gt;Jonathan Turner&lt;&#x2F;a&gt; and &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;wycats&quot;&gt;Yehuda Katz&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h4 id=&quot;why-create-nushell-is-it-me-or-does-it-have-a-next-level-awk-vibe&quot;&gt;&lt;strong&gt;Why create NuShell? Is it me or does it have a next-level AWK vibe?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Jonathan Turner&lt;&#x2F;strong&gt; : Sometimes the simplest ideas are the ones that hook you the most :). When Yehuda and I first started discussing how shells could be improved, we settled on the idea of using structured data rather than just text between applications (for example stdin&#x2F;stdout). He had just been experimenting with PowerShell and saw how adding some structure to the data opened up a lot of possibilities.&lt;&#x2F;p&gt;
+&lt;p&gt;The basic idea is pretty simple: Nu opens everything into a table you can work with. Files, streams, commands like ls and ps all output this one table format. Then you have a set of commands that work with these tables, to help you get the data you want, change it, view it, etc.&lt;&#x2F;p&gt;
+&lt;p&gt;Funny that you mention “awk”. In a way, Nu is a way of saying “what if we didn’t need tools like awk so often?” Since you’re working with structured data, as we add more support for file types, it’s less often you need to reach for “awk”, “jq”, “grep”, and the array of other tools to open and work with common file types.&lt;&#x2F;p&gt;
+&lt;p&gt;In a way, it’s taking the original spirit of Unix — where you use pipelines to combine a set of tools — and imagining how that original spirit would work today, with what we know about programming languages and tools. And, being crossplatform, it’s nice to learn this approach and then be able to easily switch operating systems and use the same techniques.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-u77ccTVL0VJ7Cw2xT_7puA.png&quot; alt=&quot;&quot; &#x2F;&gt;NuShell screen capture&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;why-use-rust-how-much-experience-did-you-have-beforehand&quot;&gt;&lt;strong&gt;Why use Rust? How much experience did you have beforehand?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Jonathan&lt;&#x2F;strong&gt; : Yehuda and I have been writing Rust for at least 4 years. He was one of the first people to deploy Rust into production, long before it hit 1.0.&lt;&#x2F;p&gt;
+&lt;p&gt;Rust also just made sense. It naturally is crossplatform, it’s easy to optimize, it’s easy to harden against memory and threading issues, and after the initial learning curve it’s also quite a lot of fun to write. When you’re doing things in your free time, having something you’re looking forward to hacking on after work makes it a lot easier to do so day after day.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;did-using-rust-present-a-challenge-in-some-aspect&quot;&gt;&lt;strong&gt;Did using Rust present a challenge in some aspect?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Yehuda Katz&lt;&#x2F;strong&gt; : Quite the opposite! Rust and its ecosystem has two properties that are a really good fit for what we’re trying to do:&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Cross-platform: There is a version of almost every basic crate that works on Windows, macOS, and Linux.&lt;&#x2F;li&gt;
+&lt;li&gt;Rigorous: Rust doesn’t really have exceptions. Instead, Rust’s library ecosystem surfaces edge-cases as Results. When writing something like a shell, this saved us from all kinds of problems as we evolved.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Rust also has a great package manager (Cargo), which means that gluing together fast, cross-platform, and rigorous packages from the ecosystem is really easy.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;how-do-you-go-about-making-software-cross-platform-in-rust-is-it-as-much-work-as-one-would-think&quot;&gt;&lt;strong&gt;How do you go about making software cross-platform in Rust? Is it as much work as one would think?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Yehuda&lt;&#x2F;strong&gt; : Not really. What you do is look for crates on &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;&quot;&gt;crates.io&lt;&#x2F;a&gt; that support Windows. Most of the time, crates that claim to care about Windows support Windows, as well as other platforms.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Jonathan&lt;&#x2F;strong&gt; : Rust is definitely my preferred tool for crossplatform development these days. Like Yehuda mentions, most crates work across Windows, macOS, and Linux. We’ll also likely explore making Nu work in the browser in the future, which would mean WASM support, and Rust is probably the best language for that as well.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;why-did-you-decide-to-ignore-posix-compliance&quot;&gt;&lt;strong&gt;Why did you decide to ignore POSIX-compliance?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Yehuda&lt;&#x2F;strong&gt; : This question is a little bit misleading in my opinion. When people say that a shell is “POSIX compliant”, they’re talking about a tiny subset of the syntax and features that people come to rely on in a shell. If you want to run a POSIX shell script in nu, you can just run it with bash or sh. On the other hand, trying to make our syntax perfectly compliant with the POSIX standard would introduce all kinds of weird decades-old cruft and constrain the ergonomics of our syntax.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Jonathan&lt;&#x2F;strong&gt; : When people ask for POSIX-compliance, I think different people mean different things. Generally, I think they mean “don’t break my muscle memory”. That’s fair, it’s annoying to unlearn habits. That said, what it means to be compatible has changed a lot from the original ideas. I saw this tweet the other day which I thought sums it up pretty well:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-gQH1jV4nzbs_WurExrLnEw.png&quot; alt=&quot;&quot; &#x2F;&gt;Source: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;danluu&#x2F;status&#x2F;1234814736144797697&quot;&gt;Dan Luu&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;where-does-nushell-stand-compared-to-others-like-zsh-or-fish-as-of-today-can-i-set-it-as-my-default-shell&quot;&gt;&lt;strong&gt;Where does NuShell stand compared to others like zsh or fish? As of today, can I set it as my default shell?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Jonathan&lt;&#x2F;strong&gt; : we’re quickly approaching when you’ll be able to use Nu as your default shell. In fact, some of Nu’s users already use it as their daily driver happily. In 0.13, we added the ability to create your own aliases, which dramatically improves how well Nu works as a shell, as it’s now easy to configure your own set of shortcuts for things you do regularly.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;how-did-you-decide-on-that-sort-of-hard-division-of-commands-streamers-filters-and-consumers-i-didn-t-see-any-official-names-for-these-concepts-but-i-think-this-conveys-the-idea&quot;&gt;&lt;strong&gt;How did you decide on that sort of “hard” division of commands: streamers, filters, and consumers?&lt;em&gt;I didn’t see any official names for these concepts, but I think this conveys the idea&lt;&#x2F;em&gt;&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Yehuda&lt;&#x2F;strong&gt; : The distinctions arose organically, and make sense. When you think about streams, there are really three parts: the first part, the middle parts, and the last part. The last part is the most special one, because it takes a stream of data and turns it into something you can see, which requires looking at the inbound stream. For example, the outputted table needs to look at some rows to see what headers to use.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;why-make-a-plugin-system-what-are-the-benefits-of-using-json-rpc-for-internal-communication&quot;&gt;&lt;strong&gt;Why make a plugin system? What are the benefits of using JSON-RPC for internal communication?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Yehuda&lt;&#x2F;strong&gt; : The main difference between plugins and builtins is that built-in commands have access to the shell internals. We wanted to build as many commands as possible on top of a more well-defined interface. This also meant that you could build custom commands in Python, Ruby or JavaScript pretty early in the project.&lt;&#x2F;p&gt;
+&lt;p&gt;The benefit of JSON-RPC is that it’s pretty easy to work with JSON-RPC in virtually all programming languages, so it’s possible to build a plugin in any language without major assistance from the nushell team.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;why-would-i-choose-to-make-a-plugin-why-not-just-make-a-binary-that-works-on-all-shells-and-let-the-parsing-of-my-output-to-users-of-nushell&quot;&gt;&lt;strong&gt;Why would I choose to make a plugin? Why not just make a binary that works on all shells and let the parsing of my output to users of NuShell?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Yehuda&lt;&#x2F;strong&gt; : The major benefit of building a plugin is the ability to work directly with structured data. This means that all of the “good stuff” that nushell gives you out of the box, like sorting and filtering, will just work without your user having to parse string output into a new structured format.&lt;&#x2F;p&gt;
+&lt;p&gt;The Nushell plugin API also allows you to specify the types of your arguments, which will give you error messages, syntax highlighting and some amount of context-sensitive completion out of the box. The more information you give Nushell, the more we can give Nushell users useful information as they interact with your command.&lt;&#x2F;p&gt;
+&lt;p&gt;Also, the Nushell plugin API is also built for streaming out of the box, so if you use the plugin API in the normal way, you can idiomatically interact with streams of structured data in a way that will scale up to huge amounts of input without “breaking the stream”.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;what-s-next-for-nushell&quot;&gt;&lt;strong&gt;What’s next for NuShell?&lt;&#x2F;strong&gt;&lt;&#x2F;h4&gt;
+&lt;p&gt;&lt;strong&gt;Jonathan&lt;&#x2F;strong&gt; : Nu, as both a shell and a language, is still very much young and growing. We’re planning on adding functions, a rich auto-completion system, better Jupyter integration for working with data, per-directory environments, and much more. In short, we want it to grow to be the best tool for working with your system, files, and data we can make.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Interview with Noria’s creator: a promising dataflow research database implemented in Rust</title>
+        <published>2019-10-22T00:00:00+00:00</published>
+        <updated>2019-10-22T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/interview-with-norias-creator-a-promising-dataflow-database-implemented-in-rust/"/>
+        <id>https://blog.lambdaclass.com/posts/interview-with-norias-creator-a-promising-dataflow-database-implemented-in-rust/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/interview-with-norias-creator-a-promising-dataflow-database-implemented-in-rust/">&lt;p&gt;After reading &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;download.tensorflow.org&#x2F;paper&#x2F;whitepaper2015.pdf&quot;&gt;Tensorflow’s original paper&lt;&#x2F;a&gt; I learnt that four of its authors were authors of Microsoft &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;sigops.org&#x2F;s&#x2F;conferences&#x2F;sosp&#x2F;2013&#x2F;papers&#x2F;p439-murray.pdf&quot;&gt;Naiad’s research paper&lt;&#x2F;a&gt; too. Naiad influenced many systems like Tensorflow.&lt;&#x2F;p&gt;
+&lt;p&gt;The Naiad paper is really interesting since it brings together many computation patterns: batch computation, streaming computation, and graph computation. It seemed to be a higher level abstraction than the traditional MapReduce and at the same time a more elegant &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Lambda_architecture&quot;&gt;Lambda architecture&lt;&#x2F;a&gt; that combines batch processing with streaming methods. Being an practitioner and not a researcher this paper helped me to understand to compare different projects like Hadoop, Spark, Storm, Samza, Flink, Kafka streams.&lt;&#x2F;p&gt;
+&lt;p&gt;Naiad’s paper introduced a computational model called timely dataflow that has influenced other systems like &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;mit-pdos&#x2F;noria&quot;&gt;Noria&lt;&#x2F;a&gt;. Noria is a fast storage backend for read-heavy web applications implemented in Rust with a MySQL adapter. One of its creators is Jon Gjengset, a PhD student in the Parallel and Distributed Operating Systems group at MIT. Jon has a great &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;thesquareplanet.com&#x2F;blog&#x2F;&quot;&gt;blog&lt;&#x2F;a&gt; and &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;channel&#x2F;UC_iD0xppBwwsrM9DegC5cQQ&quot;&gt;youtube channel&lt;&#x2F;a&gt; where he discusses everything from distributed algorithms to how to implement a ZooKeeper clone. He is into many subjects I love: Rust, distributed systems, databases and the relationship between Noria, Naiad and Tensorflow were enough reasons to interview him. We did not discuss Tensorflow but I hope to find out more about the relationship between it in the future.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;&lt;strong&gt;What is Noria?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Noria is a dynamic dataflow database that supports partial and incremental materialized views. To break that down a bit more, it is a database that is implemented using a streaming dataflow engine that can be changed on the fly (that’s the dynamic part). It supports pre-computing the results of queries (materialized views), and updates those materialized results as the data is updated (view maintenance).&lt;&#x2F;p&gt;
+&lt;p&gt;When this happens, the results are updated in-place rather than recomputed wholesale (i.e., the maintenance is incremental). When queries have parameters (e.g., &lt;em&gt;foo = ?&lt;&#x2F;em&gt;), it supports materializing the results for only some value of &lt;em&gt;foo&lt;&#x2F;em&gt; , and will compute results for “missing” values only when they are required (i.e., the materializations are partial).&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;How does it compare to other software like a relational database, in memory key-value stores, map reduce systems like Spark, stream processing like Storm or timely data flow?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The answer here requires some nuance, so please bear with me.&lt;&#x2F;p&gt;
+&lt;p&gt;Noria is very similar to a relation database on the outside. It has tables and SQL queries, and even supports the MySQL binary protocol. You interact with Noria through prepared statements, &lt;em&gt;SELECT&lt;&#x2F;em&gt; s, &lt;em&gt;INSERT&lt;&#x2F;em&gt; s, and &lt;em&gt;UPDATE&lt;&#x2F;em&gt; s. Internally though, it is quite different. Whereas a traditional database executes a query when it receives a &lt;em&gt;SELECT&lt;&#x2F;em&gt; , Noria generally executes &lt;strong&gt;all&lt;&#x2F;strong&gt; queries when data the query’s result depends on changes. In the steady state of the system, we expect queries to be executed on &lt;strong&gt;write&lt;&#x2F;strong&gt; , not on &lt;strong&gt;read&lt;&#x2F;strong&gt;. There are some smarts required here to not do undue work. For example, Noria only computes and maintains results for query parameters the application cares about (this is the “partial materialization” piece). Noria also executes queries “incrementally”; if you add a new vote to an article with a million votes, it knows to increase the count by one, rather than count a million and one things all over again.&lt;&#x2F;p&gt;
+&lt;p&gt;While Noria implements a key-value store internally to maintain and serve its materialized results, it does not seem like a key-value store to users of the system. Application authors write full SQL queries, and get structured results (rows of columns) back, just like with a normal database. The only sense in which Noria is like a key-value store is in its performance — query results will generally be fetched about as fast as a key-value store lookup.&lt;&#x2F;p&gt;
+&lt;p&gt;Streaming data-flow systems like Spark, Storm, Kafka, and timely dataflow share many similarities with Noria. They process data in the same streaming fashion, and have a similar distributed system design that relies on sharding and operator partitioning. Noria differs from these systems in a few principal ways though. First, users of Noria can change the running dataflow at any time without downtime. If a new SQL query is issued that the system has not seen before, it adapts the running dataflow on the fly to incorporate the operators from the new query. The adaptation also knows to re-use existing operators where possible to produce an overall more efficient dataflow than what you would get if you just ran each query as its own dataflow program.&lt;br &#x2F;&gt;
+Second, Noria supports partial materialization. Existing dataflow systems that support materialization are usually either windowed (i.e., they only reflect “recent” updates) or fully materialized (i.e., all results are always stored and maintained). Neither of these would work for web applications. When you issue a query, you expect to get all the results for &lt;strong&gt;that&lt;&#x2F;strong&gt; query (so no windowing), but you also don’t expect the system to waste resources on results that your application does not care around. You can think of this latter requirement as “you need the ability to evict from your cache”. And finally, Noria has a familiar interface for its queries: you issue SQL queries, and the system automatically translates them into efficient dataflow and adapts the running system to them. The other systems do not generally support this.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;The Noria paper states that it can scale to 5x higher load than a hand optimised MySQL database. How does it manage to do that?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The primary reason for this is Noria’s view materialization. When you issue a query to MySQL, the system has to &lt;strong&gt;execute&lt;&#x2F;strong&gt; that query to produce the query’s results. In Noria on the other hand, an application query effectively turns into a hashmap lookup in the common case, which is &lt;strong&gt;very&lt;&#x2F;strong&gt; fast. Noria’s reads can also happen entirely in parallel, with very little synchronization overhead, whereas MySQL includes a lot of machinery to support full-fledged transactions (which Noria does not support). Part of the trick here is Noria’s use of a neat little datastructure called an evmap (for “eventual map”; named for its support for eventual consistency). It allows reads and writes to proceed entirely in parallel with very little overhead by having reads and writes go to different hashmaps, and then occasionally atomically switching between them.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is the relationship between&lt;&#x2F;strong&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;jon.tsp.io&#x2F;papers&#x2F;osdi18-noria.pdf&quot;&gt;&lt;strong&gt;Noria’s paper&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt;&lt;strong&gt;, the&lt;&#x2F;strong&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;timelydataflow&#x2F;differential-dataflow&#x2F;blob&#x2F;master&#x2F;differentialdataflow.pdf&quot;&gt;&lt;strong&gt;Differential dataflow&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt;&lt;strong&gt;paper and&lt;&#x2F;strong&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;sigops.org&#x2F;s&#x2F;conferences&#x2F;sosp&#x2F;2013&#x2F;papers&#x2F;p439-murray.pdf&quot;&gt;&lt;strong&gt;Naiad: a timely dataflow system&lt;&#x2F;strong&gt;&lt;&#x2F;a&gt;&lt;strong&gt;?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Differential dataflow, timely dataflow, and its implementation in Naiad is one of the hallmark systems in the dataflow community. Most papers in this area relate to timely dataflow in one way or another. In the case of Noria, we also implement an incremental dataflow model, but we are trying to solve for a different use-case, and therefore arrive at different solutions.&lt;&#x2F;p&gt;
+&lt;p&gt;In particular, timely established a model for incrementally executing dataflow programs that include iteration and cycles with strong guarantees about consistency through a sophisticated timestamp tracking scheme. Noria does not support iteration or cycles, and is eventually consistent.&lt;&#x2F;p&gt;
+&lt;p&gt;Instead, we provide high-performance materialized views for fast reads, partial state so only the working set needs to be kept in memory, automatic multi-query optimization, support for dynamically modifying the dataflow as it runs, and of course SQL support. Timely does not support these features, though you could likely manually implement some of them on top of timely’s core given enough time and research effort.&lt;&#x2F;p&gt;
+&lt;p&gt;Overall, I don’t think it’s fair to say one system is &lt;strong&gt;better&lt;&#x2F;strong&gt; than another. In many ways they complement each other. Timely largely targets arbitrary batch computations over a large, interconnected dataset where reads are less frequent than just observing the “output” of the computation. And it is &lt;strong&gt;very&lt;&#x2F;strong&gt; good at that. Noria targets read-heavy applications where repeated and similar queries are common, and where the queries change over time. And it is &lt;strong&gt;very&lt;&#x2F;strong&gt; good at that.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Do you implement the full SQL language?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;It’s not clear what “full SQL” even really means, with all of the various extensions to the language that have been added to different implementations over time. Even if you restrict yourself to ANSI SQL though, the answer for Noria is no, although mostly for uninteresting reasons. Noria is a research prototype, and as such we have focused on the features that required active research to implement in Noria’s database model. Many of the remaining features we believe could be added with sufficient engineering effort, but without too much technical difficulty. To give some examples of things we don’t support: joins whose join condition is not a single column equality; &lt;em&gt;ORDER BY&lt;&#x2F;em&gt; without a limit; &lt;em&gt;CASE&lt;&#x2F;em&gt; statements; &lt;em&gt;LIKE&lt;&#x2F;em&gt; conditions; and of course the &lt;em&gt;SOUNDEX&lt;&#x2F;em&gt; operator. There are also patterns that we support, but that we believe could be optimized further, such as multi-way joins and multiple aggregations in a single query.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why did you choose to use RocksDB to persist the data?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;This was a more or less arbitrary decision. We initially wrote all base table writes directly to disk as a log, but quickly realized we needed to also keep indices over that on-disk data, otherwise recovery would be far too slow. We looked for an off-the-shelf solution, and RocksDB seemed to fit the bill. The interface for this base storage layer is pretty straightforward, and it should not be too difficult to slot in another solution there. The biggest challenge in doing so is maintaining some invariants around what writes are visible when for the purposes of Noria’s upqueries, but we believe these are solveable without too much trouble.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why does Noria needs to have Zookeeper running? Why did you choose ZooKeeper over etcd or consul?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Zookeeper serves two purposes in Noria at the moment. Service discovery and leadership change. And in fact, if you run a Noria server and client in a single process, you don’t actually need Zookeeper running at all.&lt;&#x2F;p&gt;
+&lt;p&gt;If you run a single Noria worker, and a separate client, Zookeeper is only used for the client to have an easy way to discover the location of the server. We’re considering adding a non-distributed mode to Noria which supports this single-worker use-case without Zookeeper. The bits are already in place (take a look at the &lt;em&gt;Authority&lt;&#x2F;em&gt; trait in the code if you are curious), it just hasn’t been a priority for us to fix. If you are running &lt;strong&gt;multiple&lt;&#x2F;strong&gt; Noria workers, then they need some way to agree on which worker is responsible for driving application-issued changes to the dataflow, and that is where Zookeeper’s consensus comes into play. We needed a system that allowed the workers to agree on who that should be, with a mechanism for failover, and Zookeeper provided that. The API we need from Zookeeper is very limited, and it should be straightforward to slot in another consensus provider in its place.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Is Noria production ready? Do you know anybody using it?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Noria is most definitely still a research prototype, though I think the thing standing between where it is now and a production-ready version is mostly just engineering effort. We are a small team of researchers working on it, and we focus our efforts on the aspects of the system that are related to our ongoing research. There is relatively little room for spending lots of time on doing “production engineering” in the academic setting :)&lt;&#x2F;p&gt;
+&lt;p&gt;That said, I know of several large companies who are very interested in&lt;br &#x2F;&gt;
+using Noria in a production setting, and many of them have gotten in touch with me about what might be required to achieve that. I also know that multiple companies are trying Noria out privately internally to test its viability as a replacement for certain parts of their stack. What ultimately comes of that is unclear at the moment, but I of course hope that they find Noria promising, and that they are willing to invest time into making it production ready!&lt;&#x2F;p&gt;
+&lt;p&gt;There are a few features missing from Noria that I think are the primary blockers from using it in production. The first is checkpointing of materialized views. Currently, if the system is turned off and then restarted, all the materialized views are empty. This would be equivalent to a full cache purge. An external system could heat the cache, but it’d be better if Noria internally kept some form of snapshot to aid in this process. The second is fault tolerance — when Noria is run in a distributed setting, a machine failure results in related parts of the dataflow being blown away entirely and restarted. This is obviously problematic in production settings. We are actively pursuing research in this area, and have some ideas for how to fix it, but it is a complex subject. And finally, Noria currently requires ownership of its base storage. If you have an existing data store that you’d like to keep using, you’d have to feed changes to that data to Noria, and Noria would store it a second time. Changing Noria such that it can handle the base storage being managed by a different system is possible, though would require some careful engineering with respect to consistency of upqueries.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;When would you avoid using Noria?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Noria is not great for systems that do not have a well-defined working set. If your application is constantly issuing entirely new queries over your data that do not relate to previous queries, or if it rarely queries by the same set of keys more than once, then Noria’s materializations will be mostly useless and just add unnecessary overhead. Noria is also primarily built for read-heavy applications; if your application rarely does reads, but sustains a &lt;strong&gt;very&lt;&#x2F;strong&gt; high write load, then Noria in its current form is probably not what you want. I say “probably” because Noria already supports a fairly high write throughput, and if your inputs fall below that threshold, Noria will still work fine. And, crucially, its materializations will make your reads over this quickly growing collection really fast!&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why did you choose to use Rust to implement it?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The answer to this is perhaps less interesting than you’d expect. When&lt;br &#x2F;&gt;
+we first started this iteration of the project in mid-2016, Rust was just starting to appear as a viable systems language. We were looking for a systems language to use for this new project, and did not particularly want to write C++, and wanted to explore something beyond Go. We heard about Rust, its claims were enticing, so as researchers we figured we’d try it out and see if it could live up to its promises. The cost of failure was low, as we could always start over, so we just ran with it. And now we’re 80k lines of code in, and I still think it was the right choice.&lt;&#x2F;p&gt;
+&lt;p&gt;I can also give a post-hoc analysis of the journey. I think choosing Rust has worked out great for us; specifically, it has saved us countless hours of debugging. We write a lot of concurrent code in Noria, and the Rust compiler has caught a ridiculous number of concurrency bugs that would just have slipped right by in another language. Debugging those in a distributed context in a research system where we don’t even know if the underlying &lt;strong&gt;algorithm&lt;&#x2F;strong&gt; is sound would have been a major pain (and still is when it happens). Rust has also allowed us to write low-level code when we needed to squeeze out those last bits of performance in the core pieces of Noria. What is more, I have found the Rust ecosystem to be a joy to participate in and to rely on; solid libraries like tokio have allowed us to focus on the core research-y parts of the application, and lots of knowledgeable Rustaceans have helped us when we’ve run into weird issues. Not only that, but we have been able to contribute back to that ecosystem by publishing libraries of our own and by contributing back to the compiler and other core libraries that we relied on.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;You have videos on how to implement a TCP stack, a minimal Zookeeper implementation and blog posts explaining how to implement Raft. What would gain a traditional full stack developer learning how to implement low level structures, distributed algorithms or distributed software?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I think much of this comes down to curiosity. If you’re curious about how stuff works, there’s an endless number of rabbit holes you can easily start down that teach you all of this stuff. For me, much of my distributed systems knowledge came from MIT’s 6.824 Distributed Systems class, which is &lt;strong&gt;excellent&lt;&#x2F;strong&gt;. All of their reading materials, lecture notes, and labs are also available online. For algorithms, the easiest way to get started in thinking about them is to read some of the early papers describing these algorithms, and then trying to implement them yourself! You’ll find that many of them aren’t as difficult to build as you may think, and you will learn a lot in the process. Including how tobread academic papers! I can also recommend trying to follow some low-level OS-building resources. For example, Philipp Oppermann has a great blog series on implementing an operating system from scratch in Rust that goes through all of the low-level details you’ll need to know.&lt;&#x2F;p&gt;
+&lt;p&gt;Alternatively, all the components of MIT’s 6.828 Operating Systems class are also available online.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What papers, readings and exercises do you recommend doing to learn about distributed programming?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I would highly recommend following the 6.824 class schedule&lt;br &#x2F;&gt;
+(&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;pdos.csail.mit.edu&#x2F;6.824&#x2F;schedule.html&quot;&gt;https:&#x2F;&#x2F;pdos.csail.mit.edu&#x2F;6.824&#x2F;schedule.html&lt;&#x2F;a&gt;). It covers both classic&lt;br &#x2F;&gt;
+papers, established approaches, and new research in the area. Do the&lt;br &#x2F;&gt;
+labs as well; they will force you to get &lt;strong&gt;intimately&lt;&#x2F;strong&gt; familiar with many&lt;br &#x2F;&gt;
+subtle distributed systems problems!&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Weld: accelerating numpy, scikit and pandas as much as 100x with Rust and LLVM</title>
+        <published>2019-09-21T00:00:00+00:00</published>
+        <updated>2019-09-21T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/weld-accelerating-numpy-scikit-and-pandas-as-much-as-100x-with-rust-and-llvm/"/>
+        <id>https://blog.lambdaclass.com/posts/weld-accelerating-numpy-scikit-and-pandas-as-much-as-100x-with-rust-and-llvm/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/weld-accelerating-numpy-scikit-and-pandas-as-much-as-100x-with-rust-and-llvm/">&lt;h3 id=&quot;interview-with-weld-s-main-contributor-accelerating-numpy-scikit-and-pandas-as-much-as-100x-with-rust-and-llvm&quot;&gt;Interview with Weld’s main contributor: accelerating numpy, scikit and pandas as much as 100x with Rust and LLVM&lt;&#x2F;h3&gt;
+&lt;p&gt;After working for weeks with Python’s and R’s data science stack I started to ask my self if there could be a common intermediate representation, similar to CUDA, that could be used by many languages. There should be something better than reimplementing and optimizing the same methods in each language. In addition to that, having a common runtime that could optimize the whole program instead of each function separately would be better. After a few days of researching and testing different projects I found &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.weld.rs&#x2F;&quot;&gt;Weld&lt;&#x2F;a&gt; (you can also read its &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;cs.stanford.edu&#x2F;~matei&#x2F;papers&#x2F;2017&#x2F;cidr_weld.pdf&quot;&gt;paper&lt;&#x2F;a&gt;). To my surprise, one of the creators of Weld is &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;matei_zaharia&quot;&gt;Matei Zaharia&lt;&#x2F;a&gt;, who also is the creator of Spark.&lt;&#x2F;p&gt;
+&lt;p&gt;That is how I contacted and interviewed &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;shoumik.xyz&#x2F;&quot;&gt;Shoumik Palkar&lt;&#x2F;a&gt;, the main contributor of Weld. Shoumik is a Ph.D. student in the Computer Science department at Stanford University, that is advised by Matei Zaharia.&lt;&#x2F;p&gt;
+&lt;p&gt;Weld is far from being production ready but it is promising. If you are interested in the future of data science and in Rust, you will like this interview.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-hqC6KtF-l1RN8uDg99rmow.png&quot; alt=&quot;&quot; &#x2F;&gt;Not a Monad Tutorial new logo!&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;&lt;strong&gt;What was the motivation to develop weld and what problem’s does it solve?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The motivation behind Weld is to provide bare-metal performance for applications that rely on existing high-level APIs such as NumPy and Pandas. The main problem it solves is enabling cross-function and cross-library optimizations that other libraries today don’t provide. In particular, many commonly used libraries provide state-of-the-art implementations for algorithms on a per-function basis (e.g., a fast join algorithm implemented in C in Pandas, or a fast matrix multiply in NumPy), but do not provide any facility for enabling optimization across these functions (e.g., preventing unnecessary scans of memory when performing a matrix multiply followed by an aggregation). Weld provides a common runtime that enables libraries to express computations in a common IR; that IR can then be optimized using a compiler optimizer, and can then be JIT’d to parallel native machine code with optimizations such as loop fusion, vectorization, etc. Weld’s IR is natively parallel, so programs expressed in it can always be trivially parallelized.&lt;&#x2F;p&gt;
+&lt;p&gt;We also have a new project called split annotations which will integrate with Weld that’s meant to lower the barrier for enabling these optimizations in existing libraries.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Optimizing numpy, pandas and scikit wouldn’t be easier? How faster it is?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Weld provides optimizations across functions in these libraries, whereas optimizing these libraries would only make individual function calls faster. In fact, many of these data libraries are already highly optimized on a per-function basis, but deliver performance below the limits of modern hardware because they do not exploit parallelism or do not make efficient use of the memory hierarchy. For example, many NumPy ndarray functions are already implemented in C, but calling each function requires scanning over each input in entirety. If these arrays do not fit in the CPU caches, most of the execution time can go into loading data from main memory rather than performing computations. Weld can look across individual function calls and perform optimizations such as loop fusion that will keep data in the CPU caches or registers. These kinds of optimizations can improve performance by over an order of magnitude on multi-core systems, because they enable better scaling.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-eheS9p1hxxEPH8Fqo3As8A.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;strong&gt;Prototype integrations of Weld with Spark (top left), NumPy (top right), and TensorFlow (bottom left) show up to 30x improvements over the native framework implementations, with no changes to users’ application code. Cross library optimizations between Pandas and NumPy (bottom right) can improve performance by up to two orders of magnitude.&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is Baloo?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Baloo is a library that implements a subset of the Pandas API using Weld. It was developed by Radu Jica, who was a Master’s student in CWI in Amsterdam. The goal of Baloo is to provide the kinds of optimizations described above in Pandas to improve its single-threaded performance, reduce memory usage, and to enable parallelism.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Does Weld&#x2F;Baloo support out-of-core operations (say, like Dask) to handle data that does not fit in memory?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Weld and Baloo currently do not support out-of-core operations, though we’d love open source contributions on this kind of work!&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why did you choose Rust and LLVM to implement weld? Was Rust your first choice?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;We chose Rust because:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;It has a very minimal runtime (essentially just bounds checks on arrays) and is easy to embed into other languages such as Java and Python&lt;&#x2F;li&gt;
+&lt;li&gt;It contains functional programming paradigms such as pattern matching that make writing code such as pattern matching compiler optimizations easier&lt;&#x2F;li&gt;
+&lt;li&gt;It has a great community and high quality packages (called “crates” in Rust) that made developing our system easier.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;We chose LLVM because its an open source compiler framework that has wide use and support; we generate LLVM directly instead of C&#x2F;C++ so we don’t need to rely on the existence of a C compiler, and because it improves compilation times (we don’t need to parse C&#x2F;C++ code).&lt;&#x2F;p&gt;
+&lt;p&gt;Rust was not the first language in which Weld was implemented; the first implementation was in Scala, which was chosen because of its algebraic data types and powerful pattern matching. This made writing the optimizer, which is the core part of the compiler, very easy. Our original optimizer was based on the design of Catalyst, which is Spark SQL’s extensible optimizer. We moved away from Scala because it was too difficult to embed a JVM-based language into other runtimes and languages.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;If Weld targets CPU and GPUS how does it compare to projects like RAPIDS that implements python data science libraries but for the GPU?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The main way Weld differs from systems such as RAPIDS is that it focuses on optimizing applications across individually written kernels by JIT compiling code rather than providing optimized implementations of individual functions. For example, Weld’s GPU backend would JIT-compile a single CUDA kernel optimized for the end-to-end application on the fly rather than calling existing individual kernels. In addition, Weld’s IR is meant to be hardware independent, allowing it to target GPUs as well as CPUs or custom hardware such as vector accelerators. Of course, Weld overlaps significantly and is influenced by many other projects in the same space, including RAPIDS. Runtimes such as Bohrium (a lazily evaluated NumPy) and Numba (a Python library that enables JIT compilation of numerical code) both share Weld’s high level goals, while optimizers systems such as Spark SQL have directly impacted Weld’s optimizer design.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Does weld have other applications outside data science library optimizations?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;One of the most exciting aspects of Weld’s IR is that it supports data parallelism natively. This means that loops expressed in the Weld IR are always safe to parallelize. This makes Weld an attractive IR for targeting new kinds of hardware. For example, collaborators at NEC have demonstrated that they can use Weld to run Python workloads on a custom high-memory-bandwidth vector accelerator just by adding a new backend to the existing Weld IR. The IR can also be used to implement the physical execution layer in a database, and we plan to add features that will make it possible to compile a subset of Python to Weld code as well.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Are the libraries ready to be used on real-life projects? If not, when can we expect them to be ready?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Many of the examples and benchmarks we’ve tested these libraries on are taken from real workloads, so we’d love it if users tried out the current versions for their own applications, provided feedback, and (best of all) submitted open source patches. That said, we don’t expect everything to work out of the box on real-life applications just yet. Our next few releases over the following couple months are focusing exclusively on usability and robustness of the Python libraries; our goal is to make the libraries good enough for inclusion in real-life projects, and to seamlessly fall back to the non-Weld versions of the libraries in places where support is yet to be added.&lt;&#x2F;p&gt;
+&lt;p&gt;As I mentioned on the first answer, one path toward making this easier comes in the form of a related project called split annotations (&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;weld-project&#x2F;split-annotations&quot;&gt;code&lt;&#x2F;a&gt; and &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;shoumik.xyz&#x2F;static&#x2F;papers&#x2F;mozart-sosp19final.pdf&quot;&gt;academic paper&lt;&#x2F;a&gt;). Split annotations are a system that allow annotating existing code to define how to split, pipeline, and parallelize it. They provide the optimization that we found was most impactful in Weld (keeping chunks of data in the CPU caches between function calls rather than scanning over the entire dataset), but they are significantly easier to integrate than Weld because they reuse existing library code rather than relying on a compiler IR. This also makes them easier to maintain and debug, which in turn improves their robustness. Libraries without full Weld support can fall back to split annotations when Weld is not supported, which will allow us to incrementally add Weld support based on feedback from users while still enabling some new optimizations.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Sonic: a minimalist  alternative to Elasticsearch written in Rust</title>
+        <published>2019-04-02T00:00:00+00:00</published>
+        <updated>2019-04-02T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/sonic-a-minimalist-alternative-to-elasticsearch-written-in-rust/"/>
+        <id>https://blog.lambdaclass.com/posts/sonic-a-minimalist-alternative-to-elasticsearch-written-in-rust/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/sonic-a-minimalist-alternative-to-elasticsearch-written-in-rust/">&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-ur9rT3EUiunAzys52MePnQ.jpeg&quot; alt=&quot;&quot; &#x2F;&gt;« Sonic » is the mascot of the Sonic project. Valerian drew it to look like a psychedelic hipster hedgehog.&lt;&#x2F;p&gt;
+&lt;p&gt;Database implementation sits in a nice spot between computer science and software engineering. There are lot of tradeoffs to consider. That is why nowadays we have a plethora of databases, each of them useful in a particular scenario. In the projects we work on at &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;lambdaclass.com&#x2F;&quot;&gt;LambdaClass&lt;&#x2F;a&gt; we always end up using the following: Redis, Elasticsearch, PostgreSQL, Kafka and Riak or Cassandra. It is difficult to keep up with the number of databases that are needed and it is even more difficult to learn about their internals.&lt;&#x2F;p&gt;
+&lt;p&gt;I always end up using Elasticsearch to index documents, to generate autocompletes and for geolocation. &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;valeriansaliou&#x2F;sonic&quot;&gt;Sonic&lt;&#x2F;a&gt; doesn’t solve all three problems but it is a good tool to solve the first two. I have not yet used it in production, but it seems like a good lightweight alternative to Elasticsearch.&lt;&#x2F;p&gt;
+&lt;p&gt;Since we love databases and we are trying to focus on Rust projects, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;twitter.com&#x2F;nenearria&quot;&gt;Amin Arria&lt;&#x2F;a&gt; and I decided to interview Sonic’s creator, &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;valeriansaliou&quot;&gt;Valerian Saliou,&lt;&#x2F;a&gt; who generously agreed. Also remember to check Sonic’s &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;valeriansaliou&#x2F;sonic&quot;&gt;repository&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;&lt;strong&gt;What is Sonic?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Sonic is an open-source search index server, written in Rust. It was built with simplicity, performance and lightweight-ness in mind. Sonic takes user queries in, and return identifiers. Those identifiers refer to actual documents in a relational database (eg. in our case: messages, helpdesk articles, CRM contacts, etc). Sonic does not store documents, which makes the whole system simple and efficient regarding storage, as an application getting search results from Sonic has to pull actual result data from another database (eg. MongoDB, MySQL, etc. given the search results IDs that are returned).&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Don’t Solr, ElasticSearch, Tantivy and Toshi solve similar issues to Sonic? Why did you create a new alternative?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I run a business called Crisp, which provides 100,000 users with a customer support software. Users want to search in their messages, and some of our users have A LOT of messages. Using traditional open-source search index softwares (eg. Elasticsearch amongst others) proved to be too expensive for our freemium model, as those systems are heavy and thus require huge server CPU and RAM.&lt;&#x2F;p&gt;
+&lt;p&gt;As a developer and sysadmin, I really love Redis for its simplicity and speed. In computer software, simplicity often provides speed, which is a good thing at scale. I built Sonic to be “the Redis of search”: simple features, simple network protocol.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why did you decide to use Rust? How was the experience of creating Sonic in Rust?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Rust makes the whole development experience smoother. The constraints of the language (eg. the borrow checker, the fact that there are no NULL values) guarantee that you won’t experience certain kinds of bugs while running your project in production (eg. NULL pointer exceptions and segmentation faults, which are unavoidable in programming languages such as C, C++ or Go; humans make mistakes).&lt;&#x2F;p&gt;
+&lt;p&gt;I’ve already built other Rust projects in the past to support the Crisp infrastructure at scale, such as Bloom, Vigil and Constellation (which are also available as open-source software on my GitHub). Rust was no new thing to me; overall I love working with the language. My first Rust projects 2 years ago were a bit rough, as you have to spend a lot of time with the borrow checker getting in your way for “no reason”. Once you understand how it works, you become much more productive and Rust borrow checker errors become rare.&lt;&#x2F;p&gt;
+&lt;p&gt;So overall, I can say that the experience of writing Sonic in Rust has been great. I love Rust. As a plus, it makes me become a better programmer.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is Sonic Channel? Is this feature inspired by Redis?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Sonic Channel is the name of the protocol used to communicate with Sonic over the network. As most application infrastructures today are distributed over multiple machines via the network, a TCP-based protocol to push new text data to the index and query the index was required. For performance reasons, I did not want to write an HTTP-based protocol, as Elasticsearch has.&lt;&#x2F;p&gt;
+&lt;p&gt;After releasing Sonic, I got a lot of contributions from the community to build Sonic Channel libraries (integrations) for the most popular programming languages: Go, Python, Ruby, Java, PHP and JavaScript (runs on NodeJS only). This let developers push data and search for items in Sonic right from their application, in their preferred programming language. It makes the whole process of integrating Sonic easier that calling a REST API, and cleaner.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What data structures do you use to create the index and to autocomplete words?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The index is stored in a LSM (Log-Structured Merge-tree), which is used by RocksDB under the hood. To auto-complete words, Sonic uses an FST (Finite-State Transducer), which is explained in great details in an article by &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;BurntSushi&quot;&gt;BurntSushi&lt;&#x2F;a&gt; on &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;blog.burntsushi.net&#x2F;transducers&#x2F;a&quot;&gt;his blog&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;An FST is stored on-disk for each Sonic (collection, bucket) pair, and is memory-mapped, which means that actual FST data is not loaded in RAM, but access is still fast. The downside of the Rust FST implementation that I’m using, is that any built FST is immutable. If a new word appears in a Sonic bucket, it needs to be pushed to the FST and thus a new FST needs to be re-built. Sonic runs a consolidation task periodically for mutated FSTs, and adds or remove words from them on-disk.&lt;&#x2F;p&gt;
+&lt;p&gt;The FST structure is not only used for word auto-completion, but also for typo corrections (eg. it is capable of correcting “Englich” to “English”). It uses a Levenshtein automaton to achieve that (given a maximum Levenshtein distance that’s relative to the length of the word; ie. the longer a word is, the more typos you allow).&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why did you choose RocksDB as the storage?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;rocksdb&quot;&gt;RocksDB&lt;&#x2F;a&gt; (from Facebook) is built on LevelDB (from Google), which I had good experience using through the SSDB open-source software.&lt;&#x2F;p&gt;
+&lt;p&gt;It is very good at keeping performance stable on huge key-spaces and minimizes disk usage by compressing old data (it has a leveled data storage architecture, where old data gets in lower levels, that can be compressed or compressed with a higher but slower ratio).&lt;&#x2F;p&gt;
+&lt;p&gt;RocksDB improves on LevelDB, and is very configurable. This means Sonic users can tune the internals of RocksDB through Sonic configuration to get the best out of their setups given their server hardware (spinning disks or SSDs, how many CPU cores they have, etc.).&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Any material you can offer for anyone wanting to learn how a search engine like Sonic works, and how to build it?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I’ve written a blog post summing up quickly &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;journal.valeriansaliou.name&#x2F;announcing-sonic-a-super-light-alternative-to-elasticsearch&#x2F;&quot;&gt;how Sonic works&lt;&#x2F;a&gt;. I plan to write an extensive documentation to explain the inner workings on Sonic, which is tracked on &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;valeriansaliou&#x2F;sonic&#x2F;issues&#x2F;103&quot;&gt;this GitHub issue&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Overall, reading Sonic code should help understand how things work. I spent a lot of time commenting my code and making it as clear as possible.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is jemalloc and why do you use it?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;jemalloc is a memory allocator that has been originally written for FreeBSD. It was designed for modern CPU architectures, and is much better at managing memory on multi-core architectures. It has no benefits on single core architectures though, but has been proved to be as good as older allocators in the case of single-CPU. So at worst it’s as good as traditional allocators, at best it provides better performance on multi-core CPUs and reduced memory fragmentation.&lt;&#x2F;p&gt;
+&lt;p&gt;Rust previously used jemalloc as its default allocator, and has recently moved to the system allocator for reasons other than performance. People can &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;www.bsdcan.org&#x2F;2006&#x2F;papers&#x2F;jemalloc.pdf&quot;&gt;read more on jemalloc&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Did you have any experience building something like this before? What do you recommend reading to other people to learn how to build a tool like Sonic?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I’ve built a great deal of server software, but I’ve never written databases. Databases can be hard, as they involve a great deal of lock strategies to prevent race conditions, so database developers have to be meticulous. Locks are hard to get right; locks in production are even harder: it’s easy to write code that dead-locks, while finding why a dead-lock occur is painful.&lt;&#x2F;p&gt;
+&lt;p&gt;I’d recommend people willing to build a Sonic-like project to read existing source code. The best way to build things yourself it to understand how others did it in the past.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Do you think they are fine? Do you want to change anything?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Yes, looks like Sonic worked great so far. Crisp search is now snappy and our results are relevant. Our users are happy.&lt;&#x2F;p&gt;
+&lt;p&gt;Our Sonic instance indexes half a billion objects (messages, articles, contacts). The compressed index is 20GB, and CPU usage under load is 10% of 1 Intel Xeon core. Sonic uses ~200MB of RAM for such a large index at worst, and 20MB when it’s cold-started. Search latency is under 1ms.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>An interview with the creator of Gleam: an ML like language for the Erlang VM with a compiler…</title>
+        <published>2019-04-01T00:00:00+00:00</published>
+        <updated>2019-04-01T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/an-interview-with-the-creator-of-gleam-an-ml-like-language-for-the-erlang-vm-with-a-compiler/"/>
+        <id>https://blog.lambdaclass.com/posts/an-interview-with-the-creator-of-gleam-an-ml-like-language-for-the-erlang-vm-with-a-compiler/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/an-interview-with-the-creator-of-gleam-an-ml-like-language-for-the-erlang-vm-with-a-compiler/">&lt;h3 id=&quot;an-interview-with-the-creator-of-gleam-an-ml-like-language-for-the-erlang-vm-with-a-compiler-written-in-rust&quot;&gt;An interview with the creator of Gleam: an ML like language for the Erlang VM with a compiler written in Rust&lt;&#x2F;h3&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-ivv-xih7D4rulPdRNmSYkg.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I have been writting soft real time systems with Erlang for almost a decade and for that task I think it is the best tool we have around. The concurrency model, the preemptive scheduler, the GC, the profiling tools, the libraries and the community are excellent for the task. Distribution libraries like &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;lasp-lang.readme.io&#x2F;docs&quot;&gt;Lasp&lt;&#x2F;a&gt; or distributed systems frameworks like &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;riak_core_tutorial&quot;&gt;Riak Core&lt;&#x2F;a&gt; are not easily available in other languages. At last, cheap processes, non shared state, supervisors and the let it crash philosophy are great tools when you are writing backends. Instead of trying to catch all the errors at compile time, you accept that it is impossible to catch all the possible problems and you deal with that reality. It is a very different error handling model from what you can find in Haskell or OCaml.&lt;&#x2F;p&gt;
+&lt;p&gt;However Erlang language is pretty simple. I always miss sum types when I am coding in Erlang. I miss ML’s type system expressiveness, safety and practicality. That is why I am interested in the development of Gleam, a statically typed functional programming language for the BEAM.&lt;&#x2F;p&gt;
+&lt;p&gt;Another interesting thing about Gleam is that its compiler is written in Rust. I think that Rust is a sort of ML + C language. I like C since the developer is at the driver seat driving with manual transmission. I can’t explain very well but I have always seen C as a simple and powerful language but I have always disliked C++. Knowing that I like ML and C you might understand why I find Rust an interesting language.&lt;&#x2F;p&gt;
+&lt;p&gt;To sum up we (me and &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;JuanBono&quot;&gt;Juan Bono&lt;&#x2F;a&gt;) decided to do this interview with &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;louispilfold&quot;&gt;Louis Pilfold&lt;&#x2F;a&gt; not only because of what it is, but also because it is implemented in Rust. Go ahead and check &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lpil&#x2F;gleam&quot;&gt;Gleam’s repo&lt;&#x2F;a&gt;!&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-x_OU1YRmBR8037eqsSAfYA.png&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;&lt;strong&gt;Tell us a little about yourself. Have you been working on programming languages for long?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Professionally I’m a web programmer, but over the last 4 years my hobby projects have largely been compilers in one form or another. Two of the most popular ones have been Dogma (an Elixir to angry error message compiler) and exfmt (an Elixir to slightly prettier Elixir formatter). For the last year I’ve been focusing on Gleam, which is an ML inspired statically typed language for the Erlang ecosystem.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What was the first programming language you learned?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The first language I attempted to learn was C, though with no experience and nothing but a few youtube videos I didn’t make much progress. After that I discovered an online version of MIT’s introduction to computer science and worked my way through that, so Python was the first program I successfully learnt. After finishing the course I discovered Ruby, which became my day-to-day language and my introduction to the world of web dev and professional programming, and then Haskell, which really shaped how I think about solving problems with code.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why do you think that the ML languages are a good fit for the BEAM VM?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Both families share the same lambda calculus core, and once you’ve discarded the various bells and whistles of the individual languages (such as processes, type classes, module functors, etc) they all have strikingly similar semantics. Given these shared semantics I think we can take the much loved type systems of ML languages and the proven value of the BEAM VM to create a language that has the best of both, or at least lots of fun :)&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;How does Gleam compare to the other ML-like initiatives targeting the Erlang VM? (Alpaca, Elchemy, etc). What are the main differences and what motivated you to create Gleam?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I think Gleam has a subtly different outlook to the other projects, it is more focused on using the learnings of ML to enhance the BEAM rather than creating an actual ML language. This thinking has resulted in some design differences such as simple interop in both directions, no auto-currying, no effects system, curly brace based syntax, and an Erlang style module system.&lt;&#x2F;p&gt;
+&lt;p&gt;I’m very glad that there are multiple projects working in this area. If Gleam fails and one of the other projects manages to build a healthy community then I’ll still be happy, I just want at one to succeed so I can use it in the real world.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Do you compile Gleam directly to BEAM bytecode?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The Gleam compiler has had a few full rewrites. The previous version compiled to BEAM bytecode via Core Erlang, which is an intermediate representation with the Erlang compiler, but the current version compiles to regular Erlang source code that has been pretty-printed. This has a few nice advantages such as providing an escape hatch for people who no longer wish to use Gleam, and enabling Erlang&#x2F;Elixir&#x2F;etc projects to use libraries written in Gleam without having to install the Gleam compiler.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What kind of type system Gleam uses? (Hindley-Milner?)&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Gleam uses a Hindley-Milner type system with a fairly standard implementation of Algorithm W. One slightly unusual addition is that row types are used to represent both records (which are Erlang maps) and modules, making them polymorphic in a way that I believe fits the way we use maps and modules in Erlang&#x2F;Elixir.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Does the static typing provide any run-time guarantees beyond the compilation checks?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;At runtime all types have been erased and there are no run-time checks. This is nice for performance and makes calling Gleam from Erlang easier, but it means there’s no way of automatically handling an incorrect type annotation when calling Erlang from Gleam.&lt;&#x2F;p&gt;
+&lt;p&gt;If you have an unruly or unreliable Erlang function that you wish to call from Gleam the standard library provides a module for handling dynamically typed data that can be used to handle the return values safely at runtime.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;How does the type system interact with message passing and distribution? How do you handle the message passing features of erlang? Have you given any thought on protocol specification as type checking?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Currently we don’t have a good solution for typed message passing and such, and development is currently focused on building the more run-of-the-mill parts of the language. Rather than introduce a flawed stop-gap solution that will later need to be replaced I’ve opted not to have first class support for the BEAM’s low level concurrency primitives, so these will have to be used via Erlang FFI.&lt;&#x2F;p&gt;
+&lt;p&gt;On the other hand OTP behaviours such as gen_server can be implemented using Gleam’s first class module system, which is enough to start writing OTP applications using Gleam today.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why did you choose Rust for implementing the Gleam compiler? (instead of choosing erlang&#x2F;elixir, etc)&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Gleam started as a few little experiments in Elixir but fairly quickly shifted over to Erlang. In December 2018 I realised I was going to have to refactor the type inference module in a fairly major fashion in order to correct a mistake in the design. The typer was easily the most complex part of the compiler and had accrued a lot of technical debt as I learnt and iterated on the language so I wasn’t feel very confident about the refactoring, especially without a static type system to guide me.&lt;&#x2F;p&gt;
+&lt;p&gt;I decided that a full rewrite of the compiler would give me a chance to produce a better application without the mistakes of the first version, and using a statically typed language would enable me to refactor more easily in future. I picked Rust, and after roughly 3 months I had a new compiler with roughly the same features, fewer bugs, and less tech debt. It’s also considerably faster.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Is Rust a good language for implementing programming languages?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Yes, I think so. The type system is sophisticated and robust enough to take refactorings that would have bested me in the Erlang version and complete them with relatively little stress and fewer bugs. The tooling, documentation, and libraries are delightful, and the community is exceptionally friendly and helpful.&lt;&#x2F;p&gt;
+&lt;p&gt;As a nice little bonus the performance of Rust has improved the user experience somewhat; Compilation is faster and there’s no longer a noticeable lag caused by the Erlang virtual machine booting and loading the various modules.&lt;&#x2F;p&gt;
+&lt;p&gt;However it’s certainly not a perfect language for compiler implementation. Rust’s linear type system means it doesn’t need a garbage collector, but it can be a very frustrating experience learning how to write code that type checks, and the resulting code can be quite verbose. I speculate that if I had opted to use OCaml instead the type inference code would be under half the size it currently is.&lt;&#x2F;p&gt;
+&lt;p&gt;I’m quite sure that someone with more Rust experience could make a lot of my code more concise and remove unnecessary memory allocations, but what we have today performs well and isn’t too difficult to modify. Overall I’m very happy with the decision to use Rust.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What kind of features do you plan to add to Gleam in the future (if any)? Were you inspired by a specific language?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The two main features I’ve been asked about are typed message passing (as you have enquired about above!) and some form of ad-hoc polymorphism like Haskell’s type classes. I don’t think that type classes are a good fit for Gleam, though perhaps something like OCaml’s proposed implicit module system could be worth exploring. Either way it will be a long time before we can start to design and experiment here, there’s plenty to do beforehand.&lt;&#x2F;p&gt;
+&lt;p&gt;I’d like to enhance how atoms are represented at type level. Currently we can say “this value is an atom”, but that’s about it. It would be more useful if we could say “this value is the atom ‘ok’ or the atom ‘error’”, or “this function can takes the atom ‘up’ or the atom ‘down’, but no other atom”. This could also be extended to create polymorphic enum variants too, though I’m unsure whether it makes sense to have those as well as Gleam’s existing pre-declared enums.&lt;&#x2F;p&gt;
+&lt;p&gt;It could be fun to have some alternative backends for the compiler so that we can compile to Javascript or a native binary, allowing Gleam to be used for cloud functions, command line tools, and other applications to which BEAM is less suited.&lt;&#x2F;p&gt;
+&lt;p&gt;A much more mundane feature I’m interested in is record punning, as found in Javascript or Haskell. It would be nice to be able to write this&lt;&#x2F;p&gt;
+&lt;p&gt;let {name, score} = player&lt;&#x2F;p&gt;
+&lt;p&gt;Instead of&lt;&#x2F;p&gt;
+&lt;p&gt;let {name = name, score = score} = player&lt;&#x2F;p&gt;
+&lt;p&gt;However that syntax has already been taken by tuples, so something would need to change for us to have this feature.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What recommendations would you give to someone who wants to start writing their first programming language?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Write lots of code in your language before writing the compiler! Solve lots of simple problems and compile it in your mind so that you can work out how all the different features would interplay and how it might work under the hood. Writing a compiler takes a lot of time so the more experimentation and learning you can do to build confidence in your language design the better. Changing syntax when you have one file of fake code takes seconds, while with a compiler it may take many hours. Worse still, changing the semantics of your language in your compiler could take days or weeks. It pays to get the design right first.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

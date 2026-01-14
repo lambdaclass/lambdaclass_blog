@@ -3,19 +3,26 @@
 
 base_url = "https://blog.lambdaclass.com"
 title = "LambdaClass Blog"
-description = "Technical blog by LambdaClass"
+description = "Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team."
 
 # Compilation settings
 compile_sass = true
 build_search_index = true
 generate_feeds = true
 feed_filenames = ["rss.xml", "atom.xml"]
+minify_html = false
 
 # Markdown settings
 [markdown]
-highlight_code = true
-highlight_theme = "base16-ocean-dark"
 smart_punctuation = true
+external_links_target_blank = true
+external_links_no_follow = false
+external_links_no_referrer = false
+bottom_footnotes = true
+
+[markdown.highlighting]
+enabled = true
+theme = "github-dark"
 
 # Taxonomies
 [[taxonomies]]
@@ -28,7 +35,35 @@ paginate_by = 20
 include_title = true
 include_description = true
 include_content = true
+include_path = false
+truncate_content_length = 300
 
 # Extra configuration
 [extra]
-# Add any custom variables here
+# Site information
+author = "LambdaClass"
+github_url = "https://github.com/lambdaclass"
+
+# Social links
+[extra.social]
+github = "lambdaclass"
+x = "class_lambda"
+
+# Navigation menu
+[[extra.menu]]
+name = "Home"
+url = "/"
+
+[[extra.menu]]
+name = "Topics"
+url = "/tags"
+
+[[extra.menu]]
+name = "GitHub"
+url = "https://github.com/lambdaclass"
+external = true
+
+[[extra.menu]]
+name = "X"
+url = "https://x.com/class_lambda"
+external = true

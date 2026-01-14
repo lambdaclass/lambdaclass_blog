@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>LambdaClass Blog - Vm</title>
+    <subtitle>Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://blog.lambdaclass.com/tags/vm/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2023-02-03T00:00:00+00:00</updated>
+    <id>https://blog.lambdaclass.com/tags/vm/atom.xml</id>
+    <entry xml:lang="en">
+        <title>A walkthrough on the open source Aleo VM implemented with Arkworks and blockchain implemented with Tendermint</title>
+        <published>2023-02-03T00:00:00+00:00</published>
+        <updated>2023-02-03T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/open-source-aleo-vm-implemented-with-arkworks-and-blockchain-implemented-with-tendermint/"/>
+        <id>https://blog.lambdaclass.com/posts/open-source-aleo-vm-implemented-with-arkworks-and-blockchain-implemented-with-tendermint/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/open-source-aleo-vm-implemented-with-arkworks-and-blockchain-implemented-with-tendermint/">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;&#x2F;h2&gt;
+&lt;p&gt;For the last 12 weeks, at LambdaClass, we have been developing an alternative implementation of the Aleo Blockchain. We want to thank Alex Pruden and Howard Wu from Aleo for their support throughout the process.&lt;&#x2F;p&gt;
+&lt;p&gt;At a high level, the project consists of a Consensus Layer using Tendermint and a Zero-Knowledge Virtual Machine targeting Aleo instructions implemented with the arkworks framework.&lt;&#x2F;p&gt;
+&lt;p&gt;You can check out the code:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * [Tendermint Blockchain implementation](https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;aleo_lambda_blockchain)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * [Virtual Machine implemented with Arkworks](https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;aleo_lambda_vm)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The key features of this blockchain revolve around the fact that it is designed to be a fully-private platform for users to develop applications that can then be built and executed off-chain, generating a proof of execution which is then sent to the blockchain nodes for verification and storage.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;If you’re in need of a team of engineers and researchers who’ve been working together for a decade in areas like distributed systems, machine learning, compilers, and cryptography, we’re your guys. Wanna chat more about it? Book a meeting with us by sending us an &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;calendly.com&#x2F;federicocarrone&quot;&gt;email&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;consensus-layer&quot;&gt;Consensus Layer&lt;&#x2F;h2&gt;
+&lt;p&gt;The consensus layer is in charge of validating incoming transactions which perform state changes and replicating these transactions (and the order in which they were performed) on an arbitrary number of nodes.&lt;&#x2F;p&gt;
+&lt;p&gt;To achieve this, we decided to utilize &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;tendermint&#x2F;tendermint&quot;&gt;Tendermint Core&lt;&#x2F;a&gt;, an implementation of a consensus mechanism written in Go. Alongside the Tendermint Core binaries, you need to run your implementation of an &lt;em&gt;Application Blockchain Interface&lt;&#x2F;em&gt; (or &lt;em&gt;ABCI&lt;&#x2F;em&gt; for short). This ABCI needs to implement specific hooks that Tendermint Core calls through a socket whenever required. For example, when receiving a transaction, it will call &lt;code&gt;CheckTx&lt;&#x2F;code&gt;, which is supposed to validate the transaction before entering it into the mempool and relaying it to other nodes. This flexible approach allows for the ABCI to be written in any language as long as it responds to the calls appropriately. We decided to write our implementation in Rust.&lt;&#x2F;p&gt;
+&lt;p&gt;You can see the code for this implementation &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;AleoHQ&#x2F;aleo_lambda_blockchain&quot;&gt;here&lt;&#x2F;a&gt;. The repository also contains a CLI application to compile, deploy and execute programs and send these transactions to the blockchain easily. It also has several other features related to accounts, such as retrieving a user’s balance or seeing which &lt;em&gt;records&lt;&#x2F;em&gt; the account possesses. We will explain the motivation behind records in the integration section of this post, but they are essentially a way to encapsulate state and ownership functionality in the blockchain.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;design-considerations&quot;&gt;Design considerations&lt;&#x2F;h3&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;external&#x2F;architecture.png?raw=true&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Considering the VM implementation and the requirements from the blockchain, we had to make several design decisions on the consensus layer. Here’s a general overview of how Tendermint Core was implemented:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The Tendermint Core and the ABCI need to run side by side in the same node and are coupled by the interface defined by the protocol&amp;#39;s hooks.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * All code executed on the ABCI needs to be deterministic and isolated from external services since we want to ensure all transactions perform deterministic state changes on every node in the network.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The ABCI implements two databases to maintain the current state of the blockchain: The program store and the record store. &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;      * The program store keeps track of every deployed program&amp;#39;s verifying keys and uses. The store contains the `credits` program&amp;#39;s keys as a built-in default. This program defines credit records. It is essentially a native Aleo program that has functions for managing credit records.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;      * The record store encapsulates functionality related to validating whether the records utilized in incoming transactions have already been spent. &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        * The privacy requirements imply that we cannot disclose what records have been spent and which have not. Due to this, any record in the blockchain (i.e., it was output from the execution of a program) is stored separately from records that have been spent, of which we only store serial numbers.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The genesis block needs to be provided to Tendermint on startup and is done through a JSON file. We have written a particular binary to generate it for any number of nodes and give each of them a fixed amount of starting credits.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * To make testing simple, we have created several `make` targets to initialize and start multiple validators that can run locally or on a remote network.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Both the CLI and the consensus layer support Aleo&amp;#39;s SnarkVM and our own LambdaVM and are currently interchangeable through a compiler flag&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h3 id=&quot;staking&quot;&gt;Staking&lt;&#x2F;h3&gt;
+&lt;p&gt;Tendermint supports adding new nodes to the network. In general, nodes in the network can work in two different modes:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Non-validator: The node catches up with the blockchain by performing every transaction but does not have voting power to validate and commit blocks.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Validator: The node is part of the network and can vote and sign blocks.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;To add a non-validator, the node needs to have the same Genesis block and point to persistent peers (IP addresses acting as fixed nodes in the network). To transform a node into a validator, the ABCI needs to implement functionality to update the voting power of a Tendermint node.&lt;&#x2F;p&gt;
+&lt;p&gt;For this, we implemented a &lt;code&gt;stake&lt;&#x2F;code&gt; command to “freeze” credits by exchanging them for staking records (and increase the voting power of a validator), which you can, in turn, &lt;code&gt;unstake&lt;&#x2F;code&gt; whenever you desire (decreasing the voting power accordingly).&lt;&#x2F;p&gt;
+&lt;p&gt;When a node is a validator, it gets rewards on each block commit where it was involved.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;virtual-machine&quot;&gt;Virtual Machine&lt;&#x2F;h2&gt;
+&lt;p&gt;At a high level, our VM provides an API to take an Aleo program that looks like this:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;program main.aleo;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;function add:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    input r0 as u16.public;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    input r1 as u16.private;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    add r0 r1 into r2;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    output r2 as u16.public;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;And generate a pair of proving and verifying keys for it (this is usually called &lt;em&gt;building&lt;&#x2F;em&gt; or &lt;em&gt;synthesizing&lt;&#x2F;em&gt; the program), allowing anyone to execute the program and provide proof of it or verify said proof. The consensus layer uses this to deploy programs (i.e., upload their verifying key along with the code), execute them, and verify them.&lt;&#x2F;p&gt;
+&lt;p&gt;Internally, this VM uses &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;arkworks-rs&quot;&gt;Arkworks&lt;&#x2F;a&gt; as a backend. Programs are turned into a Rank One Constraint System (&lt;code&gt;R1CS&lt;&#x2F;code&gt;), which is then passed on to the &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;arkworks-rs&#x2F;marlin&quot;&gt;Marlin&lt;&#x2F;a&gt; prover for execution. As we started using Arkworks, we noticed some aspects of the API and its genericity were becoming a burden for developers, so we created a thin wrapper around it called &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;simpleworks&quot;&gt;Simpleworks&lt;&#x2F;a&gt;, along with &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;lambdaclass.github.io&#x2F;simpleworks&#x2F;overview.html&quot;&gt;some basic documentation&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;example&quot;&gt;Example&lt;&#x2F;h3&gt;
+&lt;p&gt;Given the following Aleo program&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;program foo.aleo;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;function main:&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    input r0 as u64.public;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    input r1 as u64.public;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    add r0 r1 into r2;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    output r2 as u64.public;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Executing the function &lt;code&gt;main&lt;&#x2F;code&gt; would look like this:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;use lambdavm::jaleo::UserInputValueType::U16;&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;fn main() {&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    use lambdavm::{build_program, execute_function};&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    &#x2F;&#x2F; Parse the program&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let program_string = std::fs::read_to_string(&amp;quot;.&#x2F;programs&#x2F;add&#x2F;main.aleo&amp;quot;).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let (program, build) = build_program(&amp;amp;program_string).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let function = String::from(&amp;quot;main&amp;quot;);&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    &#x2F;&#x2F; Declare the inputs (it is the same for public or private)&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let user_inputs = vec![U16(1), U16(1)];&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    &#x2F;&#x2F; Execute the function&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let (_execution_trace, proof) = execute_function(&amp;amp;program, &amp;amp;function, &amp;amp;user_inputs).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    let (_proving_key, verifying_key) = build.get(&amp;amp;function).unwrap();&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    assert!(lambdavm::verify_proof(verifying_key.clone(), &amp;amp;user_inputs, &amp;amp;proof).unwrap())&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;h3 id=&quot;internals&quot;&gt;Internals&lt;&#x2F;h3&gt;
+&lt;p&gt;The most significant task our VM has to perform is turning the program into an arithmetic circuit, as the rest of the work, namely generating the proof and verifying it, is pretty straightforward with the Arkworks API.&lt;&#x2F;p&gt;
+&lt;p&gt;Before continuing, you should have at least a basic understanding of arithmetic circuits and how Arkworks lets you work with them. You can read about it &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;lambdaclass.github.io&#x2F;simpleworks&#x2F;overview.html&quot;&gt;here&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;To generate the circuit, we go through the following steps:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Take the program&amp;#39;s source code and parse it into a `Program` containing all the relevant information about it (a list of all input and output instructions, whether they are public or private, a list of all regular instructions like add and its operands, etc.). We currently rely on SnarkVM&amp;#39;s parser but plan to write our own.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Instantiate an Arkworks `ConstraintSystem`, which will hold all our circuit&amp;#39;s constraints by the end.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * For every input instruction, instantiate its corresponding `Gadget`. You can think of a gadget as the equivalent of a native type (like `u8`) inside an arithmetic circuit. If the input is public, the gadget is made public; otherwise, it&amp;#39;s made a `witness`, i.e., private. In our example, the first instruction `input r0 as u16.public` becomes a call to `UInt16Gadget.new_input(...)` and the second instruction becomes `UInt16Gadget.new_witness(...)`.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * For every regular instruction, we use the gadget&amp;#39;s associated function to perform the operation and generate its constraints inside our `ConstraintSystem`. In our example, when we encounter the `add r0 r1 into r2;` instruction, we call `UInt16Gadget.addmany(...)`. This is an arkworks provided function that will take a list of `UInt16&amp;#39;s, add them, implicitly mutate the `ConstraintSystem` with all the associated constraints, then return the value of the sum. Not all instructions have a corresponding arkworks function implemented, so for those, we had to roll our own.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * For every output instruction, assign to the register the computed value.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Because a program can have multiple registers interacting with each other, to do the above, we have to keep track of each register and its value as we go. For this, we keep an internal hash table throughout execution.&lt;&#x2F;p&gt;
+&lt;p&gt;Additionally, we ran some benchmarks comparing our VM with Aleo’s &lt;code&gt;SnarkVM&lt;&#x2F;code&gt;, and our results show we are a few times faster than it; details will be published in a separate post. The code for benchmarks is in &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;aleo_lambda_vm&quot;&gt;our VM Repo&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;vm-consensus-integration-layer&quot;&gt;VM-Consensus Integration Layer&lt;&#x2F;h2&gt;
+&lt;p&gt;Above, we discussed how the VM allows running arbitrary Aleo programs that can be deployed, executed locally, and then verified on the Aleo blockchain. Each Aleo transaction is either the deployment or the proof of execution of a program (this is technically inaccurate, as there can be multiple of these per transaction, but we’ll ignore that for simplicity). In the case of executions, nodes use the program’s verifying key to verify the correct execution before committing transactions to a block.&lt;&#x2F;p&gt;
+&lt;p&gt;After we got a basic VM version working, we realized that getting a fully functional Aleo blockchain required more work than just the above. Transactions would be of very little use if they proved that some computation was done correctly. To be useful, they also need to &lt;em&gt;modify the state&lt;&#x2F;em&gt;. In Aleo, the state is managed through &lt;em&gt;records&lt;&#x2F;em&gt; in what is essentially a &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Unspent_transaction_output&quot;&gt;UTXO&lt;&#x2F;a&gt; model similar to Bitcoin. Typically, when a user sends a transaction, they will spend some records they own to create new ones in their place.&lt;&#x2F;p&gt;
+&lt;p&gt;Because Aleo is entirely private, a transaction can’t just publish the records it wants to spend along with a signature; it has to &lt;em&gt;prove&lt;&#x2F;em&gt; ownership and existence of records in zero knowledge, then &lt;em&gt;encrypt&lt;&#x2F;em&gt; the records so only its owner can decrypt on-chain.&lt;&#x2F;p&gt;
+&lt;p&gt;This means that, to integrate with the consensus layer and get a fully functional blockchain, we need a bit more. The VM can prove the correct execution of programs, but the Zero-Knowledge proof that comes with a transaction also needs to include the following:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * A signature in Zero-Knowledge, proof that the signature provided is the correct one. Remember, we can&amp;#39;t just show the user&amp;#39;s address sending the transaction.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * A proof that the caller of the transaction actually _owns_ the record they&amp;#39;re spending.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * A proof that the records being spent are on-chain. This is essentially verifying a Merkle path in Zero-Knowledge.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * A proof that the input records have not been spent. This is a bit involved as it requires deriving a record&amp;#39;s `serial number` (think of it as the `nullifier` if you know ZCash) in Zero-Knowledge.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We also talked about how records should be stored encrypted on-chain so that only someone possessing the record owner’s view key can decrypt them (in Aleo, the &lt;code&gt;view key&lt;&#x2F;code&gt; is just another key tied to an account that allows record decryption).&lt;&#x2F;p&gt;
+&lt;p&gt;There’s a catch here, though. When, for instance, user A wants to send money to user B, they have to create a record owned by B and encrypt it so that only B can decrypt it. But &lt;code&gt;A&lt;&#x2F;code&gt; does not necessarily have &lt;code&gt;B&lt;&#x2F;code&gt;’s view key, only their address. This means the encryption scheme used by Aleo cannot be symmetric, as that would require user &lt;code&gt;A&lt;&#x2F;code&gt; to have &lt;code&gt;B&lt;&#x2F;code&gt;’s view key to send them money, not just their address.&lt;&#x2F;p&gt;
+&lt;p&gt;To accomplish this, records are encrypted using a scheme called &lt;code&gt;ECIES&lt;&#x2F;code&gt; (Elliptic Curve Integrated Encryption Scheme). We’re not going to go into detail about how it works, but it’s a combination of a Diffie-Hellman key exchange with a symmetric encryption scheme.&lt;&#x2F;p&gt;
+&lt;p&gt;We introduced a middle layer between our VM and the Consensus Layer to solve all the problems discussed above. This middle layer handles everything related to records, their encryption, and the snarks required for the state transition proofs.&lt;&#x2F;p&gt;
+&lt;p&gt;In the original SnarkVM implementation, this middle layer does not really exist, as it’s part of the VM itself, but we found it more beneficial to separate these two concerns.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;work-in-progress&quot;&gt;Work in Progress&lt;&#x2F;h2&gt;
+&lt;p&gt;This project is still in active development, and a few things are being worked on. They include:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;giallo&quot; style=&quot;color: #E1E4E8; background-color: #24292E;&quot;&gt;&lt;code data-lang=&quot;plain&quot;&gt;&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Support for some data types and instructions on the VM, including the `group` data type (elliptic curve elements) and things like `BHP` commitments. You can check out a complete list on [the README](https:&#x2F;&#x2F;github.com&#x2F;lambdaclass&#x2F;aleo_lambda_vm).&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Some of the circuits mentioned above prove the correctness of state transitions.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * The generation of the proof that input records exist on-chain.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;
+&lt;span class=&quot;giallo-l&quot;&gt;&lt;span&gt;    * Due to how we store record information on the blockchain and considering the privacy requirements of the blockchain, asking for a user balance or unspent records from the CLI is currently not trivial: We need to ask for all records that have ever existed in addition to all serial numbers from records that have been spent and attempt to decrypt them on the user&amp;#39;s side. Some strategies to optimize this process include keeping track of records locally and only adding newly-created ones as the blockchain grows.&lt;&#x2F;span&gt;&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We plan to finish these tasks in the next four weeks. While many things could be improved, the project is already production ready.&lt;&#x2F;p&gt;
+&lt;p&gt;We have many ideas and comments about improving the SnarkVM and Aleo in general, but we will leave that for another series of posts.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>LAM: an actor-model VM for WebAssembly and native</title>
+        <published>2021-02-26T00:00:00+00:00</published>
+        <updated>2021-02-26T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://blog.lambdaclass.com/posts/lam-an-actor-model-vm-for-webassembly-and-native/"/>
+        <id>https://blog.lambdaclass.com/posts/lam-an-actor-model-vm-for-webassembly-and-native/</id>
+        
+        <content type="html" xml:base="https://blog.lambdaclass.com/posts/lam-an-actor-model-vm-for-webassembly-and-native/">&lt;p&gt;An interview with its creator, Leandro Ostera.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;1-ZA5-hKa-yYGz8FX-kmZh9g.png&quot; alt=&quot;&quot; &#x2F;&gt;Source: &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;abstractmachines.dev&#x2F;&quot;&gt;https:&#x2F;&#x2F;abstractmachines.dev&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Here, at NAMT, we are in love with the Actor Model.&lt;br &#x2F;&gt;
+Within this paradigm, the basic units of computation are called actors. There is no shared state between them, instead, they interact via message passing. This has the advantage that actors become trivial to paralellize (in Erlang, an actor is called a &lt;em&gt;process&lt;&#x2F;em&gt;) and errors became easier to handle.&lt;&#x2F;p&gt;
+&lt;p&gt;The actor model is a concurrency paradigm created by Carl Hewitt in 1973 with the goal of making the task of writing concurrent programs simpler. It is based on the idea of actors, entities that can only send, receive and process messages. By reducing the amount of shared state it reduces the need of locks for synchronization. There exists several battle-tested implementations of the Actor Model such as Erlang&#x2F;OTP, Akka (Scala&#x2F;Java) and Orleans (C#).&lt;&#x2F;p&gt;
+&lt;p&gt;In this interview, we chat with Leandro Ostera, the founder of Abstract Machines. Ostera is working on LAM, The Little Actor Machine, an embeddable virtual machine for the actor model that runs native or compiles to WebAssembly.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;em&gt;The questions for this interview were thought by Juan Pablo Amoroso, Javier Chatruc &amp;amp; Federico Carrone. Joaquín Centeno and Juan Bono wrote the introduction and edited the article.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;&lt;strong&gt;Tell us a bit about your project lab, Abstract Machines. What kind of work do you do?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I started Abstract Machines with a single goal in mind: build tools that would help me think more clearly.&lt;&#x2F;p&gt;
+&lt;p&gt;Right now what I do think about the most is writing software. I think typed languages help me think clearly, so I’m building Caramel, an OCaml for the BEAM. I also think that understanding the program that runs your programs is fundamental to thinking clearly about the quality of what you build, so I’m building LAM, an actor-model VM.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;LAM’s tagline is “A Little Actor Machine that runs on Native and WebAssembly”. Could you give us a brief overview of the actor system?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The original name was Leandro’s Abstract Machine. Like Prolog’s WAM was named after Warren, Warren’s Abstract Machine, and the early Erlang VM was JAM after Joe’s Abstract Machine. But Little I think it’s a much better name overall: LAM should be small, tiny even.&lt;&#x2F;p&gt;
+&lt;p&gt;The actor system it implements is in spirit very close to Erlang’s take on the actor model — processes with mailboxes, message passing across them, fair scheduling through reduction counting. There’s a few more things in the roadmap, like process linking and monitoring. Overall, if you have worked with Erlang or Elixir before, you should feel right at home with LAM.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What is the motivation behind LAM? Why build a BEAM alternative?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;LAM’s mission is to make Actor concurrency available everywhere by providing a specified, lightweight runtime. Think LuaVM meets the Actor Model. I’ve always liked the LuaVM, there’s a certain elegance to it that I find very appealing.&lt;&#x2F;p&gt;
+&lt;p&gt;One of the reasons to build an alternative is that the BEAM is rather large, and the implementation is the only real spec. [Erik Stenmans’ Beam Book] or [kvavks Beam Wisdoms] have tried to document it, but without an official effort to produce a JVM style spec (like the one you can get in a bookshelf), it’s unlikely we will have a reliable drop-in alternative any time soon.&lt;&#x2F;p&gt;
+&lt;p&gt;So I thought I could instead make a new thing that could learn from both the LuaVM and the BEAM. At 35 instructions, LAM can run an interesting amount of Erlang programs, in fact I’d like most code that runs on the BEAM to be bytecode-translatable to run on LAM. Not all of it tho, and we’ll see what doesn’t make the cut.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;One of LAM’s targets is WebAssembly. Is there any alternative actor system for the web? How do they compare with LAM?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Yes, there are plenty! A most promising one these days is Lunatic, but on the Erlang side of things, there’s the up-and-coming Lumen.&lt;&#x2F;p&gt;
+&lt;p&gt;Most of the rest are libraries for building actor applications in other languages, like how Actix lets you use Actors in Rust. Lumen in particular is more of a compiler + runtime that brings Erlang down to LLVM and gives you this single optimized executable.&lt;&#x2F;p&gt;
+&lt;p&gt;LAM by contrast is a higher level VM: you feed it bytecode (spawn, send, receive, call, make list, etc), and as it runs it, side-effects happen through FFI&#x2F;Bindings depending on the platform.&lt;&#x2F;p&gt;
+&lt;p&gt;Around LAM there’s a tiny compilation toolchain that takes that bytecode, lowers it to something that can be run a little faster, and packs it &lt;em&gt;with the VM&lt;&#x2F;em&gt; in a single binary that is optimized for a specific platform.&lt;&#x2F;p&gt;
+&lt;p&gt;Because the VM is tiny, and the FFIs are pluggable, it’s straightforward to compile it to WebAssembly and run your bytecode there.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;The documentation mentions that one of the goals is to support Erlang&#x2F;OTP’s supervision tree structure. Would this allow more reliable&#x2F;resilient web UIs, capable of gracefully recovering from errors?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Absolutely! I expect it to let you build even more natural and flexible UIs. After all the “event” model fits perfectly: when process Button receives message Click, do this&#x2F;that.&lt;&#x2F;p&gt;
+&lt;p&gt;The main problem is that preemptive scheduling makes it impossible to guarantee certain processes will have enough time to make stuff like animations run smoothly. But I’m borrowing the idea of dirty schedulers and considering introducing Greedy Processes instead, that can either request upfront how much time they need, or just run to completion. Definitely interesting to experiment with hard-real time scheduling as well.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;What are some interesting use cases for LAM?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Off the top of my head, there’s 2. The first one is perhaps why I want it the most these days: fast cli tools. Write ’em in Erlang&#x2F;Elixir&#x2F;Caramel, ships as a single binary.&lt;&#x2F;p&gt;
+&lt;p&gt;The second one will have the largest impact on how we build for the BEAM: actually writing full-stack applications in a single BEAM Language.&lt;&#x2F;p&gt;
+&lt;p&gt;Write your backend in Elixir and run it on the BEAM, write your frontend in Elixir too but run it on LAM. And it doesn’t have to be a web-based app, it could be an actual native GUI application too.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Why write it in Rust? Is the Rust-WASM toolchain mature enough to target WASM reliably with LAM?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I love Rust. It’s a good language and the learning curve has certainly taught me a lot about how to build software. I think the Rust-wasm toolchain is pretty mature these days too.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Besides performance (LAM compiles AOT), what will be the advantages of LAM over the BEAM?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Really the AOT stuff I can’t consider an advantage — I don’t expect LAM to be fundamentally faster than the BEAM, especially after the BeamJIT work. Nor do I expect it to compete in speed with Lumen.&lt;&#x2F;p&gt;
+&lt;p&gt;What I see as an advantage is that LAM is being built to have a Specification and to be Embeddable.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;WebAssembly lacks a garbage collector and the BEAM is a GC environment. How does LAM tackle this?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;There is a wasm-gc spec in the works, and some other folks are waiting on it as well (like the OCaml-wasm efforts).&lt;&#x2F;p&gt;
+&lt;p&gt;But since WebAssembly isn’t the only LAM target, we’ll have to embed a GC anyway. I expect it to work very closely to the BEAMs (per process collections, ref counted binary strings, etc). I haven’t looked so deeply into this, but I have a chunky book waiting for me (The Garbage Collection Handbook).&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Is this a solo project or are you looking for contributors? If you are looking for contributors, how should they get started (first issues, roadmap, etc)?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;So far it is just me, but I’d love to build a friendly and welcoming community around it. At the moment I’ve been focused on getting this vertical slice of the project up and running so it becomes easier to do some horizontal scoping: how far along are we with the specification, or how much of the BEAM bytecode can we support via translation.&lt;&#x2F;p&gt;
+&lt;p&gt;There’s tons of work to do starting at the design level. From figuring out how to build the right layers to FFIs across platforms (native, wasi, web), to how to optimize the main emulator loop to crunch the bytecode as fast as possible, to GC and bundling the final binaries, to writing the spec and the manual.&lt;&#x2F;p&gt;
+&lt;p&gt;Formalizing the spec is a big topic where I hope I can get some interest from the TLA+ community to guide me into doing justice to both TLA+ and LAM.&lt;&#x2F;p&gt;
+&lt;p&gt;LAM could use help across the board, so if you’re reading this please tweet at me (&lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;leostera&#x2F;&quot;&gt;@leostera&lt;&#x2F;a&gt;)!&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;For our last question, in general, what are your favorite books, articles or resources for programmers?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;I think that if you asked me this a year ago I would have regurgitated a bunch of books that I should list here, but that didn’t really further my understanding. There’s a lot of reference material that is just terrible for learning, because its meant to be a compendium of information rather than a pedagogically written introduction to a subject.&lt;&#x2F;p&gt;
+&lt;p&gt;For example, Types and Programming Languages by Benjamin Pierce is deemed &lt;em&gt;the ultimate&lt;&#x2F;em&gt; reference for type stuff. But I learned more about the nature of typing by reading The Little Typer. After that it was a lot easier to get into the right headspace to understand what Pierce wanted me to get out of the book.&lt;&#x2F;p&gt;
+&lt;p&gt;So if you’re getting into a subject, don’t rush for the ultimate reference, and find something written to teach you &lt;em&gt;the core&lt;&#x2F;em&gt; of the subject. Then the rest becomes a little easier.&lt;&#x2F;p&gt;
+&lt;p&gt;Virtual Machines by Iain D. Craig, and Formal Development of a Network-Centric RTOS have been very useful in working with LAM. Hillel Wayne’s Practical TLA+, and Alloy’s Software Abstraction books have been really good to get a better grip on how to specify systems as well. Of course &lt;a rel=&quot;noopener external&quot; target=&quot;_blank&quot; href=&quot;http:&#x2F;&#x2F;lamport.azurewebsites.net&#x2F;tla&#x2F;book.html&quot;&gt;“Specifying Systems” by Lamport&lt;&#x2F;a&gt; has been a good reference as well.&lt;&#x2F;p&gt;
+&lt;p&gt;Some books that have had a massive impact in how I think and communicate have (unsurprisingly) nothing to do with computers. Like Umberto Eco’s “6 Walks in the Fictional Woods” (focused on how to create narratives and rhetoric) or Mandelbrot’s “The (Mis)Behavior of Markets” (a historical account of how fractal geometry describes better the financial markets). Nonetheless, they’ve helped shape the way I think and I’ve come out a better programmer.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;images&#x2F;max&#x2F;2000&#x2F;0-nPPWbd4-7dJavk5P.gif&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

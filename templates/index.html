@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ config.title }} - Technical Insights{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Engineering Excellence</h1>
+        <p class="hero-subtitle">Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.</p>
+    </div>
+</section>
+
+<section class="posts-section">
+    <div class="section-header">
+        <h2>Latest Articles</h2>
+        <a href="{{ get_url(path="posts") }}" class="view-all">View all articles</a>
+    </div>
+
+    <div class="posts-grid">
+        {% set section = get_section(path="posts/_index.md", metadata_only=false) %}
+        {% for page in section.pages | slice(end=12) %}
+        <article class="post-card">
+            {% if page.extra.feature_image %}
+            <a href="{{ page.permalink }}" class="post-image-link">
+                <img src="{{ page.extra.feature_image }}" alt="{{ page.title }}" class="post-image" loading="lazy">
+            </a>
+            {% endif %}
+            <div class="post-card-content">
+                <div class="post-meta">
+                    <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+                    {% if page.reading_time %}
+                    <span class="reading-time">{{ page.reading_time }} min read</span>
+                    {% endif %}
+                </div>
+                <h3 class="post-title">
+                    <a href="{{ page.permalink }}">{{ page.title }}</a>
+                </h3>
+                {% if page.description %}
+                <p class="post-excerpt">{{ page.description | truncate(length=160) }}</p>
+                {% elif page.summary %}
+                <p class="post-excerpt">{{ page.summary | striptags | truncate(length=160) }}</p>
+                {% endif %}
+                {% if page.taxonomies.tags %}
+                <div class="post-tags">
+                    {% for tag in page.taxonomies.tags | slice(end=3) %}
+                    <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}" class="tag">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    {% if paginator %}
+    <nav class="pagination">
+        {% if paginator.previous %}
+        <a href="{{ paginator.previous }}" class="pagination-link prev">Previous</a>
+        {% endif %}
+        <span class="pagination-info">Page {{ paginator.current_index }} of {{ paginator.number_pagers }}</span>
+        {% if paginator.next %}
+        <a href="{{ paginator.next }}" class="pagination-link next">Next</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+</section>
+{% endblock %}

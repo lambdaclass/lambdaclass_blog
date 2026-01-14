@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifiable AES: encryption using zero-knowledge proofs - LambdaClass Blog</title>
+    <meta name="description" content="Encryption is transforming messages into random-looking texts to ensure confidentiality between two parties.
+
+What is our objective here? We want to generate proof allowing us to verify an encryption algorithm, ensuring it does what it was designed for. ">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Verifiable AES: encryption using zero-knowledge proofs</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-01-07">January 07, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p><img src="/images/2023/01/download-1.jpeg" alt="download-1" /></p>
+<h2 id="scope">Scope</h2>
+<p>At Lambdaclass, we want to try and test different cryptographic primitives that we can use to develop new products and applications to empower individuals and organizations, with an increased focus on security and requiring minimal trust between parties. In a series of posts, we will cover powerful primitives such as zero-knowledge proofs and fully homomorphic encryption, their applications, and use cases.</p>
+<p>Encryption is transforming messages into random-looking texts to ensure confidentiality between two parties.</p>
+<p><strong>What is our objective here?</strong><br />
+We want to generate proof allowing us to verify an encryption algorithm, ensuring it does what it was designed for.</p>
+<p><strong>Why do we need this?</strong><br />
+We need this so that the user does not need to trust that the other party performed the encryption correctly; we replace trust with cryptographic proofs. There a few use cases where the receiver doesn’t want to decrypt the message unless it’s an emergency. But at the same time the receiver needs to make sure the encryption was correctly done so that the message is there waiting for him to open it.</p>
+<p><strong>When is this useful?</strong><br />
+Whenever we want to receive unknown data from untrusted parties in a secure way and be sure that we are not being cheated.</p>
+<p>The repository of the project can be found <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/AES_zero_knowledge_proof_circuit">here</a>.</p>
+<h2 id="general-introduction">General Introduction</h2>
+<p>Two parties (we will call them Alice and Bob) can communicate securely by using encryption schemes. We can broadly classify encryption schemes into the following categories:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Private (symmetric) key encryption. Commonly used methods are AES and ChaCha20.</span></span>
+<span class="giallo-l"><span>    * Public (asymmetric) key encryption. Commonly used methods are RSA and ElGamal.</span></span></code></pre>
+<p>In symmetric encryption, Alice and Bob must agree on a shared key before sending messages. The problem is how they can agree on something if they can’t send messages to each other securely? Luckily, key agreement schemes, such as Diffie-Hellman, allow them to choose a secret key. We will focus here on the Elliptic Curve Diffie-Hellman protocol. The key ingredients are a finite field $\mathbb{F_p}$ (where $p$ is a large prime) and an elliptic curve $\mathcal{C}$ defined over $\mathbb{F_p}$ (which contains a subgroup of prime order $r$ with a generator $g$). It consists of the following steps:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Alice chooses an element $s_A$ in $\mathbb{F_p}$ and computes her public key, $g_A=s_A g$.</span></span>
+<span class="giallo-l"><span>    2. Alice sends her public key $g_A$ to Bob.</span></span>
+<span class="giallo-l"><span>    3. Bob chooses an ephemeral key, $s_B$ in $\mathbb{F_p}$, and computes his public key $g_B=s_B g$ and the shared secret $g_{AB}=s_B g_A=s_As_B g$.</span></span>
+<span class="giallo-l"><span>    4. Bob sends $g_B$ to Alice; Alice can also derive the shared secret by doing $g_{AB}=s_A g_B$.</span></span>
+<span class="giallo-l"><span>    5. They can calculate the symmetric key, $sk$, from the same key derivation function, $sk=KDF(g_{AB})$.</span></span></code></pre>
+<p>Given a message $m$, Bob can encrypt it and send it to Alice by using a scheme such as AES and the key,<br />
+$$c=E(m,sk)$$<br />
+Any encryption scheme must satisfy the following consistency check:<br />
+$$ m=D(E(m,sk),sk)=D(c,sk)$$</p>
+<h3 id="goal">Goal</h3>
+<p>Alice needs Bob to send her some secret, $sc$, which she does not know directly (otherwise, she would not need to communicate with Bob). She only knows a hash of $sc$ (for example, a Pedersen commitment). To send the secret, they need to agree on the key first. Then, Bob has to use that key to encrypt $sc$ and send it to Alice. The biggest problem is that Alice does not fully trust Bob. He could encrypt another message or use a different key. We want to develop a scheme where Bob can prove to Alice that he encrypted the message $sc$ using the key $sk$ without obviously leaking information about the key or the message.</p>
+<p>Concisely, we can say that the goal is the following: Bob has to prove that the ciphertext $c$ is the result of the encryption of $m$ (whose commitment is $cm_m$) under a scheme (AES) using the symmetric key $sk$.</p>
+<p>The following list shows all the input variables, indicating whether they are sensitive (should be secret) or not:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Secret: Bob&#39;s ephemeral key, $s_B$, the message, $sc$.</span></span>
+<span class="giallo-l"><span>    * Public/Not secret: ciphertext, $c$, Alice and Bob&#39;s public keys, $g_A$ and $g_B$, the commitment to the message $cm_{sc}$.</span></span></code></pre>
+<p>All other elements, such as the curve and finite field, have been previously agreed on and are publicly known.</p>
+<h3 id="steps">Steps</h3>
+<p>The following calculations would allow Bob to achieve his goal:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Using his ephemeral key, show that $g_B==s_B g$. If he succeeds, he gets a boolean variable, $b_1=1$.</span></span>
+<span class="giallo-l"><span>    2. Using $s_B$ and $g_A$, he derives $sk$, encrypts $m$ and shows that $c==E(sc,sk)$. If this passes, he gets $b_2=1$.</span></span>
+<span class="giallo-l"><span>    3. Using $sc$, he computes $cm_m$ and compares whether $cm_{sc}=\mathrm{commit}(sc)$. If this is correct, he gets $b_3=1$.</span></span>
+<span class="giallo-l"><span>    4. If $b_1 \wedge b_2 \wedge b_3=1$.</span></span></code></pre>
+<p>The big question is how can he prove all these conditions without revealing sensitive information? Here is where zero-knowledge proofs come into play.</p>
+<h2 id="what-are-zero-knowledge-proofs">What are zero-knowledge proofs?</h2>
+<p>Zero-knowledge proofs (ZKP) are powerful cryptographic primitives which allow us to prove the validity of a statement or computation without revealing information other than the truth of the statement. We can represent any bounded computation as an arithmetic circuit, $C$. ZKP allow us to prove that we know some secret $w$ and public known values, $x$, such that $C(z=(x,w))=0$. In our case, the circuit is given by the computation performing checks 1-4. The variable $w$ contains $s_B$ and $sc$, $w=(s_B,sc)$. The public instance $x$ contains $g_A,g_B,c,cm_{sc}$ and the intended output, $1$, $x=(g_A,g_B,c,cm_{sc},1)$.</p>
+<p>ZKP use polynomials and their properties to prove statements. Zk-SNARKs are ZKP with the following additional properties: succinctness (proofs are brief and faster to verify than naïve re-execution of the calculation) and non-interactive (prover and verifier do not need to exchange messages). There are two building blocks to most SNARKs: an information-theoretic device (most commonly, polynomial interactive oracle proofs, PIOP) and a cryptographic commitment scheme (in particular, polynomial commitment schemes, PCS). In this case, we will work with Marlin (PIOP) and the Kate-Zaverucha-Goldberg (KZG) commitment scheme.</p>
+<p>The first step is to transform our code into arithmetic circuits or, equivalently, as a (quadratic) rank-one constraint system (R1CS). The latter is a system of equations of the form:<br />
+$$ Az\cdot Bz=Cz$$<br />
+where $A,B,C$ are matrices of the same size and $\cdot$ indicates the componentwise product.</p>
+<p>Then, we will express these constraints as polynomials and generate the proof. Polynomial commitments come into play to ensure the prover does not cheat and make the protocol zero-knowledge. We will now focus on the proof generation and verification of step 2 (AES encryption).</p>
+<h2 id="encryption-using-the-advanced-encryption-standard-aes">Encryption using the Advanced Encryption Standard (AES)</h2>
+<p>AES is a <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Block_cipher">block cipher</a>: it takes a 128-bit message (interpreted as a $4\times 4$ matrix of bytes) and a secret key, $sk$, and performs a pseudorandom permutation. AES has a round function, which is applied a fixed number of times, each using a different key, to encrypt the message. We use the key scheduling function to derive all the round keys from the master key, $sk$. The round function consists of the following operations:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Add a round key.</span></span>
+<span class="giallo-l"><span>    2. Substitute bytes (S-boxes).</span></span>
+<span class="giallo-l"><span>    3. Shift rows.</span></span>
+<span class="giallo-l"><span>    4. Mix columns.</span></span></code></pre>
+<p>Each of these operations is necessary to guarantee that AES is secure. Repeating the operations in multiple rounds guarantees that elements are sufficiently shuffled and mixed, leading to semantic security (that is, we cannot learn anything about the plaintext just by looking at the ciphertext).</p>
+<p>AES is described in the <a rel="noopener external" target="_blank" href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf">NIST standard</a>. AES needs to use a mode to deal with messages of size greater than 128 bits. Some standard modes are AES-CBC (cipher block chaining) and AES-GCM (Galois counter mode, which provides authenticated encryption).</p>
+<h3 id="add-round-key">Add round key</h3>
+<p>This is the step that makes the encryption depend on the key. For each round, a round key is derived from the master key ($sk$). The function is straightforward: it consists of an XOR operation between the round key and the state (the message or its transformations). To make it consistent with the code,<br />
+$$ \mathrm{ret}=\mathrm{input_text}\oplus \mathrm{key} $$</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn add_round_key(input_text: &amp;[u8], key: &amp;[u8; 16]) -&gt; [u8; 16] {</span></span>
+<span class="giallo-l"><span>    let mut ret = [0_u8; 16];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let _ = zip(input_text, key)</span></span>
+<span class="giallo-l"><span>        .map(|(cell_i, key_i)| cell_i ^ key_i)</span></span>
+<span class="giallo-l"><span>        .collect_slice(&amp;mut ret[..]);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    ret</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The XOR operation appears frequently in cryptography. Unless we know the key, we have a 50 % chance of guessing the correct value for each bit, which is as good as flipping a fair coin and guessing.</p>
+<h3 id="substitute-bytes-s-boxes">Substitute bytes / S-boxes</h3>
+<p>The S-boxes add the non-linear component to the block cipher. Here, each byte of the matrix is one-to-one mapped onto another byte. Here we present the complete code for the S-boxes, but this is done via a lookup table in practice. This will prove helpful in generating the proof since looking at the table requires fewer constraints than the whole operation.</p>
+<p>In AES, we interpret bytes as polynomials of degree at most $7$, with coefficients in ${0,1}$. For example, the byte $10010110$ is interpreted as the polynomial $x7+x4+x^2+x$, and $00100001$ is $x^5+1$. We can multiply polynomials, but if the degree is larger than 7, we have to take the remainder of the product and the irreducible polynomial $m(x)=x8+x4+x^3+x+1$.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn rotate_left(byte: u8, n: u8) -&gt; u8 {</span></span>
+<span class="giallo-l"><span>    (byte &lt;&lt; n) | (byte &gt;&gt; (8 - n))</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub fn substitute_byte(byte: u8) -&gt; Result&lt;u8&gt; {</span></span>
+<span class="giallo-l"><span>    if byte == 0x00 {</span></span>
+<span class="giallo-l"><span>        return Ok(0x63);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut p = 1_u8;</span></span>
+<span class="giallo-l"><span>    let mut q = 1_u8;</span></span>
+<span class="giallo-l"><span>    let mut sbox = [0_u8; 256];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /* loop invariant: p * q == 1 in the Galois field */</span></span>
+<span class="giallo-l"><span>    loop {</span></span>
+<span class="giallo-l"><span>        /* multiply p by 3 */</span></span>
+<span class="giallo-l"><span>        p = p ^ (p &lt;&lt; 1_u8) ^ (((p &gt;&gt; 7_u8) &amp; 1) * 0x1B);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        /* divide q by 3 (equals multiplication by 0xf6) */</span></span>
+<span class="giallo-l"><span>        q ^= q &lt;&lt; 1_u8;</span></span>
+<span class="giallo-l"><span>        q ^= q &lt;&lt; 2_u8;</span></span>
+<span class="giallo-l"><span>        q ^= q &lt;&lt; 4_u8;</span></span>
+<span class="giallo-l"><span>        q ^= ((q &gt;&gt; 7_u8) &amp; 1) * 0x09;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        /* compute the affine transformation */</span></span>
+<span class="giallo-l"><span>        let xformed =</span></span>
+<span class="giallo-l"><span>            q ^ rotate_left(q, 1) ^ rotate_left(q, 2) ^ rotate_left(q, 3) ^ rotate_left(q, 4);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        let p_as_usize: usize = p.try_into()?;</span></span>
+<span class="giallo-l"><span>        *sbox</span></span>
+<span class="giallo-l"><span>            .get_mut(p_as_usize)</span></span>
+<span class="giallo-l"><span>            .to_anyhow(&quot;Error saving substitution box value&quot;)? = xformed ^ 0x63;</span></span>
+<span class="giallo-l"><span>        if p == 1 {</span></span>
+<span class="giallo-l"><span>            break;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let byte_index: usize = byte.try_into()?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Ok(*sbox</span></span>
+<span class="giallo-l"><span>        .get(byte_index)</span></span>
+<span class="giallo-l"><span>        .to_anyhow(&quot;Error getting substitution box value&quot;)?)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>In the first step, each byte is mapped to its multiplicative inverse. If $p(x)$ is the polynomial associated with the byte, there exists another polynomial $q(x)$ such that $p(x)q(x)\equiv 1 \pmod{m(x)}$ (there is $q(x)$ such that $m(x)$ divides $p(x)q(x)-1$). The only edge case is the 0 byte, which has no inverse and is mapped onto itself (this is the if at the beginning of the function).</p>
+<p>The following steps give the calculation of the inverse:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let mut p = 1_u8;</span></span>
+<span class="giallo-l"><span>let mut q = 1_u8;</span></span>
+<span class="giallo-l"><span>p = p ^ (p &lt;&lt; 1_u8) ^ (((p &gt;&gt; 7_u8) &amp; 1) * 0x1B);</span></span>
+<span class="giallo-l"><span>q ^= q &lt;&lt; 1_u8;</span></span>
+<span class="giallo-l"><span>q ^= q &lt;&lt; 2_u8;</span></span>
+<span class="giallo-l"><span>q ^= q &lt;&lt; 4_u8;</span></span>
+<span class="giallo-l"><span>q ^= ((q &gt;&gt; 7_u8) &amp; 1) * 0x09;</span></span></code></pre>
+<p>Next, we perform an affine transformation on the inverse, which combines the bits at different positions:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let xformed =</span></span>
+<span class="giallo-l"><span>            q ^ rotate_left(q, 1) ^ rotate_left(q, 2) ^ rotate_left(q, 3) ^ rotate_left(q, 4);</span></span></code></pre>
+<p>This last operation consists of four left rotations and four XOR operations.</p>
+<h3 id="shiftrows">ShiftRows</h3>
+<p>This function changes the order of the elements in each row by performing a cyclic shift. The second row shifts each element one place to the left, the third one two places, and the fourth three. This transformation is linear; the constraints associated with it will also be linear.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn shift_rows(bytes: &amp;[u8; 16], cs: &amp;ConstraintSystemRef&lt;ConstraintF&gt;) -&gt; Result&lt;[u8; 16]&gt; {</span></span>
+<span class="giallo-l"><span>    // Add each number to the constraint system.</span></span>
+<span class="giallo-l"><span>    for byte in bytes {</span></span>
+<span class="giallo-l"><span>        UInt8::new_witness(ark_relations::ns!(cs, &quot;shift_rows_witness&quot;), || Ok(byte))?;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Turn the bytes into the 4x4 AES state matrix.</span></span>
+<span class="giallo-l"><span>    // The matrix is represented by a 2D array,</span></span>
+<span class="giallo-l"><span>    // where each array is a row.</span></span>
+<span class="giallo-l"><span>    // That is, let&#39;s suppose that the flattened_bytes variable</span></span>
+<span class="giallo-l"><span>    // is formed by the bytes</span></span>
+<span class="giallo-l"><span>    // [b0, ..., b15]</span></span>
+<span class="giallo-l"><span>    // Then the AES state matrix will look like this:</span></span>
+<span class="giallo-l"><span>    // b0, b4, b8, b12,</span></span>
+<span class="giallo-l"><span>    // b1, b5, b9, b13,</span></span>
+<span class="giallo-l"><span>    // b2, b6, b10, b14,</span></span>
+<span class="giallo-l"><span>    // b3, b7, b11, b15</span></span>
+<span class="giallo-l"><span>    // And our array will look like this:</span></span>
+<span class="giallo-l"><span>    //[</span></span>
+<span class="giallo-l"><span>    //  [b0, b4, b8, b12],</span></span>
+<span class="giallo-l"><span>    //  [b1, b5, b9, b13],</span></span>
+<span class="giallo-l"><span>    //  [b2, b6, b10,b14],</span></span>
+<span class="giallo-l"><span>    //  [b3, b7, b11,b15]</span></span>
+<span class="giallo-l"><span>    //]</span></span>
+<span class="giallo-l"><span>    let mut state_matrix = [[0_u8; 4]; 4];</span></span>
+<span class="giallo-l"><span>    for (i, state) in state_matrix.iter_mut().enumerate() {</span></span>
+<span class="giallo-l"><span>        *state = [</span></span>
+<span class="giallo-l"><span>            *(bytes.get(i).context(&quot;Out of bounds&quot;))?,</span></span>
+<span class="giallo-l"><span>            *(bytes.get(i + 4).context(&quot;Out of bounds&quot;)?),</span></span>
+<span class="giallo-l"><span>            *(bytes.get(i + 8).context(&quot;Out of bounds&quot;)?),</span></span>
+<span class="giallo-l"><span>            *(bytes.get(i + 12).context(&quot;Out ouf bounds&quot;)?),</span></span>
+<span class="giallo-l"><span>        ];</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Rotate every state matrix row (u8 array) as specified by</span></span>
+<span class="giallo-l"><span>    // the AES cipher algorithm.</span></span>
+<span class="giallo-l"><span>    for (rotations, bytes) in state_matrix.iter_mut().enumerate() {</span></span>
+<span class="giallo-l"><span>        // For the moment, this operation does not generate constraints in the</span></span>
+<span class="giallo-l"><span>        // circuit, but it should in the future.</span></span>
+<span class="giallo-l"><span>        bytes.rotate_left(rotations);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Turn the rotated arrays into a flattened</span></span>
+<span class="giallo-l"><span>    //16-byte array, ordered by column.</span></span>
+<span class="giallo-l"><span>    let mut flattened_matrix = [0_u8; 16];</span></span>
+<span class="giallo-l"><span>    for i in 0..4 {</span></span>
+<span class="giallo-l"><span>        for j in 0..4 {</span></span>
+<span class="giallo-l"><span>            *flattened_matrix</span></span>
+<span class="giallo-l"><span>                .get_mut((i * 4) + j)</span></span>
+<span class="giallo-l"><span>                .to_anyhow(&quot;Error getting element of flattened_matrix slice&quot;)? = *state_matrix</span></span>
+<span class="giallo-l"><span>                .get(j)</span></span>
+<span class="giallo-l"><span>                .to_anyhow(&quot;Error getting element of state_matrix&quot;)?</span></span>
+<span class="giallo-l"><span>                .get(i)</span></span>
+<span class="giallo-l"><span>                .to_anyhow(&quot;Error getting element of state_matrix&quot;)?;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    Ok(flattened_matrix)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h3 id="mixcolumns">MixColumns</h3>
+<p>The MixColumn function operates over each column of the state matrix. Every four-byte column is interpreted as a polynomial degree four polynomial, modulo $x^4+1$. We can view each column as the result of a linear combination. Each byte can be multiplied by 1, 2 or 3. If the result exceeds the modulus, we have to reduce the result, similar to what we did in substitute bytes.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn gmix_column(input: [u8; 4]) -&gt; Option&lt;[u8; 4]&gt; {</span></span>
+<span class="giallo-l"><span>    let mut b: [u8; 4] = [0; 4];</span></span>
+<span class="giallo-l"><span>    /* The array &#39;a&#39; is simply a copy of the input array &#39;r&#39;</span></span>
+<span class="giallo-l"><span>     * The array &#39;b&#39; is each element of the array &#39;a&#39; multiplied by 2</span></span>
+<span class="giallo-l"><span>     * in Rijndael&#39;s Galois field</span></span>
+<span class="giallo-l"><span>     * a[n] ^ b[n] is element n multiplied by 3 in Rijndael&#39;s Galois field */</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for (i, c) in input.iter().enumerate() {</span></span>
+<span class="giallo-l"><span>        let h = (c &gt;&gt; 7_usize) &amp; 1; /* arithmetic right shift, thus shifting in either zeros or ones */</span></span>
+<span class="giallo-l"><span>        *b.get_mut(i)? = (c &lt;&lt; 1_usize) ^ (h * 0x1B); /* implicitly removes high bit because b[c] is an 8-bit char, so we xor by 0x1b and not 0x11b in the next line */</span></span>
+<span class="giallo-l"><span>        /* Rijndael&#39;s Galois field */</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Some([</span></span>
+<span class="giallo-l"><span>        b.first()? ^ input.get(3)? ^ input.get(2)? ^ b.get(1)? ^ input.get(1)?,</span></span>
+<span class="giallo-l"><span>        b.get(1)? ^ input.first()? ^ input.get(3)? ^ b.get(2)? ^ input.get(2)?,</span></span>
+<span class="giallo-l"><span>        b.get(2)? ^ input.get(1)? ^ input.first()? ^ b.get(3)? ^ input.get(3)?,</span></span>
+<span class="giallo-l"><span>        b.get(3)? ^ input.get(2)? ^ input.get(1)? ^ b.first()? ^ input.first()?,</span></span>
+<span class="giallo-l"><span>    ])</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub fn mix_columns(input: &amp;[u8; 16]) -&gt; Option&lt;[u8; 16]&gt; {</span></span>
+<span class="giallo-l"><span>    let mut ret = [0_u8; 16];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for (pos, column) in input.chunks(4).enumerate() {</span></span>
+<span class="giallo-l"><span>        let column_aux = [</span></span>
+<span class="giallo-l"><span>            *column.first()?,</span></span>
+<span class="giallo-l"><span>            *column.get(1)?,</span></span>
+<span class="giallo-l"><span>            *column.get(2)?,</span></span>
+<span class="giallo-l"><span>            *column.get(3)?,</span></span>
+<span class="giallo-l"><span>        ];</span></span>
+<span class="giallo-l"><span>        let column_ret = gmix_column(column_aux)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        // put column_ret in ret:</span></span>
+<span class="giallo-l"><span>        *ret.get_mut(pos * 4)? = *column_ret.first()?;</span></span>
+<span class="giallo-l"><span>        *ret.get_mut(pos * 4 + 1)? = *column_ret.get(1)?;</span></span>
+<span class="giallo-l"><span>        *ret.get_mut(pos * 4 + 2)? = *column_ret.get(2)?;</span></span>
+<span class="giallo-l"><span>        *ret.get_mut(pos * 4 + 3)? = *column_ret.get(3)?;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Some(ret)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h3 id="key-scheduling">Key scheduling</h3>
+<p>This function derives the round keys from the master key.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn derive_keys(secret_key: &amp;[u8; 16]) -&gt; Result&lt;[[u8; 16]; 11]&gt; {</span></span>
+<span class="giallo-l"><span>    const ROUND_CONSTANTS: [u32; 10] = [</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x01, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x02, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x04, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x08, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x10, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x20, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x40, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x80, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x1B, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>        u32::from_be_bytes([0x36, 0x00, 0x00, 0x00]),</span></span>
+<span class="giallo-l"><span>    ];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut result = [0_u32; 44];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    result[0] = to_u32(&amp;secret_key[..4]).to_anyhow(&quot;Error converting to u32&quot;)?;</span></span>
+<span class="giallo-l"><span>    result[1] = to_u32(&amp;secret_key[4..8]).to_anyhow(&quot;Error converting to u32&quot;)?;</span></span>
+<span class="giallo-l"><span>    result[2] = to_u32(&amp;secret_key[8..12]).to_anyhow(&quot;Error converting to u32&quot;)?;</span></span>
+<span class="giallo-l"><span>    result[3] = to_u32(&amp;secret_key[12..16]).to_anyhow(&quot;Error converting to u32&quot;)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for i in 4..44 {</span></span>
+<span class="giallo-l"><span>        if i % 4 == 0 {</span></span>
+<span class="giallo-l"><span>            let substituted_and_rotated = to_u32(&amp;substitute_word(rotate_word(</span></span>
+<span class="giallo-l"><span>                *result.get(i - 1).to_anyhow(&quot;Error converting to u32&quot;)?,</span></span>
+<span class="giallo-l"><span>            ))?)</span></span>
+<span class="giallo-l"><span>            .to_anyhow(&quot;Error converting to u32&quot;)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            *result.get_mut(i).to_anyhow(&quot;Error getting elem&quot;)? =</span></span>
+<span class="giallo-l"><span>                (result.get(i - 4).to_anyhow(&quot;Error getting elem&quot;)? ^ (substituted_and_rotated))</span></span>
+<span class="giallo-l"><span>                    ^ ROUND_CONSTANTS</span></span>
+<span class="giallo-l"><span>                        .get(i / 4 - 1)</span></span>
+<span class="giallo-l"><span>                        .to_anyhow(&quot;Error getting elem&quot;)?;</span></span>
+<span class="giallo-l"><span>        } else {</span></span>
+<span class="giallo-l"><span>            *result.get_mut(i).to_anyhow(&quot;Error getting elem&quot;)? =</span></span>
+<span class="giallo-l"><span>                result.get(i - 4).to_anyhow(&quot;Error getting elem&quot;)?</span></span>
+<span class="giallo-l"><span>                    ^ result.get(i - 1).to_anyhow(&quot;Error getting elem&quot;)?;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut ret = [[0_u8; 16]; 11];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for (i, elem) in result.chunks(4).enumerate() {</span></span>
+<span class="giallo-l"><span>        elem.iter()</span></span>
+<span class="giallo-l"><span>            .flat_map(|e| e.to_be_bytes())</span></span>
+<span class="giallo-l"><span>            .collect_slice(&amp;mut ret.get_mut(i).to_anyhow(&quot;Error getting elem&quot;)?[..]);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Ok(ret)</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn to_u32(value: &amp;[u8]) -&gt; Option&lt;u32&gt; {</span></span>
+<span class="giallo-l"><span>    let array_aux: [u8; 4] = [</span></span>
+<span class="giallo-l"><span>        *value.first()?,</span></span>
+<span class="giallo-l"><span>        *value.get(1)?,</span></span>
+<span class="giallo-l"><span>        *value.get(2)?,</span></span>
+<span class="giallo-l"><span>        *value.get(3)?,</span></span>
+<span class="giallo-l"><span>    ];</span></span>
+<span class="giallo-l"><span>    Some(u32::from_be_bytes(array_aux))</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn rotate_word(input: u32) -&gt; [u8; 4] {</span></span>
+<span class="giallo-l"><span>    let bytes: [u8; 4] = input.to_be_bytes();</span></span>
+<span class="giallo-l"><span>    [</span></span>
+<span class="giallo-l"><span>        *bytes.get(1).unwrap_or(&amp;0),</span></span>
+<span class="giallo-l"><span>        *bytes.get(2).unwrap_or(&amp;0),</span></span>
+<span class="giallo-l"><span>        *bytes.get(3).unwrap_or(&amp;0),</span></span>
+<span class="giallo-l"><span>        *bytes.first().unwrap_or(&amp;0),</span></span>
+<span class="giallo-l"><span>    ]</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="circuits-and-gadgets">Circuits and gadgets</h2>
+<p>If we tried hardcoding the circuit of AES, this would be an impossible task, given the kind and number of operations we have to perform. For example, suppose we want to perform the XOR operation between one byte of the message and the round key, $st[i] \oplus rk[i]=st^\prime [i]$. First, we need to decompose each byte into its constituent bits and check that each of them is indeed either $0$ or $1$:<br />
+$st[i,j]\times st[i,j]=st[i,j]$<br />
+$rk[i,j]\times rk[i,j]=rk[i,j]$<br />
+$st^\prime[i,j]\times st\prime[i,j]=st\prime[i,j]$<br />
+Next, we need to compute the XOR operation between bits,<br />
+$2st[i,j]\times rk[i,j]=st[i,j]+rk[i,j]-st^\prime[i,j]$<br />
+We have eight equations per byte, so there are 32 constraints for every byte XOR (we could remove the checks for $st^\prime$ since the XOR guarantees that they are 0 or 1, reducing the count to 24). Every add round key function takes 16 bytes, so we take 512 (or 384) constraints per round!</p>
+<p>We can implement a gadget that adds the constraints corresponding to its binary decomposition whenever we define a new byte variable. We can also implement an XOR gadget between bytes, adding the constraints for the operation. The following code makes use of gadgets for <code>u8</code>:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>use ark_r1cs_std::bits::uint8::UInt8;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let a = UInt8::new_input(cs, || Ok(1))?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let result = a.xor(&amp;a)?;</span></span>
+<span class="giallo-l"><span>let zero = UInt8::constant(0);</span></span>
+<span class="giallo-l"><span>result.enforce_equal(&amp;zero)?;</span></span></code></pre>
+<p>What happens with the substitution boxes? We could implement a gadget for the whole operation. The problem is that the number of constraints scales super fast! There are more than 10 XOR operations per step, which is time-consuming. The s-boxes are generally obtained from a lookup table, which has all the possible output values precomputed.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn substitute_byte(byte: &amp;UInt8Gadget, lookup_table: &amp;[UInt8Gadget]) -&gt; Result&lt;UInt8Gadget&gt; {</span></span>
+<span class="giallo-l"><span>    Ok(UInt8Gadget::conditionally_select_power_of_two_vector(</span></span>
+<span class="giallo-l"><span>        &amp;byte.to_bits_be()?,</span></span>
+<span class="giallo-l"><span>        lookup_table,</span></span>
+<span class="giallo-l"><span>    )?)</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub fn substitute_bytes(</span></span>
+<span class="giallo-l"><span>    bytes: &amp;[UInt8Gadget],</span></span>
+<span class="giallo-l"><span>    lookup_table: &amp;[UInt8Gadget],</span></span>
+<span class="giallo-l"><span>) -&gt; Result&lt;Vec&lt;UInt8Gadget&gt;&gt; {</span></span>
+<span class="giallo-l"><span>    ensure!(</span></span>
+<span class="giallo-l"><span>        bytes.len() == 16,</span></span>
+<span class="giallo-l"><span>        &quot;Input must be 16 bytes length when substituting bytes&quot;</span></span>
+<span class="giallo-l"><span>    );</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut substituted_bytes = vec![];</span></span>
+<span class="giallo-l"><span>    for byte in bytes {</span></span>
+<span class="giallo-l"><span>        substituted_bytes.push(substitute_byte(byte, lookup_table)?);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    ensure!(substituted_bytes.len() == 16, &quot;Error substituting bytes&quot;);</span></span>
+<span class="giallo-l"><span>    Ok(substituted_bytes)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="proof-generation">Proof generation</h2>
+<p>The first step to generating the proof is to obtain the proving and verification keys. These are derived from the structured reference string (SRS) obtained from a secure multiparty computation.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let (proving_key, verifying_key) = synthesize_keys(message_length)?;</span></span></code></pre>
+<p>Here is the definition of the synthesize keys function:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn synthesize_keys(plaintext_length: usize) -&gt; Result&lt;(ProvingKey, VerifyingKey)&gt; {</span></span>
+<span class="giallo-l"><span>    let rng = &amp;mut simpleworks::marlin::generate_rand();</span></span>
+<span class="giallo-l"><span>    let universal_srs =</span></span>
+<span class="giallo-l"><span>        simpleworks::marlin::generate_universal_srs(1_000_000, 250_000, 3_000_000, rng)?;</span></span>
+<span class="giallo-l"><span>    let constraint_system = ConstraintSystem::&lt;ConstraintF&gt;::new_ref();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let default_message_input = vec![0_u8; plaintext_length];</span></span>
+<span class="giallo-l"><span>    let default_secret_key_input = [0_u8; 16];</span></span>
+<span class="giallo-l"><span>    let default_ciphertext_input = vec![0_u8; plaintext_length];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut message_circuit: Vec&lt;UInt8Gadget&gt; = Vec::with_capacity(default_message_input.len());</span></span>
+<span class="giallo-l"><span>    for byte in default_message_input {</span></span>
+<span class="giallo-l"><span>        message_circuit.push(UInt8Gadget::new_witness(constraint_system.clone(), || {</span></span>
+<span class="giallo-l"><span>            Ok(byte)</span></span>
+<span class="giallo-l"><span>        })?);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut secret_key_circuit: Vec&lt;UInt8Gadget&gt; =</span></span>
+<span class="giallo-l"><span>        Vec::with_capacity(default_secret_key_input.len());</span></span>
+<span class="giallo-l"><span>    for byte in default_secret_key_input {</span></span>
+<span class="giallo-l"><span>        secret_key_circuit.push(UInt8Gadget::new_witness(constraint_system.clone(), || {</span></span>
+<span class="giallo-l"><span>            Ok(byte)</span></span>
+<span class="giallo-l"><span>        })?);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut ciphertext_circuit: Vec&lt;UInt8Gadget&gt; =</span></span>
+<span class="giallo-l"><span>        Vec::with_capacity(default_ciphertext_input.len());</span></span>
+<span class="giallo-l"><span>    for byte in default_ciphertext_input {</span></span>
+<span class="giallo-l"><span>        ciphertext_circuit.push(UInt8Gadget::new_input(constraint_system.clone(), || {</span></span>
+<span class="giallo-l"><span>            Ok(byte)</span></span>
+<span class="giallo-l"><span>        })?);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let _ciphertext = encrypt_and_generate_constraints(</span></span>
+<span class="giallo-l"><span>        &amp;message_circuit,</span></span>
+<span class="giallo-l"><span>        &amp;secret_key_circuit,</span></span>
+<span class="giallo-l"><span>        &amp;ciphertext_circuit,</span></span>
+<span class="giallo-l"><span>        constraint_system.clone(),</span></span>
+<span class="giallo-l"><span>    );</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    simpleworks::marlin::generate_proving_and_verifying_keys(&amp;universal_srs, constraint_system)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Since this is only a test, we generate the SRS from a function instead of reading it from the result of the multiparty computation.</p>
+<p>We now define a function that contains all the steps to generate the proof:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn encrypt(</span></span>
+<span class="giallo-l"><span>    message: &amp;[u8],</span></span>
+<span class="giallo-l"><span>    secret_key: &amp;[u8; 16],</span></span>
+<span class="giallo-l"><span>    ciphertext: &amp;[u8],</span></span>
+<span class="giallo-l"><span>    proving_key: ProvingKey,</span></span>
+<span class="giallo-l"><span>) -&gt; Result&lt;MarlinProof&gt; {</span></span>
+<span class="giallo-l"><span>    let rng = &amp;mut simpleworks::marlin::generate_rand();</span></span>
+<span class="giallo-l"><span>    let constraint_system = ConstraintSystem::&lt;ConstraintF&gt;::new_ref();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut message_circuit: Vec&lt;UInt8Gadget&gt; = Vec::with_capacity(message.len());</span></span>
+<span class="giallo-l"><span>    for byte in message {</span></span>
+<span class="giallo-l"><span>        message_circuit.push(UInt8Gadget::new_witness(constraint_system.clone(), || {</span></span>
+<span class="giallo-l"><span>            Ok(byte)</span></span>
+<span class="giallo-l"><span>        })?);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut secret_key_circuit: Vec&lt;UInt8Gadget&gt; = Vec::with_capacity(secret_key.len());</span></span>
+<span class="giallo-l"><span>    for byte in secret_key {</span></span>
+<span class="giallo-l"><span>        secret_key_circuit.push(UInt8Gadget::new_witness(constraint_system.clone(), || {</span></span>
+<span class="giallo-l"><span>            Ok(byte)</span></span>
+<span class="giallo-l"><span>        })?);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let mut ciphertext_circuit: Vec&lt;UInt8Gadget&gt; = Vec::with_capacity(ciphertext.len());</span></span>
+<span class="giallo-l"><span>    for byte in ciphertext {</span></span>
+<span class="giallo-l"><span>        ciphertext_circuit.push(UInt8Gadget::new_input(constraint_system.clone(), || {</span></span>
+<span class="giallo-l"><span>            Ok(byte)</span></span>
+<span class="giallo-l"><span>        })?);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    encrypt_and_generate_constraints(</span></span>
+<span class="giallo-l"><span>        &amp;message_circuit,</span></span>
+<span class="giallo-l"><span>        &amp;secret_key_circuit,</span></span>
+<span class="giallo-l"><span>        &amp;ciphertext_circuit,</span></span>
+<span class="giallo-l"><span>        constraint_system.clone(),</span></span>
+<span class="giallo-l"><span>    )?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Here we clone the constraint system because deep down when generating</span></span>
+<span class="giallo-l"><span>    // the proof the constraint system is consumed and it has to have one</span></span>
+<span class="giallo-l"><span>    // reference for it to be consumed.</span></span>
+<span class="giallo-l"><span>    let cs_clone = (*constraint_system</span></span>
+<span class="giallo-l"><span>        .borrow()</span></span>
+<span class="giallo-l"><span>        .ok_or(&quot;Error borrowing&quot;)</span></span>
+<span class="giallo-l"><span>        .map_err(|e| anyhow!(&quot;{}&quot;, e))?)</span></span>
+<span class="giallo-l"><span>    .clone();</span></span>
+<span class="giallo-l"><span>    let cs_ref_clone = ConstraintSystemRef::CS(Rc::new(RefCell::new(cs_clone)));</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let proof = simpleworks::marlin::generate_proof(cs_ref_clone, proving_key, rng)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Ok(proof)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Finally, we run the following lines to get the proof:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let message = [1_u8; 16]; \\Example message</span></span>
+<span class="giallo-l"><span>let secret_key = [0_u8; 16]; \\Example key</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let proof = encrypt(&amp;message, &amp;secret_key, &amp;primitive_ciphertext, proving_key)?;</span></span></code></pre><h2 id="verification">Verification</h2>
+<p>To verify the proof, we first encapsulate all the steps in this function, reading the verifying key, the proof and the ciphertext:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>pub fn verify_encryption(</span></span>
+<span class="giallo-l"><span>    verifying_key: VerifyingKey,</span></span>
+<span class="giallo-l"><span>    proof: &amp;MarlinProof,</span></span>
+<span class="giallo-l"><span>    ciphertext: &amp;[u8],</span></span>
+<span class="giallo-l"><span>) -&gt; Result&lt;bool&gt; {</span></span>
+<span class="giallo-l"><span>    let mut ciphertext_as_field_array = vec![];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for byte in ciphertext {</span></span>
+<span class="giallo-l"><span>        let field_array = byte_to_field_array(*byte);</span></span>
+<span class="giallo-l"><span>        for field_element in field_array {</span></span>
+<span class="giallo-l"><span>            ciphertext_as_field_array.push(field_element);</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    simpleworks::marlin::verify_proof(</span></span>
+<span class="giallo-l"><span>        verifying_key,</span></span>
+<span class="giallo-l"><span>        &amp;ciphertext_as_field_array,</span></span>
+<span class="giallo-l"><span>        proof,</span></span>
+<span class="giallo-l"><span>        &amp;mut simpleworks::marlin::generate_rand(),</span></span>
+<span class="giallo-l"><span>    )</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Then, we run and check the result</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>let result = verify_encryption(</span></span>
+<span class="giallo-l"><span>    verifying_key,</span></span>
+<span class="giallo-l"><span>    &amp;proof,</span></span>
+<span class="giallo-l"><span>    &amp;primitive_ciphertext</span></span>
+<span class="giallo-l"><span>)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>assert!(result);</span></span></code></pre><h2 id="summary">Summary</h2>
+<p>AES is the most widely used encryption method. In this post, we addressed the problem of offering cryptographic proof for the correct execution of the AES encryption function for a given plaintext-key pair. Using the Arkworks library, we implemented AES and obtained its representation as an R1CS. Afterward, using Marlin and the Kate-Zaverucha-Goldberg polynomial commitment scheme, we generated a cryptographic proof. The verifier, using the ciphertext as input, can verify the proof to assert the correct execution of the function.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

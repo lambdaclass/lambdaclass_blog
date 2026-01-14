@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An overview of the Stone Cairo STARK Prover - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">An overview of the Stone Cairo STARK Prover</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-09-28">September 28, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>About one month ago, Starkware open-sourced its Stone Prover, which is currently in production in Starknet. It is a library that allows one to produce proofs of computational integrity using STARKs (Scalable Transparent Arguments of Knowledge).</p>
+<p>The codebase has around 100k lines of code, written mainly in C++. It has the following main components:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * AIR: contains the constraints of the algebraic intermediate representation of CAIRO.</span></span>
+<span class="giallo-l"><span>    * Channel (transcript in STARK Platinum): contains the interactions between the prover and verifier and gives methods to sample random challenges.</span></span>
+<span class="giallo-l"><span>    * Composition polynomial. The constraints of the AIR are enforced over the trace polynomials and randomly combined into a single polynomial.</span></span>
+<span class="giallo-l"><span>    * Commitment schemes: contains the methods to (cryptographically) commit to a series of polynomial evaluations.</span></span>
+<span class="giallo-l"><span>    * FRI, Fast Reed Solomon interactive oracle proofs of proximity: performs the low-degree testing that allows one to prove that a function is close to a low-degree polynomial.</span></span></code></pre>
+<p>At Lambdaclass, we are working on our Cairo prover, STARK Platinum (written in Rust), being compatible with the Stone Prover so that anyone can use the Rust version to generate valid proofs for different applications built on top of Starknet. We hope that the performance and usability of our prover helps the community to adopt it.</p>
+<p>In this post, we will analyze some of the components of the Stone Prover and explain how they work and their implementation. For an introduction to STARKs, see our <a href="/diving-deep-fri/">previous posts</a> or the <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/lambdaworks/tree/main/docs/src/starks">STARK Platinum docs</a>.</p>
+<h2 id="domains">Domains</h2>
+<p>Every implemented field $\mathbb{F}$ has a generator $\omega$ of the unit groups $\mathbb{F}^\times$. They can be obtained by calling the class method <code>Generator</code> of <code>PrimeFieldElement</code>. The generator for the <code>Stark252Field</code> is $\omega = 3$ (<a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/algebra/fields/prime_field_element.h#L138-L140">here</a> and <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/algebra/fields/big_prime_constants.h#L61">here</a>).</p>
+<p>The class representing a domain is <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/algebra/domains/list_of_cosets.h#L34"><code>ListOfCosets</code></a>. The method <code>TraceGenerator</code> returns a primitive root of unity $g$ of the order of the trace length $2^n$ that generates a domain $D$. It is computed as $g = \omega^{ ( p - 1 ) / 2^n }$. The LDE is then represented as a list of cosets ${h^i w D: i = 0, \dots , k - 1 }$ all of the same size as $D$, such that their union is the actual LDE domain:</p>
+<p>$$D_{\text{LDE}} = w D , \cup , h w D , \cup , h^2 w D , \cup , \cdots , \cup , h^{k-1} w D,$$<br />
+where $h = w^{( p - 1 ) / 2^{ n + k }}$.</p>
+<h2 id="transcript">Transcript</h2>
+<p>The stone prover uses a <code>NonInteractiveProverChannel</code> class to handle its interactions with the transcript. There are two basic operations:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * `SendBytes`: the prover appends bytes to the transcript.</span></span>
+<span class="giallo-l"><span>    * `ReceiveBytes`: the prover receives bytes from the transcript.</span></span></code></pre>
+<p>These operations are building blocks for more complex operations, such as sampling a <code>FieldElement</code> or a number. Several hash functions can be used to interact with the transcript (e.g., Keccak, Pedersen).</p>
+<p>These operations are mainly implemented in the <code>HashChain</code> class, with other classes just delegating to it. It has the following attributes:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * `self.counter`: counts how many blocks of $K$ bytes have been consumed.</span></span>
+<span class="giallo-l"><span>    * `self.hash`: holds the current state of the hash function.</span></span>
+<span class="giallo-l"><span>    * `self.spare_bytes`: when a user asks for $T$ bytes where $T$ is not multiple of $K$, it stores them to use them later on.</span></span></code></pre>
+<p>Here, $K$ is the number of bytes needed to store the output of the chosen hash functions (e.g., 32 bytes for Keccack256).</p>
+<h3 id="appending-to-the-transcript">Appending to the transcript</h3>
+<p>When bytes $X$ are appended to the transcript, the current digest $D$ is obtained and interpreted as a BigInt. Then, a seed increment is added to it. The concatenation of this new seed and $X$ is the latest state of the hash function.</p>
+<p>Pseudocode:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>def append(new_bytes, seed_increment):</span></span>
+<span class="giallo-l"><span>    digest = self.hash.digest()</span></span>
+<span class="giallo-l"><span>    new_seed = digest + self.seed_increment</span></span>
+<span class="giallo-l"><span>    self.hash = Hash(new_seed || bytes)</span></span></code></pre>
+<p>Here, <code>||</code> is the concatenation operator.</p>
+<h3 id="sampling-from-the-transcript">Sampling from the transcript</h3>
+<p>Pseudocode:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>def sample_block():</span></span>
+<span class="giallo-l"><span>    counter_bytes = | 24 bytes of 0x00 | counter as u64 | # This depends on the &quot;block&quot; size, the hash size.</span></span>
+<span class="giallo-l"><span>    self.counter++</span></span>
+<span class="giallo-l"><span>    return Hash(self.hash.digest() || counter).digest()</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>def sample(number_bytes):</span></span>
+<span class="giallo-l"><span>    for chunk32 in split(number_bytes, 32):</span></span>
+<span class="giallo-l"><span>        result = result + sample_block()</span></span>
+<span class="giallo-l"><span>    return result</span></span></code></pre>
+<p>This is a simplified version of the code. Here, the hash size is assumed to be 32 bytes (256 bits). Also, this pseudocode does not handle the case where a programmer asks for a number of bytes that’s not a multiple of the hash size.</p>
+<h3 id="transcript-initialization-strong-fiat-shamir">Transcript initialization (Strong Fiat-Shamir)</h3>
+<p>The main prover and verifier executables initialize the transcript using a Fiat-Shamir strategy. This means that the hash function is updated using the public parameters.</p>
+<p>There are two implementations of this: the Fibonacci AIR and the Cairo AIR (<code>CpuAir</code>).</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * [Fibonacci](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/statement/fibonacci/fibonacci_statement.inl#L40-L52): the transcript is initialized with `claimed_index_in_64_bit_big_endian || claimed_value_in_montgomery_form`</span></span>
+<span class="giallo-l"><span>    * [Cairo](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/statement/cpu/cpu_air_statement.cc#L99): the transcript is initialized with the `n_steps`, `rc_min`, `rc_max`, and the public memory. The layout is described [here](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/statement/cpu/cpu_air_statement.cc#L127-L135).</span></span></code></pre><h3 id="logging-interactions">Logging interactions</h3>
+<p>The flag <code>-generate_annotations</code> can be enabled when the main prover is executed. This logs the interactions between the prover and the verifier and can help debug and address compatibility issues. The annotations are added to the output JSON file of the proof.</p>
+<p><img src="/images/external/r15g0-BAn.png" alt="" /></p>
+<h3 id="hash-functions">Hash functions</h3>
+<p>By default, the <code>keccak256</code> hash function is used.</p>
+<p>This is the list of supported options:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>using HashTypes = InvokedTypes&lt;</span></span>
+<span class="giallo-l"><span>    Blake2s256, Keccak256, Pedersen, MaskedHash&lt;Keccak256, 20, true&gt;,</span></span>
+<span class="giallo-l"><span>    MaskedHash&lt;Blake2s256, 20, true&gt;, MaskedHash&lt;Blake2s256, 20, false&gt;,</span></span>
+<span class="giallo-l"><span>    MaskedHash&lt;Keccak256, 20, false&gt;&gt;;</span></span></code></pre><h2 id="composition-polynomial">Composition polynomial</h2>
+<p><a rel="noopener external" target="_blank" href="https://gist.github.com/schouhy/64fd2fca56e6776d16eb8df3437a0816">Here</a> is an example of how to instantiate a composition polynomial and compute evaluations of it. It can be run like the Fibonacci example.</p>
+<h3 id="relevant-classes">Relevant classes</h3>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * [`CompositionPolynomial`](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/composition_polynomial/composition_polynomial.h#L55): Abstract class defining interface. It has only two child classes </span></span>
+<span class="giallo-l"><span>      * [`CompositionPolynomialImpl`](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/composition_polynomial/composition_polynomial.h#L81): Concrete implementation of the above. It does NOT follow the pimpl pattern. It&#39;s just a child class.</span></span>
+<span class="giallo-l"><span>      * `CompositionPolynomialMock`: Used for testing.</span></span>
+<span class="giallo-l"><span>    * [`CompositionOracleProver`](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/composition_oracle.h#L44): A wrapper around a `CompositionPolynomial` that also knows the polynomial interpolating the trace (called `traces`), the domains of interpolation, and the transcript.</span></span></code></pre><h3 id="notes">Notes</h3>
+<p>Despite the name, the class <code>CompositionPolynomialImpl</code> is not responsible for the actual computation of the composition polynomial. It does not handle the logic of collecting all individual evaluations of the constraints and gluing them together to form the composition poly. It handles parallelization and formats all inputs to pass them to <code>Air::ConstraintsEval</code>. This is the method where constraints are both evaluated <strong>and</strong> aggregated to obtain the evaluation of the composition polynomial. So, every implementation of <code>Air</code> is responsible for the correct aggregation step of all the constraint evaluations.</p>
+<p>Two things stand out:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * There is no degree adjustment. This is seen in the [Fibonacci Air](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/air/fibonacci/fibonacci_air0.inl#L83-L164) and the [Cairo Air](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/air/cpu/board/cpu_air_definition0.inl#L302-L309).</span></span>
+<span class="giallo-l"><span>    * The coefficients used to aggregate all terms [are all powers of a single challenge](https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/stark.cc#L44-L58).</span></span></code></pre><h3 id="evaluation">Evaluation</h3>
+<p>For computing the composition polynomial evaluations, the prover calls <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/stark.cc#L327C49-L327C49"><code>CompositionOracleProver::EvalComposition(n_tasks)</code></a>. This will return the set of evaluations of the composition polynomial in the $d$ cosets, where $d$ is chosen as the minimum integer such that the degree bound of the composition polynomial is less than $2^n d$ (see the Domains section for details about domains and cosets). The oracle then uses its pointers to the trace polynomials to evaluate them at the LDE domain (or use cached computations from the previous commitment phase). The oracle then passes this to <code>CompositionPolynomial::EvalOnCosetBitReversedOutput()</code> along with coset offsets and other domain relevant data. This method launches multiple tasks that call <code>Air::ConstraintEval</code> to compute a single evaluation at a point of the LDE. This is the method where the computation is ultimately done.</p>
+<h3 id="breaking-the-composition-polynomial">Breaking the composition polynomial</h3>
+<p>The composition polynomial $H$ is always broken into $d = \deg(H) / 2^n$ parts, where $2^n$ is the trace length,</p>
+<p>$$H = H_0 ( X^d ) + X H_1 ( X^d ) + \cdots + X^{ d - 1 } H_{ d - 1 }( X^d ).$$</p>
+<p>To do so, after computing the evaluation of $H$, one way to calculate each $H_i$ would be to interpolate $H$ and then split its coefficients on a monomial basis. <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/composition_polynomial/breaker.cc#L64-L66">The approach</a> in the Stone prover is an optimization of this. Instead of running a full IFFT to interpolate $H$, they do only $\log(d)$ steps of IFFT, resulting in the evaluations of each $H_i$ if $d$ is a power of two.</p>
+<h2 id="deep-composition-polynomial">DEEP composition polynomial</h2>
+<p>One strange design choice is reusing the AIR and composition polynomial machinery to build the <strong>DEEP</strong> composition polynomial. The deep composition polynomial is seen as a composition polynomial of a particular AIR, called <code>BoundaryAIR</code> (see <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/stark.cc#L349-L370">here</a> and <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/air/boundary/boundary_air.h#L34">here</a>). It has nothing to do with boundary constraints. It is only used for building the DEEP composition poly. It is the same class, independently of whether the FibonacciAIR, CpuAir or any other AIR is being used to arithmetize the program being proven. The deep composition polynomial is called <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/stark.cc#L450"><code>oods_composition_oracle</code></a> in the main <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/stark.cc#L383"><code>ProveStark</code></a> method.</p>
+<p>A side effect of this is cluttering the annotations. It looks like the verifier chooses two times the challenge used for building the composition polynomial:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>V-&gt;P: /STARK/Out Of Domain Sampling: Constraint polynomial random element</span></span>
+<span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>V-&gt;P: /STARK/Out Of Domain Sampling: Constraint polynomial random element</span></span></code></pre>
+<p>The first time refers to the challenge of the composition polynomial. The second time refers to the challenge to build the DEEP composition polynomial.</p>
+<h2 id="commitment-scheme">Commitment Scheme</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * [Here&#39;s](https://gist.github.com/ajgara/c9ef34a8b2af614db026dc56c929509b) an example Python code.</span></span></code></pre>
+<p>The commitment algorithm is simple at its core, but many classes interact with each other to produce a commitment. Also, there are settings and other factors that can change the way the commitment is made. For example, the trace evaluated at the LDE may not fit into RAM due to its size, changing the commitment strategy. Let’s first analyze the core algorithm, assuming the LDE fits in RAM and no special settings are used.</p>
+<p>The strategy here is to build a Merkle tree. To produce this Merkle tree, we need to know how to make the leaves of the tree and how to merge two nodes into a node for the next layer.</p>
+<p>Suppose we want to commit the following trace:</p>
+<table><thead><tr><th>Evaluations of column 1 on LDE</th><th>Evaluations of column 2 on LDE</th></tr></thead><tbody>
+<tr><td>$t_0 ( wh^0 g^0 )$</td><td>$t_1 ( wh^0 g^0 )$</td></tr>
+<tr><td>$t_0 ( wh^0 g^1 )$</td><td>$t_1 ( wh^0 g^1 )$</td></tr>
+<tr><td>$t_0 ( wh^0 g^2 )$</td><td>$t_1 ( wh^0 g^2 )$</td></tr>
+<tr><td>$t_0 ( wh^0 g^3 )$</td><td>$t_1 ( wh^0 g^3 )$</td></tr>
+<tr><td>$t_0 ( wh^1 g^0 )$</td><td>$t_1 ( wh^1 g^0 )$</td></tr>
+<tr><td>$t_0 ( wh^1 g^1 )$</td><td>$t_1 ( wh^1 g^1 )$</td></tr>
+<tr><td>$t_0 ( wh^1 g^2 )$</td><td>$t_1 ( wh^1 g^2 )$</td></tr>
+<tr><td>$t_0 ( wh^1 g^3 )$</td><td>$t_1 ( wh^1 g^3 )$</td></tr>
+</tbody></table>
+<p>We refer to the Domains section for domain details and cosets. The whole LDE domain is shifted by $w$, the powers of $h$ denote in which coset the value sits, and the powers of $g$ denote the index inside that coset. Before committing the trace, the stone prover permutes the order of the rows.</p>
+<p>First, the cosets are permutated following <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Bit-reversal_permutation">bit reverse order</a>. For example, if we had:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>| coset 1 | coset 2 | coset 3 | coset 4 |</span></span></code></pre>
+<p>Applying the bit reverse permutation:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>| coset 1 | coset 3 | coset 2 | coset 4 |</span></span></code></pre>
+<p>Then, the bit reverse order is applied again but inside each coset separately. The final permuted trace would look like this:</p>
+<table><thead><tr><th>Evaluations of column 1 on LDE</th><th>Evaluations of column 2 on LDE</th></tr></thead><tbody>
+<tr><td>$t_0 (wh^0 g^0 )$</td><td>$t_1 (wh^0 g^0 )$</td></tr>
+<tr><td>$t_0 (wh^0 g^2 )$</td><td>$t_1 (wh^0 g^2 )$</td></tr>
+<tr><td>$t_0 (wh^0 g^1 )$</td><td>$t_1 (wh^0 g^1 )$</td></tr>
+<tr><td>$t_0 (wh^0 g^3 )$</td><td>$t_1 (wh^0 g^3 )$</td></tr>
+<tr><td>$t_0 (wh^1 g^0 )$</td><td>$t_1 (wh^1 g^0 )$</td></tr>
+<tr><td>$t_0 (wh^1 g^2 )$</td><td>$t_1 (wh^1 g^2 )$</td></tr>
+<tr><td>$t_0 (wh^1 g^1 )$</td><td>$t_1 (wh^1 g^1 )$</td></tr>
+<tr><td>$t_0 (wh^1 g^3 )$</td><td>$t_1 (wh^1 g^3 )$</td></tr>
+</tbody></table>
+<p>In this case, we only have two cosets, so applying the bit reverse order does nothing, and the two cosets stay in the same place. Then, the elements inside each coset are reordered. Now that we have the correct order, we can start building the leaves of the Merkle tree.</p>
+<p>Each leave will correspond to one row. This is because each time the prover opens $t_i(z)$, it will open all of the other columns $t_j(z)$ at the same value $z$, so it makes sense to store them at the same leaf and using the same authentication path for them.</p>
+<p>If each column has $|LDE|$ rows, we’ll have $|LDE|$ leaves, each with its hash. The $i$-th leaf is the hash that results from hashing the concatenation of all the columns at the $i$-th row. So, for example, the first leaf in this case is $H( t_0 (w h^0 g^0 ) || t_1 ( w h^0 g^0 ))$.</p>
+<p>Note that the stone prover stores its field elements in Montgomery form to enhance the performance of its operations. When using the bytes of a field element to hash them, the field element stays in the Montgomery form (it is not translated to standard format). Also, the limbs representing the field element are stored from least significant at position 0 to most significant at the end.</p>
+<p>Now that we have the leaves, our first layer of the tree, we can build the next layer by merging nodes. To do this, the Stone Prover connects two consecutive nodes by concatenating their hashes and obtaining the hash of the new parent. Repeating this operation halves the number of nodes at each step until the Merkle tree is complete.</p>
+<p>For a simple example, check out the <a rel="noopener external" target="_blank" href="https://gist.github.com/ajgara/c9ef34a8b2af614db026dc56c929509b">python code</a>.</p>
+<p>Check out the Fibonacci <a rel="noopener external" target="_blank" href="https://gist.github.com/schouhy/216f5de449481701d36ab99df86bc081#file-fibonacci_stone_prover-cc-L136-L144">example</a> to see how to instantiate the classes relevant to commitments.</p>
+<h3 id="tableprover">TableProver</h3>
+<p>The <code>TableProver</code> abstract class and its implementation <code>TableProverImpl</code> are high-level interfaces for dealing with commitments and decommitments of 2-dimensional arrays of field elements. It consists mainly of a commitment scheme but also has a pointer to a ProverChannel to send and receive elements from the verifier.</p>
+<p>There is a <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/table_prover.h#L102-L109">TableProverFactory</a> and a <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/utils.inl#L26-L30">utils function</a> to instantiate it. There’s also a helper used in <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/stark/stark_test.cc#L64-L72">tests</a>.</p>
+<p>The <code>TableProverImpl</code> has a <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/table_prover_impl.cc#L117"><code>Commit</code></a> method that in turn calls the <code>Commit</code> method of its <code>commitment_scheme_</code> member, which is a pointer to a <code>CommitmentSchemeProver</code>.</p>
+<h3 id="commitmentschemeprover">CommitmentSchemeProver</h3>
+<p><a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/commitment_scheme.h#L67">This class</a> implements the logic of the commitment scheme.</p>
+<p>There is a commitment scheme <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/commitment_scheme_builder.inl#L177-L195">builder</a> that calls another method <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/commitment_scheme_builder.inl#L56-L70">here</a> that constructs a <code>CommitmentSchemeProver</code> by <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/commitment_scheme_builder.inl#L106-L124">alternately calling</a> <code>PackagingCommitmentSchemeProver</code> and <code>CachingCommitmentSchemeProver</code>.</p>
+<h4 id="segments">Segments</h4>
+<p>There are several details to consider when dealing with traces or LDEs that are so large they do not fit into RAM.</p>
+<p>Evaluations of a polynomial over the LDE are split into segments. Each segment contains a continuous subset of the rows. One Merkle tree is built for each part. Then, another Merkle tree is built on top of that, where the leaves are the roots of the Merkle trees of each segment.</p>
+<p>Two comments help a bit in understanding <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/commitment_scheme.h#L47-L55">here</a> and <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/commitment_scheme_builder.inl#L63-L65">here</a></p>
+<h3 id="cachingcommitmentschemeprover">CachingCommitmentSchemeProver</h3>
+<p>The prover may want to store the entire MerkleTree once it’s committed so that when openings are performed, there’s no need to recalculate them. However, if this is too memory-consuming, the prover might choose not to store it and recalculate it later on. The <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/3d5bb8bd991b7809a6d379c123c902667bac600f/src/starkware/commitment_scheme/caching_commitment_scheme.h#L31-L40">CachingCommitmentSchemeProver</a> implements this logic.</p>
+<h3 id="packagingcommitmentschemeprover">PackagingCommitmentSchemeProver</h3>
+<p>It has an inner commitment scheme, which separates things into packages and passes them to the internal commitment scheme.</p>
+<h2 id="fri">FRI</h2>
+<p>The FRI part is responsible for generating the FRILayers, generating the query points, and producing the proof. The proof consists of several elements from the Merkle trees from every layer, plus inclusion proofs (authentication paths).</p>
+<p>The <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/blob/main/src/starkware/fri/fri_folder.h">Frifolder</a> takes two evaluations from the previous layer and computes an evaluation of the current layer using the <code>FriFolderBase</code> class. The FRI protocol allows one to commit to a certain subgroup of layers (for example, every second layer). There is the possibility of varying the number of layers one commits to, but this makes the logic more complicated. The recommendation is to commit every third layer in this <a rel="noopener external" target="_blank" href="https://github.com/starkware-libs/stone-prover/issues/4">issue</a>. However, the FRI step vector makes it harder for a new user to work with the prover and we don’t believe it particulary offers an advantage in performance.</p>
+<p>The protocol distinguishes between data and integrity queries; if an evaluation is part of the integrity queries, it is not supplied as part of the proof. This is because the integrity query can be deduced from elements from the previous layers. We don’t need to check the value directly; if we correctly computed the value, the inclusion proof should pass. More concretely, if the prover sends the values corresponding to $p_k ( x_i )$ and $p_k ( - x_i )$, the verifier can compute $p_{ k + 1 }( x_i^2 )$. This value is needed to check the inclusion proof in the Merkle tree; if we use a wrong value, the validation should fail (unless there is a collision for the hash function).</p>
+<p>The protocol finishes when the size of a layer is smaller than a threshold value; the prover supplies the polynomial representing those evaluations by performing an interpolation over those values. This optimization reduces the proof length, as we avoid sending several values from many Merkle trees and their authentication paths.</p>
+<p>The protocol is optimized for proof size since it avoids sending unnecessary information from the integrity queries, the pairs of values are grouped in the same branch in the Merkle tree, and the protocol finishes before reaching degree zero.</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>In this post, we covered different components of the Stone prover, how they work, and some of their consequences in proof size. Starkware has done a great job developing the prover and open-sourcing it. There a few parts that still need an improvement but that is always the case with software.</p>
+<p>We are currently working towards achieving compatibility between Stone and STARK Platinum. To reach this goal, we need to adapt different parts so that the challenges we generate are the same and the proof we get (from sampling the queries) and its serialization and deserialization are precisely the same. We will continue explaining how the Stone Prover works and the optimizations we are adding to STARK Platinum to enhance its performance while maintaining compatibility.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

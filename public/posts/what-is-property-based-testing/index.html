@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is property-based testing?  Two examples in Rust - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">What is property-based testing?  Two examples in Rust</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-02-03">February 03, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p>This article will explore property-based tests and demonstrate their use in two of our open-source projects.<br />
+First, let’s explain what a property-based test (PBT) is: If a picture is worth a thousand words, a PBT is worth a thousand unit tests (although this is tunable, as we will see later).<br />
+It was born in the functional programming community and is very different from conventional methods. It’s a great tool to consider when testing the correctness of our programs.</p>
+<p>As its name suggests, it is based on testing the properties of our code. In other words, invariants or behavior that we expect to be consistent across inputs. When we write a unit test, we test a function/method for a specific set of parameters. So, we usually test with a representative (but small) number of inputs where we think the code may hide bugs. In contrast, a property-based test generates many random inputs and checks that the property is met for all of them. If it finds an unsatisfied value, it proceeds with a shrinking process to find the smallest input that breaks the property. That way, it is easier to reproduce the issue.</p>
+<h2 id="a-first-example">A First Example</h2>
+<p>Enough talk; let us use a simple example to show how it works in practice. We’ll work with Rust to illustrate the benefits of this way of testing.</p>
+<p>There are several libraries for doing property-based tests in Rust, but we chose <a rel="noopener external" target="_blank" href="https://github.com/proptest-rs/proptest">proptest</a> because it’s straightforward to use and is being actively maintained.</p>
+<p>In this example, we create a test for a function that adds two positive numbers. The test checks a property of positive number addition: the result is greater than each of the individual parts. We use the <code>prop_assert!</code> macro to verify that the property holds.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>use proptest::prelude::*;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn add(a: i32, b: i32) -&gt; i32 {</span></span>
+<span class="giallo-l"><span>	a + b</span></span>
+<span class="giallo-l"><span>}  </span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>proptest! {</span></span>
+<span class="giallo-l"><span>	// Generate 1000 tests.</span></span>
+<span class="giallo-l"><span>	#![proptest_config(ProptestConfig::with_cases(1000))]</span></span>
+<span class="giallo-l"><span>	#[test]</span></span>
+<span class="giallo-l"><span>	fn test_add(a in 0..1000i32, b in 0..1000i32) {</span></span>
+<span class="giallo-l"><span>		let sum = add(a, b);</span></span>
+<span class="giallo-l"><span>		prop_assert!(sum &gt;= a);</span></span>
+<span class="giallo-l"><span>		prop_assert!(sum &gt;= b);</span></span>
+<span class="giallo-l"><span>		prop_assert_eq!(a + b, sum);</span></span>
+<span class="giallo-l"><span>	}</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Let us see what happens if we change the first property to an incorrect one:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>// prop_assert!(sum &gt;= a); previous line</span></span>
+<span class="giallo-l"><span>prop_assert!(sum &lt;= a)</span></span></code></pre>
+<p>We will receive a report with the smallest instance that breaks the property.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>---- test_add stdout ----</span></span>
+<span class="giallo-l"><span>thread &#39;test_add&#39; panicked at &#39;Test failed: assertion failed: sum &lt;= a at src/lib.rs:13; minimal failing input: a = 0, b = 1</span></span>
+<span class="giallo-l"><span>        successes: 0</span></span>
+<span class="giallo-l"><span>        local rejects: 0</span></span>
+<span class="giallo-l"><span>        global rejects: 0</span></span>
+<span class="giallo-l"><span>&#39;, src/lib.rs:7:1</span></span>
+<span class="giallo-l"><span>note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace</span></span></code></pre>
+<p>To build tests for more complex structures, we can use regular expressions (if we have a way of building our data type from a string) or use <a rel="noopener external" target="_blank" href="https://docs.rs/proptest/latest/proptest/strategy/trait.Strategy.html">Strategies</a>, which are used to control how values are generated and how the shrinking process is done.</p>
+<h2 id="case-studies">Case studies</h2>
+<h3 id="case-study-1-cairo-rs">Case study 1: cairo-rs</h3>
+<p>Let’s start with a more practical example. At LambdaClass, we developed a <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/cairo-rs">Rust implementation of the Cairo virtual machine</a>. Cairo stands for CPU Algebraic Intermediate Representation. It’s a programming language for writing provable programs, where one party can prove to another that a computation was executed correctly by producing a zero-knowledge proof.</p>
+<p>Executing a program made in Cairo involves operating with a lot of field elements (i.e., numbers between 0 and a huge prime number). So every operation (addition, subtraction, multiplication, and division) needs to evaluate to a felt (field element) in the range [0; PRIME -1].</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>proptest! {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  #[test]</span></span>
+<span class="giallo-l"><span>  // Property-based test that ensures, for 100 felt values that are randomly generated each time tests are run, that a new felt doesn&#39;t fall outside the range  [0, PRIME-1].</span></span>
+<span class="giallo-l"><span>  // In this and some of the following tests, The value of {x} can be either [0]  or a huge number to try to overflow the value of {p} and thus ensure the modular arithmetic is working correctly.</span></span>
+<span class="giallo-l"><span>  fn new_in_range(ref x in &quot;(0|[1-9][0-9]*)&quot;) {</span></span>
+<span class="giallo-l"><span>    let x = &amp;Felt::parse_bytes(x.as_bytes(), 10).unwrap();</span></span>
+<span class="giallo-l"><span>    let p = &amp;BigUint::parse_bytes(PRIME_STR[2..].as_bytes(), 16).unwrap();</span></span>
+<span class="giallo-l"><span>    prop_assert!(&amp;x.to_biguint() &lt; p);</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  #[test]</span></span>
+<span class="giallo-l"><span>  // Property-based test that ensures, for 100 felt values that are randomly generated each time tests are run, that the negative of a felt doesn&#39;t fall outside the range [0, PRIME-1].</span></span>
+<span class="giallo-l"><span>  fn neg_in_range(ref x in &quot;(0|[1-9][0-9]*)&quot;) {</span></span>
+<span class="giallo-l"><span>    let x = &amp;Felt::parse_bytes(x.as_bytes(), 10).unwrap();</span></span>
+<span class="giallo-l"><span>    let neg = -x;</span></span>
+<span class="giallo-l"><span>    let as_uint = &amp;neg.to_biguint();</span></span>
+<span class="giallo-l"><span>    let p = &amp;BigUint::parse_bytes(PRIME_STR[2..].as_bytes(), 16).unwrap();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    prop_assert!(as_uint &lt; p);</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  #[test]</span></span>
+<span class="giallo-l"><span>  // Property-based test that ensures, for 100 {x} and {y} values that are randomly generated each time tests are run, that multiplication between two felts {x} and {y} and doesn&#39;t fall outside the range [0, PRIME-1]. The values of {x} and {y} can be either [0] or a very large number.</span></span>
+<span class="giallo-l"><span>  fn mul_in_range(ref x in &quot;(0|[1-9][0-9]*)&quot;, ref y in &quot;(0|[1-9][0-9]*)&quot;) {</span></span>
+<span class="giallo-l"><span>    let x = &amp;Felt::parse_bytes(x.as_bytes(), 10).unwrap();</span></span>
+<span class="giallo-l"><span>    let y = &amp;Felt::parse_bytes(y.as_bytes(), 10).unwrap();</span></span>
+<span class="giallo-l"><span>    let p = &amp;BigUint::parse_bytes(PRIME_STR[2..].as_bytes(), 16).unwrap();</span></span>
+<span class="giallo-l"><span>    let prod = x * y;</span></span>
+<span class="giallo-l"><span>    let as_uint = &amp;prod.to_biguint();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    prop_assert!(as_uint &lt; p, &quot;{}&quot;, as_uint);</span></span>
+<span class="giallo-l"><span>  }</span></span></code></pre>
+<p>We already found two hard-to-find bugs by using a suite of property-based tests for each arithmetical operation. Also, it helped us easily change our field elements’ internal implementation to a more performant one and be confident that we didn’t break anything.</p>
+<h3 id="case-study-2-patricia-merkle-tree">Case study 2: Patricia Merkle Tree</h3>
+<p>At LambdaClass, we are also developing a <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/merkle_patricia_tree">Merkle Patricia tree library</a> (like those used in Ethereum and many other cryptography-related projects). To test the correctness of the implementation, we decided to make property-based tests by comparing the results of our library’s operations against the results of a reference implementation, <a rel="noopener external" target="_blank" href="https://github.com/citahub/cita-trie">cita-trie</a>.</p>
+<p>For testing, let’s generate some inputs for creating two trees: one using the reference implementation and one using our library.<br />
+This time the property that we want to test is that for every generated tree from our library, its root hash matches the root hash of the reference implementation.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>fn proptest_compare_root_hashes(path in vec(any::&lt;u8&gt;(), 1..32), value in vec(any::&lt;u8&gt;(), 1..100)) {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  use cita_trie::MemoryDB;</span></span>
+<span class="giallo-l"><span>  use cita_trie::{PatriciaTrie, Trie};</span></span>
+<span class="giallo-l"><span>  use hasher::HasherKeccak;</span></span>
+<span class="giallo-l"><span>  </span></span>
+<span class="giallo-l"><span>  // Prepare the data for inserting it into the tree</span></span>
+<span class="giallo-l"><span>  let data: Vec&lt;(Vec&lt;u8&gt;, Vec&lt;u8&gt;)&gt; = vec![(path, value)];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  // Creates an empty patricia Merkle tree using our library and </span></span>
+<span class="giallo-l"><span>  // Keccak256 as the hashing algorithm.</span></span>
+<span class="giallo-l"><span>  let mut tree = PatriciaMerkleTree::&lt;_, _, Keccak256&gt;::new();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  // insert the data into the tree.</span></span>
+<span class="giallo-l"><span>  for (key, val) in data.clone().into_iter() {</span></span>
+<span class="giallo-l"><span>    tree.insert(key, val);</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  // computes the root hash using our library</span></span>
+<span class="giallo-l"><span>  let root_hash = tree.compute_hash().as_slice().to_vec();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  // Creates a cita-trie implementation of the</span></span>
+<span class="giallo-l"><span>  // Patricia Merkle tree.</span></span>
+<span class="giallo-l"><span>  let memdb = Arc::new(MemoryDB::new(true));</span></span>
+<span class="giallo-l"><span>  let hasher = Arc::new(HasherKeccak::new());</span></span>
+<span class="giallo-l"><span>  let mut trie = PatriciaTrie::new(Arc::clone(&amp;memdb), Arc::clone(&amp;hasher));</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  // Insert the data into the cita-trie tree.</span></span>
+<span class="giallo-l"><span>  for (key, value) in data {</span></span>
+<span class="giallo-l"><span>    trie.insert(key.to_vec(), value.to_vec()).unwrap();</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>  // Calculates the cita-tree&#39;s root hash.</span></span>
+<span class="giallo-l"><span>  let reference_root = trie.root().unwrap();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  prop_assert_eq!(</span></span>
+<span class="giallo-l"><span>    reference_root,</span></span>
+<span class="giallo-l"><span>    root_hash</span></span>
+<span class="giallo-l"><span>  );</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Using this technique, we can ensure that our implementation behaves the same way as the reference one.</p>
+<h2 id="closing-words">Closing words</h2>
+<p>In conclusion, property-based testing is a powerful and effective way to test the correctness of our programs. Testing properties helps find bugs and ensure that our program meets invariants across a wide range of inputs. In this article, we demonstrated property-based testing in two open-source projects. We hope you consider it in your testing practices.</p>
+<h2 id="related-resources">Related Resources</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. QuickCheck original paper &lt;https://www.cs.tufts.edu/~nr/cs257/archive/john-hughes/quick.pdf&gt;</span></span>
+<span class="giallo-l"><span>    2. _Property-Based Testing with PropEr, Erlang, and Elixir_ by Fred Hebert &lt;https://propertesting.com/&gt;</span></span>
+<span class="giallo-l"><span>    3. Rust port of QuickCheck &lt;https://github.com/BurntSushi/quickcheck&gt;</span></span>
+<span class="giallo-l"><span>    4. proptest book &lt;https://altsysrq.github.io/proptest-book/intro.html&gt;</span></span></code></pre>
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

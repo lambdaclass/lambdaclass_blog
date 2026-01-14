@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lambda’s engineering philosophy - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Lambda’s engineering philosophy</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-09-27">September 27, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="what-makes-lambda-different">What makes Lambda different</h2>
+<p>We often hear that Lambda has a different way of operating compared with other companies. Many people we’ve worked with have praised the speed and quality of our delivery. We attribute that to a set of principles that anyone can apply, and might benefit others. It can be summed up as: observe, iterate, simplify, have a close relationship with your code both in its static and dynamic form, and incorporate process at the correct times to serve the needs of engineering and not management. Let’s break this down:</p>
+<h2 id="be-curious-be-attached-to-learning-and-solving">Be curious, be attached to learning and solving</h2>
+<p>We promote a culture where engineers can feel the joy of putting things into production and applying their skills to interesting challenges.</p>
+<h2 id="observe-and-measure">Observe and Measure</h2>
+<p>Engineering is applying knowledge to solve problems under a given cost/benefit tradeoff. You cannot solve a problem you cannot see. Seeing is measuring. Use your tools to diagnose the problem, have a metric for success, then measure again after applying your solution.</p>
+<p>Build observability into your system. The sooner you see, the sooner you can react, to both changing requirements and changing metrics.</p>
+<p>This also applies to performance engineering. Optimization is premature (thus evil) only when it occurs before it is a requirement and before measuring.</p>
+<p>Iterate frequently in your perceive-act loop to shorten feedback.</p>
+<h2 id="speak-openly-about-engineering-problems">Speak openly about engineering problems</h2>
+<p>Once a problem has been identified, speak openly about it. Of course <em>how</em> one communicates is all important when talking to other humans, but if framed correctly a technical discussion should not offend anyone, as the merits or faults of any technical solution only reflect on the thing itself, and not the value of the human or group implementing it.</p>
+<p>The earlier a problem (or solution) is communicated and discussed, the better the final solution will be, the lower the risk and cost.</p>
+<p>“Pride is not the opposite of shame, but its source. True humility is the only antidote to shame.”</p>
+<h2 id="relationship-with-complexity-or-lack-thereof">Relationship with complexity (or lack thereof)</h2>
+<p>If there is one mantra we repeat and can apply in any context, it is KISS, Keep It Simple, Silly.<br />
+Much has been written about this, and there are echoes of it in many other wise reflections, such as Joe Armstrong’s famous quote <em>“Make it work, then make it beautiful, then if you really, really have to, make it fast. 90% of the time, if you make it beautiful, it will already be fast. So really, just make it beautiful!”</em> ; or in some of the tenets of the Zen of Python:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>Beautiful is better than ugly.</span></span>
+<span class="giallo-l"><span>  Explicit is better than implicit.</span></span>
+<span class="giallo-l"><span>  Simple is better than complex.</span></span>
+<span class="giallo-l"><span>  Complex is better than complicated.</span></span>
+<span class="giallo-l"><span>  Flat is better than nested.</span></span>
+<span class="giallo-l"><span>  Sparse is better than dense.</span></span>
+<span class="giallo-l"><span>  Readability counts.</span></span></code></pre>
+<p>Such general maxims are something that may seem truisms, or tautological sometimes. Their value is in keeping them constantly in mind and asking “how does this apply <em>in this context</em>?”.</p>
+<h2 id="dogfooding">Dogfooding</h2>
+<p>Repositories should build easily and cleanly on all of the target environments. A newcomer to the project should be able to set it up with no hassle. Take pride in having an up-to-date readme that people can follow and have your code working on their machine in no time. Open-source as much as you can. Put your code out into the world.</p>
+<p>Developers should be hands-on about infra, not only familiar with the usual tooling for development but also with the pipelines and code which puts it into production. Your pipelines should be clean and as observable and debuggable as the product code.</p>
+<h2 id="generalization-should-be-end-game">Generalization should be end game</h2>
+<p>Do not generalize until you absolutely need it. Repeating code two or three times can be fine. Solve the problem you need to solve, don’t get tangled up in how to abstract or generalize the solution, just get it done in the simplest way possible. Generalizations and abstractions arise naturally with time.</p>
+<p>Most new challenging projects usually have two different phases:</p>
+<h3 id="first-few-weeks-experiment-and-prototype">First few weeks: experiment and prototype</h3>
+<p>Things are just starting out. The problem being solved is not yet well understood, there’s a lot of uncertainty; some people know just enough about the problem to recognize it’s a difficult task, but not enough to go ahead and tackle it. This creates a lot of anxiety around how things should be done and what the best way forward is; endless debates that go nowhere ensue. Sometimes some knowledge is worse than knowing nothing at all.</p>
+<p>Getting through this requires recognizing that you don’t fully know how to do things and that’s fine; you have to figure it out through trial and error. The mantra here is <em>Go fast, try things out, fail quickly, figure it out</em>.</p>
+<p>Introducing a lot of process at this stage is counter-productive, you can’t make a gantt and plan things out with deadlines when you’re not even sure what it is you are building. Doing so just slows you down, or set you on the wrong path.</p>
+<p>Morale at this stage is also very important; people are anxious that the project might not pan out, that the problem is not solvable. If there’s too much time without any update or any sort of progress, they get demoralized. The antidote is quickly coding something that performs some basic form of the final desired behavior, and each passing week should expand and improve upon functionality. Don’t let weeks pass by creating lots of code that still doesn’t perform a basic function. Showing regular updates, merging changes quickly and trying them out, deploying regularly and all around having a fast feedback loop is essential to keep people excited and focused.</p>
+<h3 id="settling-down">Settling down</h3>
+<p>After a few weeks of work, the project begins to take shape, the problem is better understood and the solution is working out well. People start developing a common vocabulary around the project, they know what problem needs to be solved next and how to do it. Anxiety wears off.</p>
+<p>At this point, two things become important:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Organizing the work that’s yet to come. The project is no more than a prototype right now, and there is a ton of work to be done to make it production ready.</span></span>
+<span class="giallo-l"><span>    * Documenting the progress so far. A lot of knowledge was accumulated in the first few weeks/months of work as ideas were tried out and discarded. It’s important for it not to get lost.</span></span></code></pre>
+<p>Solving these issues (especially the first one) requires introducing <em>process</em>. Writing down all the tasks left, making a gantt, defining milestones and distributing work accordingly are now necessary to continue. The main obstacle is not so much uncertainty anymore, but rather correct planning and execution.</p>
+<p>As the project continues to take shape and grow, merging new changes becomes more and more difficult; its complexity starts making it impossible for you to know every nook and cranny. Also, breaking things has a higher cost both in development time and perhaps money if you’re in production. Thorough testing and code review thus become key.</p>
+<p>Process is the sign of a <em>mature</em> project. It is very important, but it should not be introduced before it’s necessary.</p>
+<h3 id="back-and-forth">Back and forth</h3>
+<p>Most projects go through these phases more than once. In general, any time a project gets a new requirement that involves a challenging task, a part of it has to revert to the experimentation phase.</p>
+<p>The key here is <em>uncertainty</em>. When you detect that a given task is hard and people are spending way too much time arguing about how to solve it, without ever trying things out (for fear of breaking things or making the wrong move) you need to revert back to the first phase. This doesn’t mean throwing all the process out the window; people who are working on other regular tasks can continue as usual. It’s just the part of the team tackling this new challenge that needs to change its approach.</p>
+<h2 id="incorporating-process">Incorporating process</h2>
+<p>Of all the infinite process management tools and diagrams under the sun, the one we find most useful is the Gantt chart.<br />
+Here is an outline of how we go about making one, once the project requires it.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. Understand what areas there are in the project in a very broad way. E.g. networking, state transitions, api, db, external services, infra. Architecture diagrams might help at this stage.</span></span>
+<span class="giallo-l"><span>    2. Divide areas into tasks.</span></span>
+<span class="giallo-l"><span>    3. Repeat step 2 a couple of times. This refining will help direct research and prevent the “I want to know everything before coding”.</span></span>
+<span class="giallo-l"><span>    4. Research doesn’t mean just reading, this is a good stage to start with some very small PoCs of things you don’t understand. Some PoCs can even be a good task to delegate to other team members while still figuring out tasks. You’ll need to review those in depth later on though.</span></span>
+<span class="giallo-l"><span>    5. Track dependencies between tasks. A dependency graph might be a good output here.</span></span>
+<span class="giallo-l"><span>    6. Use the dependencies to prioritize (order), and group tasks in vertical slices. These are E2E integrations that provide some high-level feature and usually include a bit of all areas.</span></span>
+<span class="giallo-l"><span>    7. The first vertical slice should be bare bones, maybe providing a dumb useless feature, but should give you “something” working. It should have a db, api, networking, ci, testing and linting (and other tools if necessary). This will force you to forever be in a production mindset from day 1 and avoid giant integrations later on. It also forces you to start doing PoCs of different tools early to reduce uncertainty and unblock as many independent paths as possible for next slices.</span></span>
+<span class="giallo-l"><span>    8. Make a release plan using these slices. Roughly estimate a number of weeks for each. This is not the time for precise estimations. Also, multiply that number by 1.5 or 2 depending on how optimist you tend to be and how little you still know about the project.</span></span>
+<span class="giallo-l"><span>    9. Now you can make a Gantt reflecting the release plan and according to the amount of people you have.</span></span></code></pre>
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do You Want Quality Code? Learn How to Use Differential Fuzzers! - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Do You Want Quality Code? Learn How to Use Differential Fuzzers!</h1>
+        
+        <div class="page-meta">
+            <time datetime="2023-04-14">April 14, 2023</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <p>Let’s be honest, who hasn’t missed testing an edge case in their life? Surely it has happened to you, and maybe you realized it months after having implemented it (maybe when it’s already in production!). Some cases escape even the most experienced tester, and to avoid explanations to your manager, today we present the concept of fuzzing, and one of its types: the differential fuzzer.</p>
+<p>As stipulated by the OWASP Foundation:</p>
+<blockquote>
+<p>Fuzz testing or Fuzzing is a Black Box software testing technique, which consists in finding implementation bugs using malformed/semi-malformed data injection in an automated fashion.</p>
+</blockquote>
+<p>Fuzzing is a very efficient technique when looking for errors in our code. This is achieved by generating a massive set of random entries that are used to test a program. The resulting tests often manage to reach less common cases, the kind that can go usually be overlooked.<br />
+If you are interested in learning more about the fuzzer concept in general you can watch the videos we made on the subject, <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=z-THCexE4zs">hacking with fuzzers</a> and <a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=F3CtyKm7SV4&amp;t=79s">fuzzing tools</a></p>
+<p>However, this tool is not limited to a single program, or to only finding errors that end up causing a crash; we can also compare the outputs of at least two different implementations of the same program and check that they follow the same behavior; this is known as differential fuzzing.</p>
+<h2 id="when-should-we-use-differential-fuzzing">When should we use differential fuzzing?</h2>
+<p>The cases in which we can use the differential fuzzing technique are where we have two different implementations of the same algorithm. For example, let’s think about all the different languages in which the <a rel="noopener external" target="_blank" href="https://ethereum.org/en/developers/docs/evm/">Ethereum Virtual Machine</a> is implemented. The simple magic of the differential fuzzer is to test massively with different inputs that all implementations return the same result when running the same process or function. If this is not the case, at least one of the implementations has logic errors and is giving us a result that was not expected.</p>
+<h2 id="structure-of-a-differential-fuzzer">Structure of a differential fuzzer</h2>
+<p>The structure of a differential fuzzer is simple, first, we define which tool we are going to use for fuzzing since we have a large number of tools for this purpose like <a rel="noopener external" target="_blank" href="https://github.com/google/honggfuzz">Honggfuzz</a>, <a rel="noopener external" target="_blank" href="https://github.com/rust-fuzz/cargo-fuzz">Cargofuzz</a>, <a rel="noopener external" target="_blank" href="https://github.com/google/atheris">Atheris</a> and many more.</p>
+<p>Whichever tool you choose (we do not judge preferences here), all tools should provide us with the same thing, a series of random inputs that we will inject into the code to be tested.</p>
+<p>With the input provided by the fuzzer, we adapt it to each of the implementations. In this way, both should have the same input at the end, and we tell the fuzzer to return an error if the results differ. This will give us a list of inputs where at least one of the implementations has an error in its logic, giving a different result than the expected one.</p>
+<p>For this, we may need intermediate functions to ensure that the result returned by both implementations is comparable.</p>
+<h2 id="example-of-a-differential-fuzzer">Example of a differential fuzzer</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>#![no_main]</span></span>
+<span class="giallo-l"><span>use libfuzzer_sys::fuzz_target;</span></span>
+<span class="giallo-l"><span>use std::io::prelude::*;</span></span>
+<span class="giallo-l"><span>use inflate::inflate_bytes;</span></span>
+<span class="giallo-l"><span>use libflate::deflate::Decoder;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// This differential fuzzer panics if two different implementations for deflate</span></span>
+<span class="giallo-l"><span>// decode function returns different results </span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fuzz_target!(|data: &amp;[u8]| {</span></span>
+<span class="giallo-l"><span>    let mut libflate_decoded = Decoder::new(data);</span></span>
+<span class="giallo-l"><span>    let mut decoded_data = Vec::new();</span></span>
+<span class="giallo-l"><span>    let libflate_res = libflate_decoded.read_to_end(&amp;mut decoded_data).is_ok();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    let inflate_decoded = inflate_bytes(data).is_ok();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    if libflate_res != inflate_decoded {</span></span>
+<span class="giallo-l"><span>    panic!(&quot;differential fuzz failed {}-{}&quot;,</span></span>
+<span class="giallo-l"><span>            libflate_res, inflate_decoded)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>});</span></span></code></pre>
+<p>In the example, we can see an example of a differential fuzzer. This fuzzer is created using the <code>libfuzzer</code> tool, meant to be used in Rust. the structure of the code is simple and it’s the same for all the fuzzer tools that you want to use.</p>
+<p>First, we have the imports that include the implementations we want to compare in our fuzzer. Then we have the function that´s going to run the fuzzer, in this case, is the <code>fuzz_target!()</code> function. This function supplies us with a randomly generated input, in this case, the variable <code>data</code>. With the previous <code>data</code> generated, we run the piece of code that we want to test. In cases like the one in the example code used by <code>libflate,</code> we need to adjust the random <code>data</code> to be received by the code in the first instance. As the last step we do the differential magic, that is, we compare the result returned by the different implementations.</p>
+<p><img src="/images/external/DzicizT.png" alt="" /></p>
+<p>In this case, as we can see in the image when we run the fuzzer, it finds a crash because one of the implementations returns a valid result and the other one an error.</p>
+<h2 id="inputs-and-outputs">Inputs and outputs</h2>
+<p>According to every particular case of inputs and outputs, we might need to provide some extra code.</p>
+<p>Let’s understand what that means with a simple example. We might be comparing two implementations of some code that receives a <a rel="noopener external" target="_blank" href="https://en.wikipedia.org/wiki/Quadratic_equation">quadratic equation</a> and an answer and returns if the answers responds to the equation. In this case, one of the implementations receives 4 numbers that correspond to the index of the equation and the answer and the other receives the input as a string with the equation, something like “axx+bx+c=d”.</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span># Implementation 1 </span></span>
+<span class="giallo-l"><span>def check_if_answer(a,b,c,d, answer):</span></span>
+<span class="giallo-l"><span>    result = (a * answer^2) + (b * answer) + c </span></span>
+<span class="giallo-l"><span>     </span></span>
+<span class="giallo-l"><span>    if result == d: { </span></span>
+<span class="giallo-l"><span>        True</span></span>
+<span class="giallo-l"><span>    } </span></span>
+<span class="giallo-l"><span>    else: {</span></span>
+<span class="giallo-l"><span>        False</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span># Implementation 2</span></span>
+<span class="giallo-l"><span>def check_if_anwer(equation, answer):</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    string_without_x = remove_x_from_string(equation) # This returns &quot;a+b+c=d&quot;</span></span>
+<span class="giallo-l"><span>    array_of_indexes = split_string(string_without_x) # This returns [a,b,c,d]</span></span>
+<span class="giallo-l"><span>    [a,b,c,d] =  array_of_indexes</span></span>
+<span class="giallo-l"><span>    result = (a * answer^2) + (b * answer) + c </span></span>
+<span class="giallo-l"><span>     </span></span>
+<span class="giallo-l"><span>    if result == d: { </span></span>
+<span class="giallo-l"><span>        True</span></span>
+<span class="giallo-l"><span>    } </span></span>
+<span class="giallo-l"><span>    else: {</span></span>
+<span class="giallo-l"><span>        False</span></span>
+<span class="giallo-l"><span>    }</span></span></code></pre>
+<p>To give the different implementations the “same” input we need to adjust the starting input so it’s the same for both. In the output, we have to do the same. One of the implementations might return True/ False while the other return 0/1, we need to adjust the outputs so the equality works as it has to.</p>
+<p>This applies to both regular and differential fuzzers.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>A differential fuzzer is a very valuable tool in case you are implementing a process that already has another implementation to ensure that even the edge cases are handled consistently. This tool can also be used in the case of choosing implementations of a solution that we want to use for our project, by comparing the effectiveness of each one.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

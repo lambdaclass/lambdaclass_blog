@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NuShell: the shell where traditional Unix meets  modern development, written in Rust - LambdaClass Blog</title>
+    <meta name="description" content="We interviewed its creators">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">NuShell: the shell where traditional Unix meets  modern development, written in Rust</h1>
+        
+        <div class="page-meta">
+            <time datetime="2020-05-14">May 14, 2020</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h4 id="we-interviewed-its-creators">We interviewed its creators</h4>
+<p>Shells have been around forever and, for better or for worse, haven’t changed much since their inception. Until <a rel="noopener external" target="_blank" href="https://www.nushell.sh/">NuShell</a> appeared to reinvent shells and defy our muscle memory. It brought some big changes, which include rethinking how pipelines work, structured input/output, and plugins.</p>
+<p>We wanted to learn more about NuShell so we interviewed both of its creators: <a rel="noopener external" target="_blank" href="https://twitter.com/jntrnr">Jonathan Turner</a> and <a rel="noopener external" target="_blank" href="https://twitter.com/wycats">Yehuda Katz</a>.</p>
+<hr />
+<h4 id="why-create-nushell-is-it-me-or-does-it-have-a-next-level-awk-vibe"><strong>Why create NuShell? Is it me or does it have a next-level AWK vibe?</strong></h4>
+<p><strong>Jonathan Turner</strong> : Sometimes the simplest ideas are the ones that hook you the most :). When Yehuda and I first started discussing how shells could be improved, we settled on the idea of using structured data rather than just text between applications (for example stdin/stdout). He had just been experimenting with PowerShell and saw how adding some structure to the data opened up a lot of possibilities.</p>
+<p>The basic idea is pretty simple: Nu opens everything into a table you can work with. Files, streams, commands like ls and ps all output this one table format. Then you have a set of commands that work with these tables, to help you get the data you want, change it, view it, etc.</p>
+<p>Funny that you mention “awk”. In a way, Nu is a way of saying “what if we didn’t need tools like awk so often?” Since you’re working with structured data, as we add more support for file types, it’s less often you need to reach for “awk”, “jq”, “grep”, and the array of other tools to open and work with common file types.</p>
+<p>In a way, it’s taking the original spirit of Unix — where you use pipelines to combine a set of tools — and imagining how that original spirit would work today, with what we know about programming languages and tools. And, being crossplatform, it’s nice to learn this approach and then be able to easily switch operating systems and use the same techniques.</p>
+<p><img src="/images/max/2000/1-u77ccTVL0VJ7Cw2xT_7puA.png" alt="" />NuShell screen capture</p>
+<h4 id="why-use-rust-how-much-experience-did-you-have-beforehand"><strong>Why use Rust? How much experience did you have beforehand?</strong></h4>
+<p><strong>Jonathan</strong> : Yehuda and I have been writing Rust for at least 4 years. He was one of the first people to deploy Rust into production, long before it hit 1.0.</p>
+<p>Rust also just made sense. It naturally is crossplatform, it’s easy to optimize, it’s easy to harden against memory and threading issues, and after the initial learning curve it’s also quite a lot of fun to write. When you’re doing things in your free time, having something you’re looking forward to hacking on after work makes it a lot easier to do so day after day.</p>
+<h4 id="did-using-rust-present-a-challenge-in-some-aspect"><strong>Did using Rust present a challenge in some aspect?</strong></h4>
+<p><strong>Yehuda Katz</strong> : Quite the opposite! Rust and its ecosystem has two properties that are a really good fit for what we’re trying to do:</p>
+<ol>
+<li>Cross-platform: There is a version of almost every basic crate that works on Windows, macOS, and Linux.</li>
+<li>Rigorous: Rust doesn’t really have exceptions. Instead, Rust’s library ecosystem surfaces edge-cases as Results. When writing something like a shell, this saved us from all kinds of problems as we evolved.</li>
+</ol>
+<p>Rust also has a great package manager (Cargo), which means that gluing together fast, cross-platform, and rigorous packages from the ecosystem is really easy.</p>
+<h4 id="how-do-you-go-about-making-software-cross-platform-in-rust-is-it-as-much-work-as-one-would-think"><strong>How do you go about making software cross-platform in Rust? Is it as much work as one would think?</strong></h4>
+<p><strong>Yehuda</strong> : Not really. What you do is look for crates on <a rel="noopener external" target="_blank" href="https://crates.io/">crates.io</a> that support Windows. Most of the time, crates that claim to care about Windows support Windows, as well as other platforms.</p>
+<p><strong>Jonathan</strong> : Rust is definitely my preferred tool for crossplatform development these days. Like Yehuda mentions, most crates work across Windows, macOS, and Linux. We’ll also likely explore making Nu work in the browser in the future, which would mean WASM support, and Rust is probably the best language for that as well.</p>
+<h4 id="why-did-you-decide-to-ignore-posix-compliance"><strong>Why did you decide to ignore POSIX-compliance?</strong></h4>
+<p><strong>Yehuda</strong> : This question is a little bit misleading in my opinion. When people say that a shell is “POSIX compliant”, they’re talking about a tiny subset of the syntax and features that people come to rely on in a shell. If you want to run a POSIX shell script in nu, you can just run it with bash or sh. On the other hand, trying to make our syntax perfectly compliant with the POSIX standard would introduce all kinds of weird decades-old cruft and constrain the ergonomics of our syntax.</p>
+<p><strong>Jonathan</strong> : When people ask for POSIX-compliance, I think different people mean different things. Generally, I think they mean “don’t break my muscle memory”. That’s fair, it’s annoying to unlearn habits. That said, what it means to be compatible has changed a lot from the original ideas. I saw this tweet the other day which I thought sums it up pretty well:</p>
+<p><img src="/images/max/2000/1-gQH1jV4nzbs_WurExrLnEw.png" alt="" />Source: <a rel="noopener external" target="_blank" href="https://twitter.com/danluu/status/1234814736144797697">Dan Luu</a></p>
+<h4 id="where-does-nushell-stand-compared-to-others-like-zsh-or-fish-as-of-today-can-i-set-it-as-my-default-shell"><strong>Where does NuShell stand compared to others like zsh or fish? As of today, can I set it as my default shell?</strong></h4>
+<p><strong>Jonathan</strong> : we’re quickly approaching when you’ll be able to use Nu as your default shell. In fact, some of Nu’s users already use it as their daily driver happily. In 0.13, we added the ability to create your own aliases, which dramatically improves how well Nu works as a shell, as it’s now easy to configure your own set of shortcuts for things you do regularly.</p>
+<h4 id="how-did-you-decide-on-that-sort-of-hard-division-of-commands-streamers-filters-and-consumers-i-didn-t-see-any-official-names-for-these-concepts-but-i-think-this-conveys-the-idea"><strong>How did you decide on that sort of “hard” division of commands: streamers, filters, and consumers?<em>I didn’t see any official names for these concepts, but I think this conveys the idea</em></strong></h4>
+<p><strong>Yehuda</strong> : The distinctions arose organically, and make sense. When you think about streams, there are really three parts: the first part, the middle parts, and the last part. The last part is the most special one, because it takes a stream of data and turns it into something you can see, which requires looking at the inbound stream. For example, the outputted table needs to look at some rows to see what headers to use.</p>
+<h4 id="why-make-a-plugin-system-what-are-the-benefits-of-using-json-rpc-for-internal-communication"><strong>Why make a plugin system? What are the benefits of using JSON-RPC for internal communication?</strong></h4>
+<p><strong>Yehuda</strong> : The main difference between plugins and builtins is that built-in commands have access to the shell internals. We wanted to build as many commands as possible on top of a more well-defined interface. This also meant that you could build custom commands in Python, Ruby or JavaScript pretty early in the project.</p>
+<p>The benefit of JSON-RPC is that it’s pretty easy to work with JSON-RPC in virtually all programming languages, so it’s possible to build a plugin in any language without major assistance from the nushell team.</p>
+<h4 id="why-would-i-choose-to-make-a-plugin-why-not-just-make-a-binary-that-works-on-all-shells-and-let-the-parsing-of-my-output-to-users-of-nushell"><strong>Why would I choose to make a plugin? Why not just make a binary that works on all shells and let the parsing of my output to users of NuShell?</strong></h4>
+<p><strong>Yehuda</strong> : The major benefit of building a plugin is the ability to work directly with structured data. This means that all of the “good stuff” that nushell gives you out of the box, like sorting and filtering, will just work without your user having to parse string output into a new structured format.</p>
+<p>The Nushell plugin API also allows you to specify the types of your arguments, which will give you error messages, syntax highlighting and some amount of context-sensitive completion out of the box. The more information you give Nushell, the more we can give Nushell users useful information as they interact with your command.</p>
+<p>Also, the Nushell plugin API is also built for streaming out of the box, so if you use the plugin API in the normal way, you can idiomatically interact with streams of structured data in a way that will scale up to huge amounts of input without “breaking the stream”.</p>
+<h4 id="what-s-next-for-nushell"><strong>What’s next for NuShell?</strong></h4>
+<p><strong>Jonathan</strong> : Nu, as both a shell and a language, is still very much young and growing. We’re planning on adding functions, a rich auto-completion system, better Jupyter integration for working with data, per-directory environments, and much more. In short, we want it to grow to be the best tool for working with your system, files, and data we can make.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

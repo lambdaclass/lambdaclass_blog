@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How does Basefold polynomial commitment scheme generalize FRI - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">How does Basefold polynomial commitment scheme generalize FRI</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-02-09">February 09, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p><a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/lambdaworks">lambdaworks</a> is a library designed to provide efficient proof systems. We want it to support state of the art provers and associated primitives so that people can use them to build new applications. Among those primitives we have polynomial commitment schemes (PCS). These are a powerful cryptographic tool that allows us to bind ourselves to a given polynomial by means of a small data structure (such as the root of a Merkle tree or a point over an elliptic curve) and prove its evaluations at some points. Polynomial commitment schemes consist of the following five algorithms:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Setup: given a security parameter, $\lambda$, it generates the public parameters (pp) for the PCS.</span></span>
+<span class="giallo-l"><span>    * Commit: taking the pp and a polynomial, $p$, outputs a commitment to the polynomial $\mathrm{cm}(p)$.</span></span>
+<span class="giallo-l"><span>    * Open: given the pp, a polynomial $p$ and a commitment to $p$, $\mathrm{cm}(p)$, checks whether $\mathrm{cm}(p)$ is the commitment to $p$.</span></span>
+<span class="giallo-l"><span>    * Prove evaluation: given the pp, a polynomial $p$, a point $z$ and a claimed evaluation $v$, outputs a proof $\pi$ that the $p(z) = v$.</span></span>
+<span class="giallo-l"><span>    * Verify evaluation: given the pp, the commitment to $p$, the proof $\pi$, the point $z$ and the claimed value $v$, checks whether the evaluation proof is valid.</span></span></code></pre>
+<p>Polynomial commitment schemes are one of the basic building blocks of modern SNARKs. Some commitment schemes require a trusted setup (such as <a href="/mina-to-ethereum-bridge/">KZG</a>), while others are transparent (such as FRI, Brakedown and IPA). Different PCS offer trade-offs between evaluation proof sizes, evaluation times, security assumptions, and other algebraic properties (for example, being additively homomorphic).</p>
+<p><a rel="noopener external" target="_blank" href="https://eprint.iacr.org/2023/1705.pdf">Basefold</a> generalizes the <a href="/how-to-code-fri-from-scratch/">FRI commitment scheme</a> to other codes different from Reed-Solomon. These codes need to have certain properties, though. This post will discuss the basics of coding theory and explain how basefold works.</p>
+<h2 id="coding-theory">Coding theory</h2>
+<p>Error-correcting codes are ways of representing data so that we can recover the information even if parts of it were corrupted. We do this by introducing redundancy, and the message can be recovered even if parts of the redundant data are corrupted. There is a trade-off between maximizing error correction and redundancy: codes with higher redundancy should be able to tolerate a higher number of errors.</p>
+<p>A code of block length $n$ over an alphabet $\Sigma$ is a subset of $\Sigma^n$. In our case, we will be interested in codes where the alphabet $\Sigma$ is some finite field $\mathbb{F}$ and $\vert \Sigma \vert = q$.</p>
+<p>The rate of a code of dimension $k$ and block size $n$ is given by $\rho = k / n$ and is a measure of the amount of redundancy introduced in the code.</p>
+<p>Given a code, the Hamming distance, $d$, between two code words is given by the number of positions they differ at. The relative distance is the ratio between the distance and the block length, $\delta = d / n$.</p>
+<p>A code over $\Sigma^n$ of dimension $k$ and distance $d$ is called an $(n , k , d )_{\Sigma}$ - code. A linear code is such that any linear combination of codewords results in a codeword (that is, if $c_0$ and $c_1$ are the encoding of $m_0$ and $m_1$, then $\alpha_0 c_0 + \alpha_1 c_1$ is also a codeword, specifically, the codeword associated with $\alpha_0 m_0 + \alpha_1 m_1$).</p>
+<p>For linear codes, the encoding function can be represented as a vector-matrix product using a generator matrix, $G$, that is<br />
+$\mathrm{Enc}(v) = v . G$</p>
+<p>For example, Reed-Solomon codes use a Vandermondian matrix with points $\alpha_0, \alpha_1, … , \alpha_{n - 1}$:<br />
+$$\begin{align}<br />
+V(\alpha_0 , \alpha_1 , … , \alpha_{n - 1}, k)_{i,j} = \alpha_j^i<br />
+\end{align}$$</p>
+<p>Reed-Solomon codes work by interpreting the message as the coefficients of a degree $k - 1$ polynomial. If the message is $(m_0 , m_1 , … , m_{k - 1})$, we can think of them as $m_0 + m_1 x + … + m_{k - 1} x^{ k - 1}$ and provide the evaluations over $n$ distinct points. Since the polynomial is at most of degree $k - 1$, it has at most $k - 1$ zeros, making two different codewords coincide at most in $k - 1$ places, so $d = n - k + 1$. Codes which satisfy $d = n - k + 1$ are called maximum distance separable codes.</p>
+<h2 id="basefold">Basefold</h2>
+<p><a rel="noopener external" target="_blank" href="https://www.youtube.com/watch?v=OuKUqPbHLQ0">Basefold</a> works with foldable linear codes. Remember that we can represent linear codes via the generator matrix, $G$. The generator matrix, $G_{k , n}$ of the foldable linear $(n, k, d )$ - code has the following block matrix structure:<br />
+$$G_{k,n} = \begin{bmatrix}<br />
+G_{k/2,n/2} &amp; G_{k/2,n/2} \newline<br />
+G_{k/2,n/2} T_{k/2,n/2} &amp; G_{k/2,n/2}T^\prime_{k/2,n/2}<br />
+\end{bmatrix}$$<br />
+where $G_{k/2,n/2}$ is the generator matrix of the foldable linear $[n/2, k/2, d^\prime ]_\Sigma$-code.</p>
+<p>For example, Reed-Solomon codes satisfy this property, when instantiated over a multiplicative subgroup of size $n = 2^m$ (we also assume that $\rho = 2^{- \beta}$). If we choose a generator $g$ of the subgroup and represent the points as $\{ 1, g, g^2 , … g^{m - 1} \}$, we have<br />
+$$G_{k,n} = \begin{bmatrix}<br />
+1 &amp; 1 &amp; 1 &amp; 1 &amp; \dots &amp; 1 \newline<br />
+1 &amp; g &amp; g^2 &amp; g^3 &amp; \dots &amp; g^{m - 1} \newline<br />
+1 &amp; g^2 &amp; g^4 &amp; g^6 &amp; \dots &amp; g^{2(m - 1)} \newline<br />
+1 &amp; g^3 &amp; g^6 &amp; g^9 &amp; \dots &amp; g^{3(m - 1)} \newline<br />
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \newline<br />
+1 &amp; g^{k - 1} &amp; g^{2(k - 1)} &amp; g^{3(k - 1)} &amp; \dots &amp; g^{(k - 1) (m - 1)}<br />
+\end{bmatrix}$$</p>
+<p>Let’s reorder the matrices rows by placing first all the even-numbered rows, in increasing order, followed by all the odd-numbered rows. We get,<br />
+$$G_{k,n} = \begin{bmatrix}<br />
+1 &amp; 1 &amp; 1 &amp; 1 &amp; \dots &amp; 1 \newline<br />
+1 &amp; g^2 &amp; g^4 &amp; g^6 &amp; \dots &amp; g^{2(m - 1)} \newline<br />
+1 &amp; g^4 &amp; g^8 &amp; g^{12} &amp; \dots &amp; g^{4(m - 1)} \newline<br />
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \newline<br />
+1 &amp; g &amp; g^2 &amp; g^3 &amp; \dots &amp; g^{m - 1} \newline<br />
+1 &amp; g^3 &amp; g^6 &amp; g^9 &amp; \dots &amp; g^{3(m - 1)} \newline<br />
+1 &amp; g^5 &amp; g^{10} &amp; g^{15} &amp; \dots &amp; g^{15(m - 1)} \newline<br />
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \newline<br />
+1 &amp; g^{k - 1} &amp; g^{2(k - 1)} &amp; g^{3(k - 1)} &amp; \dots &amp; g^{(k - 1) (m - 1)}<br />
+\end{bmatrix}$$</p>
+<p>We can see that the lower block (the odd rows) looks a bit similar to the upper block, except that most columns are shifted by a similar amount. For example, column one there is a factor $g$ missing, column two, a factor $g^2$, column three, $g^3$ and so on. We have therefore broken the matrix into upper and lower parts. We need to break each part into right and left parts.</p>
+<p>If $g$ is a generator of a group of order $m$, then $\omega = g^2$ is a generator of a subgroup of order $m/2$. As soon as we have something like $\omega^{m/2}$ we wrap back to $1$. This breaks the upper half into two identical matrices, which correspond to $G_{k/2, n/2}$. In the lower half, the diagonal matrices are:<br />
+$T_{ii} = g^i$<br />
+$T^\prime_{ii} = g^{m/2} g^i$<br />
+But $g^{m/2} = - 1$, so $T = - T^\prime$.</p>
+<p>We see that linear foldable codes generalize this property we had in Reed-Solomon codes. There are, however, no restrictions on the generator matrices, other than fulfilling the foldable linear code definition. This lets us choose the diagonal matrices $T, T^\prime$ more freely and be able to use non FFT-friendly fields (this makes basefold PCS field-agnostic). In basefold, they set the matrices $T = - T^\prime$, and their elements are sampled at random from the multiplicative group of the base field. We can construct the generator matrices inductively, by choosing $G_0$ and $T_0 , T_0^\prime$ and get $G_1$, which, together with $T_1 , T_1^\prime$ leads to $G_2$, etc. To encode a message $v$, we just have to do $v.G_d$. We can also encode $v$ in a recursive fashion,</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. If $d = 0$, $\mathrm{enc}_0 ( v ) = v.G_0$</span></span>
+<span class="giallo-l"><span>    2. Otherwise, split $v = (w_0 , w_1)$ in the first and second halves. Let $c_0 = \mathrm{enc}( w_0 )$, $c_1 = \mathrm{enc}( w_1 )$, $t = \mathrm{diagonal}(T)$ and compute $\mathrm{enc}(v) = (m_0 + m_1 \times t , m_0 - m_1 \times t)$, where $\times$ is the componentwise (Hadamard) product.</span></span></code></pre>
+<p>The evaluation of a multilinear polynomial $p$ at $z$ can be turned into an evaluation check of $p$ at a random point via the <a href="/have-you-checked-your-sums/">sumcheck protocol</a>. FRI works in a similar way: the last value sent in FRI corresponds to the encoding of a random evaluation of the polynomial of the first round. Therefore, a PCS can be constructed by using a Merkle tree commitment to the encoding of some polynomial $p$. During evaluation, prover and verifier run in parallel the proximity test and the sumcheck protocol using the same set of challenges. The verifier can check that the evaluation of the polynomial corresponds to the last message of the prover in the proximity test.</p>
+<p>Basefold’s proximity test works in the same way as FRI. We have a commit phase where the prover commits to lists of codewords/evaluations and a query phase, where the verifier checks the consistency between the codewords. During the commitment phase,</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. The prover starts with $\pi_d$, the encoding of some polynomial.</span></span>
+<span class="giallo-l"><span>    2. For i = $d - 1$ to $0$  </span></span></code></pre>
+<p>a. Samples $\alpha_i$ from the verifier.<br />
+b. For every $j$ in $n_i$ the prover computes the line $l_j (x)$ passing through $(T_i [j,j] , \pi_{i+1} [j])$ and $(-T_i [j,j] , \pi_{i+1} [j + n_i ])$ and sets $\pi_i [j] = l(\alpha_j )$<br />
+c. The prover commits to $\pi_i$.</p>
+<p>This commit phase is, in fact, identical to FRI. We start with the evaluations of the composition polynomial, $f$ (which is the Reed-Solomon encoding of the polynomial) and to which we committed previously. We sample the folding challenge $\alpha_i$ and then obtain the following function, $l(x) = (f(x_0 ) + f( - x_0 ))/2 + x (f( x_0 ) - f( - x_0))/2x_0$. We can see that $l(x_0 ) = f( x_0 )$ and $l( - x_0) = f (- x_0 )$, which is essentially the line passing through those two points.</p>
+<p>During the query phase,</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. The verifier samples an index $i$ in $[0, n_d - 1]$.</span></span>
+<span class="giallo-l"><span>    2. For $j = d - 1$ to $0$,  </span></span></code></pre>
+<p>a. Queries $\pi_{j + 1} [i]$ and $\pi_{j + 1} [i + n_i / 2]$<br />
+b. Computes the line $l_i(x)$ passing through those two points.<br />
+c. Checks that $\pi_j [i] = l(\alpha_j )$<br />
+d. If $j &gt; 0$ and $i &gt; n_{i - 1}$, set $i = i - n_{i - 1}$.
+3. Finally, check whether $\pi_0$ is a valid codeword using the generator matrix $G_0$.</p>
+<p>To reduce the soundness error, the verifier can query more indexes, as we did in FRI. We are only lacking the evaluation protocols (prove and verify). To construct it, we need to use the sumcheck protocol, together with the proximity test.</p>
+<p>At the start of the protocol, the verifier has access to $\pi_d$, the encoding of the polynomial, the evaluation point, $z$ and the claimed evaluation, $v$. The protocol proceeds as follows:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    1. The prover sends the univariate polynomial $h_d (x) = \sum_b f(b,x) eq_z (b,x)$ to the verifier.</span></span>
+<span class="giallo-l"><span>    2. For $i = d - 1$ to $0$,  </span></span></code></pre>
+<p>a. The prover runs the commit phase steps 2.a, 2.b, 2.c.<br />
+b. If $i &gt; 0$, the prover sends $h_i = \sum_b f(b,x, r_i , … , r_{d - 1} ) eq_z (b,x, r_i , … , r_{d - 1} )$.
+3. The verifier:<br />
+a. Checks query phase of the proximity test.<br />
+b. Performs all the checks in the sumcheck protocol<br />
+c. Verifies that $\mathrm{enc_0} (h_1 ( r_0 ) / eq_z (r_0 , … r_{d - 1} )) = \pi_0$</p>
+<p>We see that the evaluation protocol basically consists of the sumcheck and proximity tests run concurrently.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>This post discussed a new commitment scheme, basefold, which generalizes FRI. The main advantanges over FRI are that the new commitment works better with multilinear polynomials and is field agnostic. The construction can be instantiated with any foldable linear code. These are codes whose generator matrix has a given block structure. We will be adding this new commitment scheme to lambdaworks in the coming future and compare its performance with other constructions.</p>
+
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

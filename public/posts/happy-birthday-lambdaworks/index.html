@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy birthday, lambdaworks! - LambdaClass Blog</title>
+    <meta name="description" content="Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team.">
+
+    <!-- Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://blog.lambdaclass.com/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.lambdaclass.com/atom.xml">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://blog.lambdaclass.com/style.css">
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <div class="site-wrapper">
+        <header class="site-header">
+            <nav class="nav-container">
+                <a href="https://blog.lambdaclass.com" class="site-logo">
+                    <span class="logo-text">LambdaClass</span>
+                </a>
+                <div class="nav-links">
+                    <a href="https://blog.lambdaclass.com" >Home</a>
+                    <a href="https://blog.lambdaclass.com/tags" >Topics</a>
+                    <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-main">
+            
+<article class="page-article">
+    <header class="page-header">
+        <h1 class="page-title">Happy birthday, lambdaworks!</h1>
+        
+        <div class="page-meta">
+            <time datetime="2024-01-30">January 30, 2024</time>
+        </div>
+        
+    </header>
+
+    <div class="page-content prose">
+        <h2 id="introduction">Introduction</h2>
+<p>It’s been almost a year since we started building <a rel="noopener external" target="_blank" href="https://github.com/lambdaclass/lambdaworks">lambdaworks</a>! lambdaworks is our library that implements efficient cryptographic primitives to build proof systems. Along with it, many backends for proof systems are shipped, and compatibility with different frontends is supported. We wanted to give an overview of what we have done over the last year and the roadmap for the future. Why did we choose to embark on this journey? We are truly bullish on zero-knowledge/validity proofs and their potential to solve many problems and create new applications, as we stated in our <a href="/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/">previous post</a> and <a href="/lambda-crypto-doctrine/">crypto doctrine</a>. We decided to work in this challenging environment, where math, distributed systems, and cryptography meet. The first challenge we faced was the lack of performant and developer-friendly libraries, though there are some exceptions. Some have nice APIs and are easy to use but not written in Rust; others are written in Rust but have poor programming practices. So, we decided with a team of engineers and mathematicians to build a new library, written in Rust, focusing on performance and developer-friendliness. We also wanted to make all this knowledge available to other developers and help onboard new people to this space by writing clear documentation and explaining how each of the parts and proof systems work. Open source and decentralization are necessary practical conditions to build crypto, and we cannot think of decentralization as the knowledge and tools to build things are centralized in a few players. Let’s jump into our plans for the future and some numbers.</p>
+<h2 id="some-numbers">Some numbers:</h2>
+<p>Here we give some figures to understand all the work we have been doing in the library and the contributions from the community:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * 464 PRs merged.</span></span>
+<span class="giallo-l"><span>    * 60 contributors.</span></span>
+<span class="giallo-l"><span>    * 8 releases.</span></span>
+<span class="giallo-l"><span>    * 49k lines of code in Rust</span></span>
+<span class="giallo-l"><span>    * Several posts on finite fields, cryptography, and proof systems.</span></span>
+<span class="giallo-l"><span>    * Use of lambdaworks in 2 CTF events and Lambda ZK Week.</span></span>
+<span class="giallo-l"><span>    * 800+ members in lambdaworks channel.</span></span>
+<span class="giallo-l"><span>    * One cryptography bootcamp with 21 interns from 12 countries</span></span></code></pre><h2 id="objectives">Objectives:</h2>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Reference library for cryptography and proof systems.</span></span>
+<span class="giallo-l"><span>    * Written in Rust.</span></span>
+<span class="giallo-l"><span>    * To be used in production, not just for academic research. However, we also want to enable researchers to write their papers in our library easily.</span></span>
+<span class="giallo-l"><span>    * Support for GPU acceleration (Metal, CUDA).</span></span>
+<span class="giallo-l"><span>    * Simple to use, developer-focused.</span></span>
+<span class="giallo-l"><span>    * Clear documentation, plenty of examples.</span></span></code></pre><h2 id="what-do-we-still-have-to-work-on">What do we still have to work on</h2>
+<p>We have added several tools and proof systems to the library, but we still have a long way to go:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Integration into other provers, VMs, and cryptography projects.</span></span>
+<span class="giallo-l"><span>    * Documentation. We still need to improve the project documentation, add more examples, and enhance user experience.</span></span>
+<span class="giallo-l"><span>    * Create a grant and bounty program</span></span>
+<span class="giallo-l"><span>    * Support the use of Icicle.</span></span>
+<span class="giallo-l"><span>    * Towers of binary fields.</span></span>
+<span class="giallo-l"><span>    * New polynomial commitment schemes: basefold, brakedown, inner product argument (IPA), Binius.</span></span>
+<span class="giallo-l"><span>    * New layouts for Cairo STARK Platinum.</span></span>
+<span class="giallo-l"><span>    * Lookup arguments (for example, Plookup, and Lasso)</span></span>
+<span class="giallo-l"><span>    * New proof systems: Hyperplonk, Spartan, Marlin, GKR.</span></span>
+<span class="giallo-l"><span>    * Folding schemes.</span></span>
+<span class="giallo-l"><span>    * Supporting new elliptic curves.</span></span>
+<span class="giallo-l"><span>    * New hash functions.</span></span>
+<span class="giallo-l"><span>    * Improve performance of FFT, elliptic curves, polynomials, and general finite field arithmetic.</span></span>
+<span class="giallo-l"><span>    * Add new coordinate systems for elliptic curves.</span></span>
+<span class="giallo-l"><span>    * Second edition of the cryptography bootcamp.</span></span></code></pre><h2 id="what-we-accomplished">What we accomplished?</h2>
+<p>Over the year, we have implemented different core math, crypto building blocks, and proof systems. We have received contributions from the community, not only in the form of PRs but also as issues and bug reports.</p>
+<h3 id="main-crates">Main crates:</h3>
+<p>The main crates we have implemented are:</p>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Finite Fields: all the mathematical building blocks for cryptography and proof systems. This is used by the Cairo VM in production in Starknet.</span></span>
+<span class="giallo-l"><span>    * Crypto: hash functions, Merkle trees, polynomial commitment schemes.</span></span>
+<span class="giallo-l"><span>    * Provers (&amp; verifiers): STARK Platinum, Groth 16, Plonk. Adapters for Cairo, Winterfell, Miden (STARKs), Circom, and Arkworks (Groth 16).</span></span></code></pre><h3 id="fields">Fields:</h3>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Optimized Montgomery backend.</span></span>
+<span class="giallo-l"><span>    * Specialized backends for Mersenne-31 and Mini-Goldilocks ($2^{64} - 2^{32} +1$).</span></span>
+<span class="giallo-l"><span>    * Field extensions.</span></span>
+<span class="giallo-l"><span>    * Radix-2 and radix-4 fast Fourier Transform.</span></span>
+<span class="giallo-l"><span>    * Elliptic curves.</span></span>
+<span class="giallo-l"><span>    * Multiscalar multiplication.</span></span>
+<span class="giallo-l"><span>    * Pairings.</span></span>
+<span class="giallo-l"><span>    * Univariate polynomials.</span></span>
+<span class="giallo-l"><span>    * Multivariate polynomials.</span></span></code></pre><h3 id="crypto">Crypto:</h3>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * Fiat Shamir transformation.</span></span>
+<span class="giallo-l"><span>    * Hash functions: Poseidon, Pedersen</span></span>
+<span class="giallo-l"><span>    * Merkle trees</span></span>
+<span class="giallo-l"><span>    * KZG commitment scheme</span></span></code></pre><h3 id="provers">Provers:</h3>
+<pre class="giallo" style="color: #E1E4E8; background-color: #24292E;"><code data-lang="plain"><span class="giallo-l"><span>    * General STARK prover</span></span>
+<span class="giallo-l"><span>    * Groth 16</span></span>
+<span class="giallo-l"><span>    * Plonk with KZG commitment</span></span>
+<span class="giallo-l"><span>    * Adapters</span></span></code></pre>
+    </div>
+</article>
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <p class="footer-copyright">&copy; 2026 LambdaClass. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/lambdaclass" target="_blank" rel="noopener">GitHub</a>
+                        <a href="https://x.com/class_lambda" target="_blank" rel="noopener">X</a>
+                        <a href="https://blog.lambdaclass.com/rss.xml">RSS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>
