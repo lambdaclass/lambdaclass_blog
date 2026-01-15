@@ -30,6 +30,12 @@ jobs:
       - name: Build with Zola
         run: nix develop --command zola build
 
+      - name: Minify CSS
+        run: nix develop --command sh -c 'find public -name "*.css" -exec lightningcss --minify {} -o {} \;'
+
+      - name: Minify JS
+        run: nix develop --command sh -c 'find public -name "*.js" ! -name "*.min.js" -exec terser {} -o {} -c -m \;'
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

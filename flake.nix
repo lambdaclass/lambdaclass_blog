@@ -15,6 +15,8 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             zola
+            lightningcss
+            nodePackages.terser
           ];
 
           shellHook = ''
@@ -33,10 +35,14 @@
           version = "1.0.0";
           src = ./.;
 
-          nativeBuildInputs = [ pkgs.zola ];
+          nativeBuildInputs = with pkgs; [ zola lightningcss nodePackages.terser findutils ];
 
           buildPhase = ''
             zola build
+            # Minify CSS
+            find public -name "*.css" -exec lightningcss --minify {} -o {} \;
+            # Minify JS (excluding already minified files)
+            find public -name "*.js" ! -name "*.min.js" -exec terser {} -o {} -c -m \;
           '';
 
           installPhase = ''
