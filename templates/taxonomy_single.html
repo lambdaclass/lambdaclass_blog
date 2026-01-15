@@ -24,9 +24,9 @@
                     <a href="{{ page.permalink }}">{{ page.title }}</a>
                 </h2>
                 {% if page.description %}
-                <p class="post-excerpt">{{ page.description | truncate(length=200) }}</p>
+                <p class="post-excerpt">{{ page.description | truncate(length=160) }}</p>
                 {% elif page.summary %}
-                <p class="post-excerpt">{{ page.summary | striptags | truncate(length=200) }}</p>
+                <p class="post-excerpt">{{ page.summary | striptags | truncate(length=160) }}</p>
                 {% endif %}
             </div>
             {% if page.extra.feature_image %}

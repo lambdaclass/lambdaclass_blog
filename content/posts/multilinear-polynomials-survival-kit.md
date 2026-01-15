@@ -4,6 +4,7 @@ date = 2025-08-26
 slug = "multilinear-polynomials-survival-kit"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Le_Serment_des_Horaces_-_Jacques-Louis_David_-_Muse--e_du_Louvre_Peintures_INV_3692_-_MR_1432.jpg"
 authors = ["LambdaClass"]
 +++

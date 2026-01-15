@@ -4,6 +4,7 @@ date = 2024-12-02
 slug = "continuous-read-only-memory-constraints-an-implementation-using-lambdaworks"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Joseph_Vernet_bundet_til_masten.jpg"
 authors = ["LambdaClass"]
 +++

@@ -4,6 +4,7 @@ date = 2024-07-31
 slug = "pinocchio-verifiable-computation-revisited"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Massacre_of_the_Mamelukes_at_Cairo_-jpg_version_and_without_frame-.jpg"
 authors = ["LambdaClass"]
 +++

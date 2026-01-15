@@ -4,6 +4,7 @@ date = 2023-01-25
 slug = "climbing-the-tower-field-extensions"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Aeneas-_Flight_from_Troy_by_Federico_Barocci.jpg"
 authors = ["LambdaClass"]
 

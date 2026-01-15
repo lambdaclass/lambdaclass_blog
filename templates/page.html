@@ -2,7 +2,9 @@
 
 {% block title %}{{ page.title }} - {{ config.title }}{% endblock %}
 
-{% block description %}{% if page.description %}{{ page.description }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=160) }}{% else %}{{ config.description }}{% endif %}{% endblock %}
+{% block description %}{% if page.description %}{{ page.description | truncate(length=160) }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=160) }}{% else %}{{ config.description }}{% endif %}{% endblock %}
+
+{% block canonical %}{{ page.permalink }}{% endblock %}
 
 {% block content %}
 <article class="page-article">

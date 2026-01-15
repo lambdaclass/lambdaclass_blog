@@ -4,6 +4,7 @@ date = 2023-08-25
 slug = "ipa-and-a-polynomial-commitment-scheme"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Robert_Arch_of_Titus.jpg"
 authors = ["LambdaClass"]
 +++

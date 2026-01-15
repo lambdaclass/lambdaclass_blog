@@ -1,7 +1,7 @@
 # Zola configuration for LambdaClass Blog
 # Documentation: https://www.getzola.org/documentation/getting-started/configuration/
 
-base_url = "https://blog.lambdaclass.com"
+base_url = "https://lambdaclass.github.io/lambdaclass_blog"
 title = "LambdaClass Blog"
 description = "Deep technical insights on cryptography, distributed systems, zero-knowledge proofs, and cutting-edge software engineering from the LambdaClass team."
 
@@ -10,7 +10,7 @@ compile_sass = true
 build_search_index = true
 generate_feeds = true
 feed_filenames = ["rss.xml", "atom.xml"]
-minify_html = false
+minify_html = true
 
 # Markdown settings
 [markdown]

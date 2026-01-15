@@ -4,6 +4,7 @@ date = 2024-02-28
 slug = "implementing-babysnark-in-our-internal-bootcamp"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Scheffer_henry_joan_arc.jpeg"
 authors = ["LambdaClass"]
 +++

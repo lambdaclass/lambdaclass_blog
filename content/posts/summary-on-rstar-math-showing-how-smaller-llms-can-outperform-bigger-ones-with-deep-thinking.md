@@ -4,6 +4,7 @@ date = 2025-01-28
 slug = "summary-on-rstar-math-showing-how-smaller-llms-can-outperform-bigger-ones-with-deep-thinking"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Saint_Jerome_Writing-Caravaggio_-1605-6-.jpg"
 authors = ["LambdaClass"]
 +++

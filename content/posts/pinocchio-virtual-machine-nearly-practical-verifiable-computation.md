@@ -4,6 +4,7 @@ date = 2023-01-13
 slug = "pinocchio-virtual-machine-nearly-practical-verifiable-computation"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Wilhelm_von_Kobell_-_Cattle_Market_before_a_Large_City_on_a_Lake-_1820_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 

@@ -4,12 +4,23 @@
 
 {% block title %}{{ page.title }} - {{ config.title }}{% endblock %}
 
-{% block description %}{% if page.description %}{{ page.description }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=160) }}{% else %}{{ config.description }}{% endif %}{% endblock %}
+{% block description %}{% if page.description %}{{ page.description | truncate(length=160) }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=160) }}{% else %}{{ config.description }}{% endif %}{% endblock %}
+
+{% block canonical %}{{ page.permalink }}{% endblock %}
+
+{% block katex %}
+{% if page.extra.math %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" integrity="sha384-Pu5+C18nP5dwykLJOhd2U4Xen7rjScHN/qusop27hdd2drI+lL5KvX7YntvT8yew" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" integrity="sha384-2B8pfmZZ6JlVoScJm/5hQfNS2TI/6hPqDZInzzPc8oHpN5SgeNOf4LzREO6p5YtZ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+{% endif %}
+{% endblock katex %}
 
 {% block og_tags %}
 <meta property="og:type" content="article">
 <meta property="og:title" content="{{ page.title }}">
-<meta property="og:description" content="{% if page.description %}{{ page.description }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=200) }}{% else %}{{ config.description }}{% endif %}">
+<meta property="og:description" content="{% if page.description %}{{ page.description | truncate(length=160) }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=160) }}{% else %}{{ config.description }}{% endif %}">
 <meta property="og:url" content="{{ page.permalink }}">
 {% if page.extra.feature_image %}<meta property="og:image" content="{{ page.extra.feature_image }}">{% endif %}
 <meta property="article:published_time" content="{{ page.date }}">
@@ -20,7 +31,7 @@
 
 {% block twitter_tags %}
 <meta name="twitter:title" content="{{ page.title }}">
-<meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=200) }}{% else %}{{ config.description }}{% endif %}">
+<meta name="twitter:description" content="{% if page.description %}{{ page.description | truncate(length=160) }}{% elif page.summary %}{{ page.summary | striptags | truncate(length=160) }}{% else %}{{ config.description }}{% endif %}">
 {% if page.extra.feature_image %}<meta name="twitter:image" content="{{ page.extra.feature_image }}">{% endif %}
 {% endblock twitter_tags %}
 

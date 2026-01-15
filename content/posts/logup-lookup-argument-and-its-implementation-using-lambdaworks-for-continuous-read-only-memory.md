@@ -4,6 +4,7 @@ date = 2024-12-27
 slug = "logup-lookup-argument-and-its-implementation-using-lambdaworks-for-continuous-read-only-memory"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Carl_Blechen_007.jpg"
 authors = ["LambdaClass"]
 +++

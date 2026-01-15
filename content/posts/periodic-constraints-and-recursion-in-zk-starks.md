@@ -4,6 +4,7 @@ date = 2023-02-24
 slug = "periodic-constraints-and-recursion-in-zk-starks"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Rudolf_Ritter_von_Alt_001.jpg"
 authors = ["LambdaClass"]
 

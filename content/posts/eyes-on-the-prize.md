@@ -4,6 +4,7 @@ date = 2023-01-23
 slug = "eyes-on-the-prize"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Angelica_Kauffmann_-_Virgil_reading_the_---Aeneid---_to_Augustus_and_Octavia_-Hermitage-.jpg"
 authors = ["LambdaClass"]
 

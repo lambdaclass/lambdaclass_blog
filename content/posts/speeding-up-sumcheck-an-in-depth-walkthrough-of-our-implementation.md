@@ -4,6 +4,7 @@ date = 2025-11-28
 slug = "speeding-up-sumcheck-an-in-depth-walkthrough-of-our-implementation"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/The-age-of-augustus---Jeon-Leon-Gerome.jpg"
 authors = ["LambdaClass"]
 +++

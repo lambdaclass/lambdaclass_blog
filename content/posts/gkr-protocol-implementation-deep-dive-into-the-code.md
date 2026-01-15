@@ -4,6 +4,7 @@ date = 2025-07-22
 slug = "gkr-protocol-implementation-deep-dive-into-the-code"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/The_fall_of_Babylon-_Cyrus_the_Great_defeating_the_Chaldean_Wellcome_V0034440.jpg"
 authors = ["LambdaClass"]
 +++

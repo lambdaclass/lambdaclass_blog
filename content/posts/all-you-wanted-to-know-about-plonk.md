@@ -4,6 +4,7 @@ date = 2023-05-01
 slug = "all-you-wanted-to-know-about-plonk"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Pieter_Janszoon_Saenredam_Interior_of_the_Church_of_St_Bavo_in_Haarlem.jpg"
 authors = ["LambdaClass"]
 +++

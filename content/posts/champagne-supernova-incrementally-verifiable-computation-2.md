@@ -4,6 +4,7 @@ date = 2023-02-02
 slug = "champagne-supernova-incrementally-verifiable-computation-2"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Abel-_Joseph_-_Self-Portrait_in_the_Studio_-_Google_Art_Project.jpg"
 authors = ["LambdaClass"]
 

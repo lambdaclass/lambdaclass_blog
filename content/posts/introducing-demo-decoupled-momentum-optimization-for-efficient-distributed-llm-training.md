@@ -4,6 +4,7 @@ date = 2024-12-06
 slug = "introducing-demo-decoupled-momentum-optimization-for-efficient-distributed-llm-training"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Horace_Vernet_-1789-1863-_-_Arabs_Travelling_in_the_Desert_-_P584_-_The_Wallace_Collection.jpg"
 authors = ["LambdaClass"]
 +++

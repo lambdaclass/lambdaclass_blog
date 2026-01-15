@@ -4,6 +4,7 @@ date = 2023-03-09
 slug = "better-sane-defaults-in-zero-knowledge-proofs-libraries-or-how-to-get-the-prover-private-key"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Old_Amsterdam_-_Barend_Cornelis_Koekkoek.png"
 authors = ["LambdaClass"]
 +++

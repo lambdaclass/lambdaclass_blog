@@ -4,6 +4,7 @@ date = 2022-08-06
 slug = "what-every-developer-needs-to-know-about-elliptic-curves"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Jose--_Moreno_Carbonero_-_Fundacio--n_de_Buenos_Aires.jpg"
 authors = ["LambdaClass"]
 

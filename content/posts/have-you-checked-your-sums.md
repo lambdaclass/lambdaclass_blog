@@ -4,6 +4,7 @@ date = 2023-10-26
 slug = "have-you-checked-your-sums"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Hubert_Robert_-_View_of_Ripetta_-_WGA19603.jpg"
 authors = ["LambdaClass"]
 +++

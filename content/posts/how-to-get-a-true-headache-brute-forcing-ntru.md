@@ -4,6 +4,7 @@ date = 2023-04-24
 slug = "how-to-get-a-true-headache-brute-forcing-ntru"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Alma-Tadema_The_Education_of_the_Children_of_Clovis.jpg"
 authors = ["LambdaClass"]
 +++

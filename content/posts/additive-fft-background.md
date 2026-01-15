@@ -4,6 +4,7 @@ date = 2025-06-17
 slug = "additive-fft-background"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Jacques-Louis_David_-_The_Coronation_of_Napoleon_-1805-1807-.jpg"
 authors = ["LambdaClass"]
 +++

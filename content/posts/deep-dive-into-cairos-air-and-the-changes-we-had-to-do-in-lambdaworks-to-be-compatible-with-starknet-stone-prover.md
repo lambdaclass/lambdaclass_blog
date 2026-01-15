@@ -4,6 +4,7 @@ date = 2024-01-25
 slug = "deep-dive-into-cairos-air-and-the-changes-we-had-to-do-in-lambdaworks-to-be-compatible-with-starknet-stone-prover"
 
 [extra]
+math = true
 feature_image = "/images/2025/12/Bonaparte_ante_la_Esfinge-_por_Jean-Le--on_Ge--ro--me.jpg"
 authors = ["LambdaClass"]
 +++
