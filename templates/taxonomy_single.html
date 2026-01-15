@@ -31,7 +31,7 @@
             </div>
             {% if page.extra.feature_image %}
             <a href="{{ page.permalink }}" class="post-list-image">
-                <img src="{{ page.extra.feature_image }}" alt="{{ page.title }}" loading="lazy">
+                <img src="{{ get_url(path=page.extra.feature_image) }}" alt="{{ page.title }}" loading="lazy">
             </a>
             {% endif %}
         </article>
