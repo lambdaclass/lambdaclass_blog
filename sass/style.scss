@@ -1050,6 +1050,11 @@ button {
     overflow-y: hidden;
     padding: var(--spacing-4) 0;
   }
+
+  // KaTeX dark mode fix - ensure math is visible on dark background
+  .katex {
+    color: var(--color-text-primary);
+  }
 }
 
 // --------------------------------------------
