@@ -136,10 +136,7 @@ Since $\mathbb{F_4}$ has 4 elements, we need an irreducible polynomial of degree
         * $q(0) = 0^2 + 0 + X_0 = X_0 \neq 0$
         * $q(1) = 1^2 + 1 + X_0 = 1 + 1 + X_0 = 0 + X_0 = X_0 \neq 0$
         * $q(X_0) = X_0^2 + X_0 + X_0 = (X_0 + 1) + X_0 + X_0 = X_0 + 1 + 0 = X_0 + 1 \neq 0$
-        * \begin{align*}  
-q(1 + X_0) &= (1 + X_0)^2 + (1 + X_0) + X_0  
-= (1 + X_0^2) + 1 + X_0 + X_0 \newline &= 1 + (X_0 + 1) + 1 + 0 = X_0 + 1 + 1 = X_0 \neq 0  
-\end{align*}
+        * $$\begin{align*} q(1 + X_0) &= (1 + X_0)^2 + (1 + X_0) + X_0 = (1 + X_0^2) + 1 + X_0 + X_0 \\\\ &= 1 + (X_0 + 1) + 1 + 0 = X_0 + 1 + 1 = X_0 \neq 0 \end{align*}$$
 
 Since $q(t)$ has degree 2 and no roots in $\mathbb{F_4}$, it is irreducible over $\mathbb{F_4}$ and the extension obtained by adjoining a root $X_1$ of $q$ yields
 
@@ -245,24 +242,34 @@ One of the more straightforward way of multiplying elements in a field extension
 
 To illustrate, consider $u,v \in \mathcal{T_2}$. Let's go slowly.
 
-**Multiplication as Polynomials in $X_1$ with Coefficients in $\mathcal{T_1}$:**  
-\begin{align*}  
-u \cdot v &= ((1 + X_0) + X_1)(X_0 + X_0X_1) \newline  
-&= (1 + X_0)X_0 + (1 + X_0)X_0X_1 + X_1X_0 + X_1(X_0X_1) \newline  
-&= (X_0 + X_0^2) + (X_0 + X_0^2 ) X_1 + X_0 X_1 + X_0 X_1^2  
-\end{align*}
+**Multiplication as Polynomials in $X_1$ with Coefficients in $\mathcal{T_1}$:**
 
-Now, we substitute $X_0^2 = X_0 + 1$ and $X_1^2 = X_1 X_0 + 1$:  
-\begin{align*}  
-&= (X_0 + X_0 + 1) + (X_0 + X_0 + 1)X_1 + X_0 X_1 + X_0(X_1 X_0 + 1) \newline  
-&= (2X_0 + 1) + (2X_0 + 1)X_1 + X_0 X_1 + X_1 X_0^2 + X_0)  
-\end{align*}  
-Since we are in a field with characteristic 2, $2X_0 = 0$. So,  
-\begin{align*}  
-&= 1 + X_1 + X_0X_1 + X_1(X_0 + 1) + X_0 \newline  
-&= 1 + X_1 + X_0X_1 + X_0X_1 + X_1 + X_0 \newline  
-&= 1 + X_0  
-\end{align*}  
+$$
+\begin{align*}
+u \cdot v &= ((1 + X_0) + X_1)(X_0 + X_0X_1) \\\\
+&= (1 + X_0)X_0 + (1 + X_0)X_0X_1 + X_1X_0 + X_1(X_0X_1) \\\\
+&= (X_0 + X_0^2) + (X_0 + X_0^2 ) X_1 + X_0 X_1 + X_0 X_1^2
+\end{align*}
+$$
+
+Now, we substitute $X_0^2 = X_0 + 1$ and $X_1^2 = X_1 X_0 + 1$:
+
+$$
+\begin{align*}
+&= (X_0 + X_0 + 1) + (X_0 + X_0 + 1)X_1 + X_0 X_1 + X_0(X_1 X_0 + 1) \\\\
+&= (2X_0 + 1) + (2X_0 + 1)X_1 + X_0 X_1 + X_1 X_0^2 + X_0)
+\end{align*}
+$$
+
+Since we are in a field with characteristic 2, $2X_0 = 0$. So,
+
+$$
+\begin{align*}
+&= 1 + X_1 + X_0X_1 + X_1(X_0 + 1) + X_0 \\\\
+&= 1 + X_1 + X_0X_1 + X_0X_1 + X_1 + X_0 \\\\
+&= 1 + X_0
+\end{align*}
+$$  
 So, $((1 + X_0 ) + X_1 )(X_0 + X_0 X_1 ) = 1 + X_0$ in $\mathcal{T_2}$.
 
 As the reader may have guessed - this is a lot of work. We'd like to have a more efficient algorithm for multiplication of field elements that draws from the highly structured tower of extensions.
