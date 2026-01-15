@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found - {{ config.title }}{% endblock %}
+
+{% block description %}The page you're looking for doesn't exist or has been moved.{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div class="error-content">
+        <div class="error-code">
+            <span class="glitch" data-text="404">404</span>
+        </div>
+        <h1 class="error-title">// SEGMENTATION FAULT</h1>
+        <p class="error-message">The requested memory address could not be accessed.<br>Page not found in the system.</p>
+        <div class="error-details">
+            <code>
+                <span class="prompt">&gt;</span> ERROR: Resource not found<br>
+                <span class="prompt">&gt;</span> STATUS: 404<br>
+                <span class="prompt">&gt;</span> Returning to safe state...
+            </code>
+        </div>
+        <div class="error-actions">
+            <a href="{{ get_url(path="/") }}" class="error-button">
+                <span class="button-text">cd /home</span>
+            </a>
+            <a href="{{ get_url(path="posts") }}" class="error-button secondary">
+                <span class="button-text">ls /posts</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -18,7 +18,7 @@
 
     <div class="posts-grid">
         {% set section = get_section(path="posts/_index.md", metadata_only=false) %}
-        {% for page in section.pages | slice(end=12) %}
+        {% for page in section.pages | slice(end=40) %}
         <article class="post-card">
             {% if page.extra.feature_image %}
             <a href="{{ page.permalink }}" class="post-image-link">
@@ -39,13 +39,6 @@
                 <p class="post-excerpt">{{ page.description | truncate(length=160) }}</p>
                 {% elif page.summary %}
                 <p class="post-excerpt">{{ page.summary | striptags | truncate(length=160) }}</p>
-                {% endif %}
-                {% if page.taxonomies.tags %}
-                <div class="post-tags">
-                    {% for tag in page.taxonomies.tags | slice(end=3) %}
-                    <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}" class="tag">{{ tag }}</a>
-                    {% endfor %}
-                </div>
                 {% endif %}
             </div>
         </article>
