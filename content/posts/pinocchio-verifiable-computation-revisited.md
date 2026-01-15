@@ -40,8 +40,8 @@ R1CS stands for Rank-1 Constraint System. It allows us to express relationships 
 
 To fully understand what R1CS are and how to build them, we recommend reading [this article](https://www.rareskills.io/post/rank-1-constraint-system). Nevertheless, we enumerate here the steps to transform an arithmetic circuit into an R1CS.
 
-        1. Identify all the variables used in the circuit. Let's call them $c = (1, c_1 , \ldots, c_N , c_{N + 1}, \ldots, c_m)$ where $\\{ c_1, \ldots, c_N \\}$ are the public variables and $\\{c_{ N + 1}, \ldots, c_m \\}$ are the intermediate and private variables of the circuit.
-        2. Represent the circuit as a system of equations with variables $\\{ c_i \\}_{i = 1}^{m}$ and just one multiplication per equation. We will call each equation a _constraint_ and $n$ the number of constraints.
+        1. Identify all the variables used in the circuit. Let's call them $c = (1, c_1 , \ldots, c_N , c_{N + 1}, \ldots, c_m)$ where $\{ c_1, \ldots, c_N \}$ are the public variables and $\{c_{ N + 1}, \ldots, c_m \}$ are the intermediate and private variables of the circuit.
+        2. Represent the circuit as a system of equations with variables $\{ c_i \}_{i = 1}^{m}$ and just one multiplication per equation. We will call each equation a _constraint_ and $n$ the number of constraints.
         3. Construct matrix $A \in { \mathbb{F_p} }^{n \times m}$ in the following way: $a_{ik}$ is the coefficient of the variable $c_k$ at the left entry of the constraint $i$.  
 (If you don't know what ${ \mathbb{F_p} }^{n \times m}$ means, don't worry you could think it as ${\mathbb{R}}^{n \times m}$, so $A$ is just a matrix of numbers).
         4. Analogously, construct matrix $B$ whose rows represent the right side of the multiplication of each constraint.
@@ -59,7 +59,7 @@ QAPs encode the constraints of an R1CS into sets of [polynomials](https://en.wik
 For each $k \in {1, \ldots, m}$, interpolate $(1, \ldots, n)$ with $(a_{1k} , \ldots , a_{nk} )$ the column $k$ of $A$. We will call the resulting polynomial $v_k(x)$.  
 Analogously, $w_k(x)$ and $y_k(x)$ interpolate the columns of $B$ and $C$ respectively.
         3. Define the polynomials $$\begin{align}  
-p(x) &= \left(\sum_{k = 1 }^m c_k v_k(x) \right) \left(\sum_{k = 1 }^m c_k w_k(x) \right) - \sum_{k = 1 }^m c_k y_k(x), \ \newline  
+p(x) &= \left(\sum_{k = 1 }^m c_k v_k(x) \right) \left(\sum_{k = 1 }^m c_k w_k(x) \right) - \sum_{k = 1 }^m c_k y_k(x), \ \\  
 t(x) &= (x - 1)( x - 2)\ldots( x - n).  
 \end{align}$$We will call $t(x)$ the _vanishing polynomial_.
         4. Finally, $c$ is a solution of the R1SC if and only if there exists a polynomial $h$ such that $p(x) = h(x)t(x)$. This can be checked by choosing a random $s$ and verifying that $p(s) = h(s)t(s)$.
@@ -121,9 +121,9 @@ Two public keys are generated in the Setup: the evaluation key, that is sent to 
         5. $\gamma \cdot g_2$
         6. $\beta \gamma \cdot g_2$
         7. $r_y t(s) \cdot g_1$
-        8. $\\{r_v v_k(s) \cdot g_1 \\}_{k \in \\{0,\ldots, N \\} }$
-        9. $\\{r_w w_k(s) \cdot g_2 \\}_{k \in \\{0,\ldots, N \\} }$
-        10. $\\{r_y y_k(s) \cdot g_1 \\}_{k \in \\{0,\ldots, N \\} }$
+        8. $\{r_v v_k(s) \cdot g_1 \}_{k \in \{0,\ldots, N \} }$
+        9. $\{r_w w_k(s) \cdot g_2 \}_{k \in \{0,\ldots, N \} }$
+        10. $\{r_y y_k(s) \cdot g_1 \}_{k \in \{0,\ldots, N \} }$
 
 To implement this in rust, we first need to create a struct VerificationKey with each element and then generate it.
     
@@ -155,15 +155,15 @@ To implement this in rust, we first need to create a struct VerificationKey with
 
 ##### The evaluation key
 
-        1. $\\{r_v v_k(s) \cdot g_1 \\}_{k \in \\{N + 1, \ldots, m \\}}$
-        2. $\\{r_w w_k(s) \cdot g_1 \\}_{k \in \\{N + 1, \ldots, m \\}}$
-        3. $\\{r_w w_k(s) \cdot g_2 \\}_{k \in \\{N + 1, \ldots, m \\}}$
-        4. $\\{r_y y_k(s) \cdot g_1 \\}_{k \in \\{N + 1, \ldots, m \\}}$
-        5. $\\{r_v \alpha_v v_k(s) \cdot g_1 \\}_{k \in \\{N + 1, \ldots, m \\}}$
-        6. $\\{r_w \alpha_w w_k(s) \cdot g_1 \\}_{k \in \\{N + 1, \ldots, m \\}}$
-        7. $\\{r_y \alpha_y y_k(s) \cdot g_1 \\}_{k \in \\{N + 1, \ldots, m \\}}$
+        1. $\{r_v v_k(s) \cdot g_1 \}_{k \in \{N + 1, \ldots, m \}}$
+        2. $\{r_w w_k(s) \cdot g_1 \}_{k \in \{N + 1, \ldots, m \}}$
+        3. $\{r_w w_k(s) \cdot g_2 \}_{k \in \{N + 1, \ldots, m \}}$
+        4. $\{r_y y_k(s) \cdot g_1 \}_{k \in \{N + 1, \ldots, m \}}$
+        5. $\{r_v \alpha_v v_k(s) \cdot g_1 \}_{k \in \{N + 1, \ldots, m \}}$
+        6. $\{r_w \alpha_w w_k(s) \cdot g_1 \}_{k \in \{N + 1, \ldots, m \}}$
+        7. $\{r_y \alpha_y y_k(s) \cdot g_1 \}_{k \in \{N + 1, \ldots, m \}}$
         8. $(r_v \beta v_k(s) + r_w \beta w_k(s) + r_y \beta y_k(s)) \cdot g_1$
-        9. $\\{ s^i \cdot g_2 \\}_{i \in \\{ 1,\ldots,d \\} }$ where $d$ is the degree of $t(x) = (x - 1) \ldots (x - n)$. That is, $d = n$ the number of raws of the R1SC matrices (i.e. the number of constraints).
+        9. $\{ s^i \cdot g_2 \}_{i \in \{ 1,\ldots,d \} }$ where $d$ is the degree of $t(x) = (x - 1) \ldots (x - n)$. That is, $d = n$ the number of raws of the R1SC matrices (i.e. the number of constraints).
     
     pub struct EvaluationKey {
         pub g1_vk: Vec<G1Point>,

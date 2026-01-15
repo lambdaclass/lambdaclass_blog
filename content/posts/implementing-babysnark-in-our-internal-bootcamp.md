@@ -51,7 +51,7 @@ One way to build a PCS is by using a pairing-friendly elliptic curve, such as BN
 [KZG commitment scheme](/mina-to-ethereum-bridge/) works in this setting, which is the tool we will use. Why are pairings useful? Because they provide us with a way of multiplying things hidden inside an elliptic curve group.
 
 We pick a random $s$ (which is unknown to both the prover and verifier), and we generate the following points in the elliptic curve  
-$\\{ P_0 , P_1 , ..., P_n \\} = \\{ g_1 , s g_1 , ..., s^n g_n \\}$  
+$\{ P_0 , P_1 , ..., P_n \} = \{ g_1 , s g_1 , ..., s^n g_n \}$  
 These points contain the powers of $s$ hidden inside a group of the elliptic curve. Given any $P_k$, recovering $s$ is computationally intractable due to the hardness of the discrete log problem over elliptic curves.
 
 We commit to the polynomial by computing  
@@ -114,15 +114,15 @@ To compute the commitments, we need parameters $s , \beta , \gamma$ to be unknow
 
 Prover and verifier agree on a pairing-friendly elliptic curve and generators of the groups $G_1$ and $G_2$, denoted by $g_1$ and $g_2$, respectively. In our case, we choose BLS12-381. The proving key consists of the following:
 
-        1. $\\{s^k g_1 \\}$ for $k = 0, 1, 2 , ... m$
-        2. $\\{U_j (s) g_1 \\}$ for $j = l , l + 1 , ... m$ ($l$ being the number of public inputs).
-        3. $\\{U_j (s) g_2 \\}$ for $j = l , l + 1 , ... m$
-        4. $\\{\beta U_j (s) g_1 \\}$ for $j = l , l + 1 , ... m$
+        1. $\{s^k g_1 \}$ for $k = 0, 1, 2 , ... m$
+        2. $\{U_j (s) g_1 \}$ for $j = l , l + 1 , ... m$ ($l$ being the number of public inputs).
+        3. $\{U_j (s) g_2 \}$ for $j = l , l + 1 , ... m$
+        4. $\{\beta U_j (s) g_1 \}$ for $j = l , l + 1 , ... m$
 
 The verifying key consists of the following:
 
-        1. $\\{U_j (s) g_1 \\}$ for $j = 0 , 1 , ... l - 1$
-        2. $\\{U_j (s) g_2 \\}$ for $j = 0 , 1 , ... l - 1$
+        1. $\{U_j (s) g_1 \}$ for $j = 0 , 1 , ... l - 1$
+        2. $\{U_j (s) g_2 \}$ for $j = 0 , 1 , ... l - 1$
         3. $[Z^\prime ] = (s^m - 1)g_2$ (commitment to the vanishing polynomial)
         4. $e(g_1 , g_2)^{ - 1}$
         5. $\beta \gamma g_1$

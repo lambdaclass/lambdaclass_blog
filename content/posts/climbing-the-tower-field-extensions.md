@@ -14,7 +14,7 @@ tags = ["Math"]
 ## Introduction
 
 Finite fields are a central piece in every cryptography and [zk-SNARKs](/the-hunting-of-the-zk-snark/). The most common finite fields appearing in practice are the fields with prime order $\mathbb F_p$. There are multiple ways of defining them. A usual one is seeing $\mathbb F_p$ as the set  
-$$ \\{0, 1, \cdots, p-1\\}$$  
+$$ \{0, 1, \cdots, p-1\}$$  
 together with the rule of addition and the rule of multiplication modulo $p$. But other finite fields play important roles, too. For example, when dealing with pairing-friendly elliptic curves. You may have seen them denoted by things like $\mathbb F_{p^n}$.  
 The usual way of defining and introducing them is through the theory of field extensions that involve quotients of [polynomial rings](/math-survival-kit-for-developers/). It is the most natural and correct way from a mathematical standpoint, mainly to prove things about them. But going down that road can be obscure and confusing if you are unfamiliar with the mathematical tools involved.
 
@@ -73,7 +73,7 @@ The good news is that both constructions will work in the land of finite fields!
 
 Let's start simple. Consider $\mathbb F_2$. It has only two elements
 
-$$\mathbb F_2 = \\{0, 1\\}$$
+$$\mathbb F_2 = \{0, 1\}$$
 
 The addition and multiplication rules have $0$ as the neutral element for addition, $1$ as the neutral element for multiplication, and $1+1$ equals $0$. The addition is the usual XOR on the set of bits. This will be our building block. The field $\mathbb F_2$ will play the role of the real numbers in the previous section.
 
@@ -88,10 +88,10 @@ Let's try to reverse-engineer it. Assume it is somehow defined and has all the p
 Let's find out what would be $(0,1)\cdot(0,1)$. It surely is one of the elements of $\mathbb{F}_2^2$. So there are only four possible choices. It cannot be $(0,1)\cdot(0,1)=(0,0)$, otherwise we would get $(0, 1) = (0,0)$. This is the property we mentioned in the first section of this post: in a field, if $x\cdot x$ equals the neutral element of the addition $0$, then $x = 0$. Here the neutral element is $(0,0)$ because we are in $\mathbb F_2^2$ with the component-wise addition.
 
 Another possibility is that $(0,1)\cdot(0,1) = (1,0)$, then we could do the following reasoning.  
-\\[ \begin{align} (1,1)\cdot(1,1) &= ((1,0) + (0,1))\cdot((1,0) + (0,1)) \newline  
-&= (1,0)\cdot(1,0) + 2(1,0)\cdot(0,1) + (0,1)\cdot(0,1) \newline  
-&= (1,0)\cdot(1,0) + (0,1)\cdot(0,1) \newline  
-&= (1,0) + (1,0) \newline  
+\\[ \begin{align} (1,1)\cdot(1,1) &= ((1,0) + (0,1))\cdot((1,0) + (0,1)) \\  
+&= (1,0)\cdot(1,0) + 2(1,0)\cdot(0,1) + (0,1)\cdot(0,1) \\  
+&= (1,0)\cdot(1,0) + (0,1)\cdot(0,1) \\  
+&= (1,0) + (1,0) \\  
 &= (0,0) \end{align} \\]  
 This is bad for the same reason, we got $(1,1)\cdot(1,1) = (0,0)$ but $(1,1)$ is different from $(0,0)$.  
 So we are left with only two options for the result of $(0, 1)\cdot(0, 1)$. Either $(0,1)\cdot(0,1)$ is equal to $(1,1)$ or it is equal to $(0, 1)$. But a similar argument to the ones we gave rules out $(0, 1)$. And so, the only possible candidate is  

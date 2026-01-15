@@ -31,8 +31,8 @@ $$ let's show that $F$ is the inverse of $f$ in $R_q$.
 Recall that the product in $R_q$ is explained in our previous post: we multiply as usual, replacing the appearance of $x^N$. Then in our example, we have that  
 $$  
 \begin{align*}  
-fF & = 29x^8 + 35x^7 + 30x^6 + 6x^5 + 8x^3 + 2x^2 + 7x + 32 \newline  
-& = (29+8)x^3 + (35+2)x^2 + (30+7) x + (6+32) \newline  
+fF & = 29x^8 + 35x^7 + 30x^6 + 6x^5 + 8x^3 + 2x^2 + 7x + 32 \\  
+& = (29+8)x^3 + (35+2)x^2 + (30+7) x + (6+32) \\  
 & = 1.  
 \end{align*}  
 $$ This example shows that the inverse of $f$ can have arbitrarily large coefficients, even though $f$ is small.
@@ -51,7 +51,7 @@ By replacing every appereance of $x^N$ with 1, we can write every polynomial $h 
 
 In these terms, the multiplication in $R$ can be stated in matrix form. More precisely, let $M_\mathbf{h} \in \mathbb Z^{N\times N}$ be the matrix given by.  
 $$  
-M_h = \left(\begin{array}{cccc}h_0 & h_1 & \cdots & h_{N-1} \newline h_{N-1} & h_0 & \cdots & h_{N-2} \newline \vdots & \vdots & \ddots & \vdots \newline h_1 & h_2 & \cdots & h_0\end{array}\right).  
+M_h = \left(\begin{array}{cccc}h_0 & h_1 & \cdots & h_{N-1} \\ h_{N-1} & h_0 & \cdots & h_{N-2} \\ \vdots & \vdots & \ddots & \vdots \\ h_1 & h_2 & \cdots & h_0\end{array}\right).  
 $$  
 Then, given a polynomial $f \in R$ and letting $g = fh$, it is not hard to see that we have the equality of vectors  
 $$\mathbf{g} = \mathbf{f} \cdot M_{\mathbf h}.$$ Regarding the example above, the reader can verify that modulo 37, we have that
@@ -59,10 +59,10 @@ $$\mathbf{g} = \mathbf{f} \cdot M_{\mathbf h}.$$ Regarding the example above, th
 $$  
 (0, 1, 0, -1, -1) =  
 (1, 1, -1, 0, 1)\cdot \left(\begin{array}{rrrrr}  
-32 & 12 & 22 & 35 & 28 \newline  
-28 & 32 & 12 & 22 & 35 \newline  
-35 & 28 & 32 & 12 & 22 \newline  
-22 & 35 & 28 & 32 & 12 \newline  
+32 & 12 & 22 & 35 & 28 \\  
+28 & 32 & 12 & 22 & 35 \\  
+35 & 28 & 32 & 12 & 22 \\  
+22 & 35 & 28 & 32 & 12 \\  
 12 & 22 & 35 & 28 & 32  
 \end{array}\right).$$
 
@@ -73,7 +73,7 @@ $$ fh = g + qk \quad \in R.$$
 
 To use the matrix formulation from above, we introduce the block matrix $M_{\mathbf h,q}$ given by  
 $$  
-M_{\mathbf h,q} = \left(\begin{array}{cc}I_N & M_{\mathbf h} \newline 0 & qI_N \end{array}\right).  
+M_{\mathbf h,q} = \left(\begin{array}{cc}I_N & M_{\mathbf h} \\ 0 & qI_N \end{array}\right).  
 $$ Note that it has a nonzero determinant. This means that its rows form a basis of $\mathbb R ^{2N}$. In particular, they span a (public) lattice, which we will denote by $L_{h,q}$.
 
 Considering block multiplication, we see that the equality above is rewritten as  
@@ -88,7 +88,7 @@ The vector on the right-hand side, being $f$ and $g$ ternary, is a small (or _sh
 ### Lattices: recalling the basics
 
 Recall that given a basis $v_1 , \dots , v_n$ of $\mathbb R^n$, the lattice $L$ defined by this basis is  
-$$ L = \\{ \sum_{ i = 1 }^n k_i v_i : k_i \in \mathbb Z \\}.$$
+$$ L = \{ \sum_{ i = 1 }^n k_i v_i : k_i \in \mathbb Z \}.$$
 
 It is easy to see that if we apply to the given basis a base change given by a matrix with integral coefficients and determinant 1 or -1 (a _unimodular_ matrix), we obtain a different basis for $L$. Moreover, every other basis for $L$ is obtained in this way.
 

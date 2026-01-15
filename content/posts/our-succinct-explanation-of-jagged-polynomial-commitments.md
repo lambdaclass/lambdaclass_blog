@@ -25,7 +25,7 @@ We will explain the idea behind the dense representation using one table, but th
 $t_0 = l_0$  
 $t_{k + 1} = t_k + l_{k + 1}$  
 Note that, since the $l_k$ are all positive, the vector $t$ has non-decreasing entries. We can merge all the columns into a single one, by stacking them one below the other. Given an index $j$ for the vector of stacked columns, we can find where the original element was. First, we look for the smallest $k$, such that $j < t_k$. This $k$ gives the column where the element belongs. Then, we can compute the row by doing $i = j - t_{k - 1}$ (if $k = 0$, then $i = j$). This yields a one-to-one correspondence between the original table and the stacked columns (we will call this, the dense representation form now on). The dense representation has a length equal to $2^m$, where $m = \lceil \log_2 \max{t} \rceil$. Given the procedure to find the row and column, we can define two functions,  
-$\mathrm{col}(j) = \min_k \\{t_k > j \\}$  
+$\mathrm{col}(j) = \min_k \{t_k > j \}$  
 $\mathrm{row}(j) = j - t_{k - 1}$  
 Using the letter $q$ to denote the multilinear encoding of the dense representation, we see that each entry corresponds to the non-dummy part of the multilinear extension of the whole table, $p$.  
 $p(\mathrm{row}(j), \mathrm{col}(j)) = q(j)$.

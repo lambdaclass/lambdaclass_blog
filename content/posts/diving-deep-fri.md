@@ -27,7 +27,7 @@ $a_0 = 3$
 $a_1 = {a_0}^2 = 9$  
 $a_2 = {a_1}^2 = 9^2 = 81 \equiv 13 \pmod{17}$  
 $a_3 = {a_2}^2 = 13^2 = 169 \equiv 16 \pmod{17}$  
-The first step is to interpret these values as evaluations of a polynomial over a suitable domain. We are working with $p=17$, whose multiplicative group has 16 elements: $\\{ 1 , 2 , 3 , 4 , \dots , 15 , 16 \\}$. We will choose the following subgroup $D_t = {1 , 13 , 16, 4 }$, which is none other than the group formed by all powers of $13$ modulo $17$:  
+The first step is to interpret these values as evaluations of a polynomial over a suitable domain. We are working with $p=17$, whose multiplicative group has 16 elements: $\{ 1 , 2 , 3 , 4 , \dots , 15 , 16 \}$. We will choose the following subgroup $D_t = {1 , 13 , 16, 4 }$, which is none other than the group formed by all powers of $13$ modulo $17$:  
 $13^0 = 1$  
 $13^1 = 13$  
 $13^2 = 169 \equiv 16 \pmod{17}$  
@@ -57,10 +57,10 @@ If we evaluate the polynomial at $D_t$, you can check that we get the same value
 
 ## Committing to the trace polynomial
 
-We have to commit to the trace interpolating polynomial. To do so, we perform a low-degree extension by choosing a larger domain, different from the original domain. If we choose $h = 9$ and its powers, we get a cyclic subgroup with $8$ elements, $\\{ h^0 , h^1 , h^2 , \dots , h^7 \\}$. This group contains elements from $D_t$, so we shift it to another domain by introducing an element from the coset, $w$, and forming the following domain,  
-$$ D_0 = \\{ wh^0 , wh^1 , wh^2, \dots , wh^7 \\}$$  
+We have to commit to the trace interpolating polynomial. To do so, we perform a low-degree extension by choosing a larger domain, different from the original domain. If we choose $h = 9$ and its powers, we get a cyclic subgroup with $8$ elements, $\{ h^0 , h^1 , h^2 , \dots , h^7 \}$. This group contains elements from $D_t$, so we shift it to another domain by introducing an element from the coset, $w$, and forming the following domain,  
+$$ D_0 = \{ wh^0 , wh^1 , wh^2, \dots , wh^7 \}$$  
 We can choose $w = 3$, and so the domain becomes  
-$$ D_0 = \\{ 3, 10, 5, 11, 14 , 7 , 12 , 6 \\}$$  
+$$ D_0 = \{ 3, 10, 5, 11, 14 , 7 , 12 , 6 \}$$  
 To commit, we evaluate $t(x)$ over all values in $D_0$ and form a Merkle tree whose leaves are those values.
 
 $x$ | $t(x)$  
@@ -137,7 +137,7 @@ $x$ | $H_1(x)$ | $H_2(x)$
   
 ## Sampling outside the original domain
 
-The verifier now chooses a random point, $z$, outside the trace interpolation and evaluation domains. In our example, the points outside those are $\\{ 2, 8, 9 , 15 \\}$. Suppose the verifier selected $z = 8$. Then,  
+The verifier now chooses a random point, $z$, outside the trace interpolation and evaluation domains. In our example, the points outside those are $\{ 2, 8, 9 , 15 \}$. Suppose the verifier selected $z = 8$. Then,  
 $H ( 8 ) = 10$  
 with each part being  
 $H_1 (8^2) = 6$  
@@ -192,7 +192,7 @@ $xP_{0,odd} (x) = 15 x^3 + 15 x$
 $P_{0,even} (x) = 1$  
 The verifier samples $\beta_0 = 4$. Then,  
 $P_1 (y=x^2) = 9y +10$  
-The domain is given by points of the form $y=x^2$, so $D_1 = \\{ 9, 15, 8, 2\\}$. The leaves of the Merkle tree are
+The domain is given by points of the form $y=x^2$, so $D_1 = \{ 9, 15, 8, 2\}$. The leaves of the Merkle tree are
 
 $y$ | $P_1(y)$  
 ---|---  
@@ -206,7 +206,7 @@ $yP_{0,odd} (y) = 9y$
 $P_{0,even} (y) = 10$  
 The verifier samples $\beta_1 = 3$  
 $P_2 (z=y^2) = 3$.  
-And we ended with a constant polynomial. This second domain is $D_2 = \\{13, 4\\}$
+And we ended with a constant polynomial. This second domain is $D_2 = \{13, 4\}$
 
 ## Checking FRI layers
 

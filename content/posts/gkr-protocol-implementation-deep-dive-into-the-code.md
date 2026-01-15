@@ -138,9 +138,9 @@ The prover is responsible for evaluating the circuit and constructing a proof th
 Let's recall what the polynomials $g_j$ and $q$ are. In each circuit layer and for each round $j$ of its sumcheck, the prover has to compute the univariate polynomial $g_j$ by fixing the first variable and summing over all the others. For example, in our previous post, in the layer $0$, the sumcheck had four rounds leading to these polynomials:
 
 $$\begin{align}  
-g_1 (z) &= \sum_{(b_2, c_1, c_2) : \in {0, 1}^3} \tilde f_{ r_0 }^{ (0) } (z, b_2, c_1, c_2), \ \newline  
-g_2 (z) &= \sum_{(c_1, c_2) : \in {0, 1}^2} \tilde f_{ r_0 }^{ (0) } (s_1, z, c_1, c_2), \ \newline  
-g_3 (z) &= \sum_{c_2 : \in {0, 1}} \tilde f_{ r_0 }^{ (0) } (s_1, s_2, z, c_2),\ \newline  
+g_1 (z) &= \sum_{(b_2, c_1, c_2) : \in {0, 1}^3} \tilde f_{ r_0 }^{ (0) } (z, b_2, c_1, c_2), \ \\  
+g_2 (z) &= \sum_{(c_1, c_2) : \in {0, 1}^2} \tilde f_{ r_0 }^{ (0) } (s_1, z, c_1, c_2), \ \\  
+g_3 (z) &= \sum_{c_2 : \in {0, 1}} \tilde f_{ r_0 }^{ (0) } (s_1, s_2, z, c_2),\ \\  
 g_4 (z) &= \tilde f_{ r_0 }^{ (0) } (s_1, s_2, s_3, z),  
 \end{align}$$
 

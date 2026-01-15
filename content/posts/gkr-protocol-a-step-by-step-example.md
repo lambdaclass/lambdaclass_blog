@@ -78,7 +78,7 @@ where $\chi_w$ are the (multilinear) Lagrange basis polynomials: $$\chi_w(x_1, \
 
 > In our case (with $k_0=1$):
 > 
-> $$\begin{align} \tilde D(x) &= D(0) : (x \cdot 0 + (1-x)(1-0)) + D(1) : (x \cdot 1 (1 - x)(1 - 1)) \newline  
+> $$\begin{align} \tilde D(x) &= D(0) : (x \cdot 0 + (1-x)(1-0)) + D(1) : (x \cdot 1 (1 - x)(1 - 1)) \\  
 >  &= D(0)\cdot(1-x) + D(1) \cdot x= 18(1-x)+7x\end{align}$$
 > 
 > Thus:
@@ -96,7 +96,7 @@ $$m_0 = \tilde W_0(r_0)$$
 
 Before continuing, let's introduce an additional notation. For each layer $i$ of the circuit, we will denote
 
-$$W_i: \\{0,1\\}^{ k_i } \to \mathbb{F_{p}}$$
+$$W_i: \{0,1\}^{ k_i } \to \mathbb{F_{p}}$$
 
 to be the function that maps a node’s position to its actual value, let $\tilde W_i(x)$ be its multilinear extension.
 
@@ -130,7 +130,7 @@ We define two functions that capture the circuit's wiring:
 
 This function marks all the addition nodes in layer $i$. It takes as input:
 
-$$x \in \\{0,1\\}^{k_i + 2k_{i + 1}}$$
+$$x \in \{0,1\}^{k_i + 2k_{i + 1}}$$
 
 which encodes the position $a$ of an addition node in the current layer, along with the positions $b$ and $c$ of the two nodes in the next layer to which it is connected.
 
@@ -144,7 +144,7 @@ Just like with $\tilde D(x)$, we will need to create the multilinear extension: 
 >  And is connected to nodes: $$b: (1,0) \ \ c: (1,1)$$  
 >  Since this is the only addition node, we define the function:  
 >  $$\text{Add_1}(x) \begin{cases}  
->  1 & \text{if } x = (1,1,0,1,1)\newline  
+>  1 & \text{if } x = (1,1,0,1,1)\\  
 >  0 & \text{if not}.  
 >  \end{cases}$$  
 >  We then extend this function to a multilinear polynomial, denoted $\widetilde{\text{Add}}_i(x)$:
@@ -157,7 +157,7 @@ Similarly, we define the function $\text{Mult}_0(x)$ for the multiplication node
 
 > For the Multiplication node in our first layer:  
 >  $$\text{Mult_1}(x) \begin{cases}  
->  1 & \text{if } x = (0,0,0,0,1)\newline  
+>  1 & \text{if } x = (0,0,0,0,1)\\  
 >  0 & \text{if not}.  
 >  \end{cases}$$  
 >  Its multilinear extension is given by  
@@ -174,7 +174,7 @@ When this function is evaluated on the values $(a,b,c)$ corresponding to a node 
 
 This function is handy, but we can go one step forward and fix $a = r$ and sum over all possible binary assignments for $b$ and $c$, we obtain:
 
-$$\sum_{(b,c) \in \\{0,1\\}^{ 2k_i }} \tilde f^{(i)}(r,b,c) = \tilde W(r)$$
+$$\sum_{(b,c) \in \{0,1\}^{ 2k_i }} \tilde f^{(i)}(r,b,c) = \tilde W(r)$$
 
 This new function is now a univariate polynomial!
 
@@ -201,7 +201,7 @@ Let's describe, step by step, all the operations performed by the prover and the
 
         1. The prover $\mathcal{P}$ builds a new function $g_1(z)$:  
 $$g_1(z): \mathbb{F_{p}} \to \mathbb{F_{p}}$$  
-$$g_1(z) := \sum_{ (x_2, x_3, ... , x_{ 2k_1 }) \in \\{0,1\\}^{2k_1 - 1} } \tilde f_{r_0}^{(0)} (z, x_2, ..., x_{2k_1 - 1})$$
+$$g_1(z) := \sum_{ (x_2, x_3, ... , x_{ 2k_1 }) \in \{0,1\}^{2k_1 - 1} } \tilde f_{r_0}^{(0)} (z, x_2, ..., x_{2k_1 - 1})$$
 
 In other words, we leave the first coordinate of $x$ in $\tilde f_{r_0}^{(0)} (x)$ as the free variable $z$ and sum over all possible assignments of the remaining coordinates.
 
@@ -212,13 +212,13 @@ $$g_1(0) + g_1(1) = m_0$$
 Because $g_1(0)$ sums over all combinations with the first coordinate set to 0, and $g_1(0)$ does so for the first coordinate equal to 1.
 
 > In our case, since $k_1 = 2$ (i.e. there are $2^2$ nodes in layer 2), we have:  
->  $$g_1 (z) = \sum_{ (x_2, x_3, x_4) \in \\{0, 1\\}^3 } \tilde f_{r_0}^{(0)} (z, x_2, x_3, x_4).$$  
+>  $$g_1 (z) = \sum_{ (x_2, x_3, x_4) \in \{0, 1\}^3 } \tilde f_{r_0}^{(0)} (z, x_2, x_3, x_4).$$  
 >  $$\begin{align}  
 >  f_{ r_0 }^{(0)} (b, c) = & \ 2b_1 (1 - b_2) c_1 c_2 \Big[  
->  (3(1 - b_1)(1 - b_2) + 6(1 - b_1)b_2 + 4b_1(1 - b_2) + 3b_1b_2) \notag \newline  
->  & \quad + (3(1 - c_1)(1 - c_2) + 6(1 - c_1)c_2 + 4c_1 (1 - c_2) + 3c_1 c_2 ) \Big] \notag \newline  
->  & \- (1 - b_1)(1 - b_2)(1 - c_1)c_2 \notag \newline  
->  & \Big[ (3(1 - b_1)(1 - b_2) + 6(1 - b_1)b_2 + 4b_1(1 - b_2) + 3b_1b_2 ) \notag \newline  
+>  (3(1 - b_1)(1 - b_2) + 6(1 - b_1)b_2 + 4b_1(1 - b_2) + 3b_1b_2) \notag \\  
+>  & \quad + (3(1 - c_1)(1 - c_2) + 6(1 - c_1)c_2 + 4c_1 (1 - c_2) + 3c_1 c_2 ) \Big] \notag \\  
+>  & \- (1 - b_1)(1 - b_2)(1 - c_1)c_2 \notag \\  
+>  & \Big[ (3(1 - b_1)(1 - b_2) + 6(1 - b_1)b_2 + 4b_1(1 - b_2) + 3b_1b_2 ) \notag \\  
 >  & \quad \times (3(1 - c_1)(1 - c_2) + 6(1 - c_1)c_2 + 4c_1(1 - c_2) + 3c_1c_2) \Big]  
 >  \end{align}  
 >  $$  
@@ -270,7 +270,7 @@ $$g_1(s_1) = C_1$$
         3. Upon receiving $s_1$, $\mathbb{F_{p}}$ computes $C_1$ and then repeats a similar procedure. The prover defines a new function:
 
 $$g_2(z): \mathbb{F_{p}} \to \mathbb{F_{p}}$$  
-$$g_2(z) := \sum_{(x_3, ... , x_{2k_1}) \in \\{0,1\\}^{2k_1 - 2}} \tilde f_{r_0}^{(0)} (s_1, z, x_3 ..., x_{ 2k_1 - 2})$$
+$$g_2(z) := \sum_{(x_3, ... , x_{2k_1}) \in \{0,1\}^{2k_1 - 2}} \tilde f_{r_0}^{(0)} (s_1, z, x_3 ..., x_{ 2k_1 - 2})$$
 
 Here, the prover fixes the first variable to $s_1$ and leaves the second variable free (denoted by $z$), summing over the remaining binary assignments.
 
@@ -331,7 +331,7 @@ In effect, we have reduced the problem of verifying the circuit’s outputs to v
 >  $$\tilde f^{(0)}_{r_0}(s_1,s_2,s_3,s_4) = c_4$$  
 >  $$\begin{equation}  
 >  \begin{aligned}  
->  \tilde{f}^{(0)}(r_1,s_1,s_2,s_3,s_4) := & \newline \widetilde{\text{Add}}_1(r_1,s_1,s_2,s_3,s_4) \cdot (\tilde{W}_2(s_1,s_2) + \tilde{W}_2(s_3,s_4)) \newline  
+>  \tilde{f}^{(0)}(r_1,s_1,s_2,s_3,s_4) := & \\ \widetilde{\text{Add}}_1(r_1,s_1,s_2,s_3,s_4) \cdot (\tilde{W}_2(s_1,s_2) + \tilde{W}_2(s_3,s_4)) \\  
 >  & \+ \widetilde{\text{Mult}}_1(r_1,s_1,s_2,s_3,s_4) \cdot \tilde{W}_2(s_1,s_2) \cdot \tilde{W}_2(s_3,s_4)  
 >  \end{aligned}  
 >  \end{equation}$$

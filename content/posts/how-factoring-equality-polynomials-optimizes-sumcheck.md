@@ -22,11 +22,11 @@ for $\omega_i \in \mathbb{F}$. Suppose now that we partition $\omega$ in blocks;
 
 $$\omega = (\omega_L,\omega_C,\omega_R)$$
 
-where $L,C,R$ are a partition of $[\ell] = \\{1,2,\ldots \ell \\}$ such that $$l < c < r \quad \forall\ l \in L, c\in C, r\in R$$. These subsets indicate the indices involved in each ''chunk'' of $\omega$. If the reader needs some help visualizing this, just think
+where $L,C,R$ are a partition of $[\ell] = \{1,2,\ldots \ell \}$ such that $$l < c < r \quad \forall\ l \in L, c\in C, r\in R$$. These subsets indicate the indices involved in each ''chunk'' of $\omega$. If the reader needs some help visualizing this, just think
 
 $$\omega = (2,3,4,2,5,5) = ((2,3), (4,2), (5,5))$$
 
-for $L = \\{1,2\\}, C = \\{3,4}, R = \\{5,6\\}$.
+for $L = \{1,2\}, C = \{3,4}, R = \{5,6\}$.
 
 > The good thing about block partitioning points is that it is compatible with factorization of equality polynomials: $$\omega = (\omega_L ,\omega_R )\implies eq_\omega (x) = eq_{\omega_L}(x_L ) eq_{\omega_R} (x_R )$$ for $x = (x_L,x_R)$, a block partition of the variable $x$.
 
@@ -57,8 +57,8 @@ The effect of this decomposition is that the round polynomial, $s_i (X_i)$ origi
 
 \begin{equation}  
 \begin{split}  
-s_i (X_i) &=\sum\limits_{x'}g(r,X_i,x') = \sum\limits_{x'}eq(r,X_i,x')p(r,X_i,x') \newline  
-&= \sum\limits_{x'}eq_{w<i}(r)eq_{w_i}(X_i)eq_{w>i}(x')p(r,X_i,x') \newline  
+s_i (X_i) &=\sum\limits_{x'}g(r,X_i,x') = \sum\limits_{x'}eq(r,X_i,x')p(r,X_i,x') \\  
+&= \sum\limits_{x'}eq_{w<i}(r)eq_{w_i}(X_i)eq_{w>i}(x')p(r,X_i,x') \\  
 &= eq_{w<i}(r)eq_{w_i}(X_i)\left(\sum\limits_{x'}eq_{w>i}(x')p(r,X_i,x')\right)  
 \end{split}  
 \end{equation}
@@ -171,7 +171,7 @@ $$A_i(v, u) = \sum_{x_{out}} \tilde{eq}(w_{out}, x_{out}) \sum_{x_{in}} \tilde{e
 
 Don't panic, we're there already. Consider now the prefix $\beta = (v,u)$ and call $E_{in} [x_{in}] =eq(w_{in},x_{in})$. The last inner sum is then parametrized by $\beta$ and $x_{out}$ and shall be called temporary accumulator $tA[\beta]$.
 
-$$tA[\beta] = \sum_{x_{in} \in \\{0,1\\}^{ l/2 }} E_{in}[x_{in}] \cdot \prod_{k = 1}^{d} p_k(\beta, x_{in}, x_{out})$$
+$$tA[\beta] = \sum_{x_{in} \in \{0,1\}^{ l/2 }} E_{in}[x_{in}] \cdot \prod_{k = 1}^{d} p_k(\beta, x_{in}, x_{out})$$
 
 Now that we have baptized the proper objects, we can describe how the algorithm works.
 
@@ -237,7 +237,7 @@ Consider the polynomial
 
 $$g(X) = \tilde{eq}(w, X) \cdot (X_1 + X_3 + X_5 + 1) \cdot (X_2 + X_4 + X_6 + 2)$$
 
-and $eq$ is the equality polynomial for the vector $w = (1, 0, 1, 1, 0, 1)$. Considering $l_0 = 2$ then only rounds 1 and 2 are optimized. As the author's choice of interpolation set, we will stick to $U_2 = \\{\infty, 0, 1 \\}$. The prover needs to compute $t_2(u)$ for $u \in \hat{U_2} = \\{\infty, 0\\}$.
+and $eq$ is the equality polynomial for the vector $w = (1, 0, 1, 1, 0, 1)$. Considering $l_0 = 2$ then only rounds 1 and 2 are optimized. As the author's choice of interpolation set, we will stick to $U_2 = \{\infty, 0, 1 \}$. The prover needs to compute $t_2(u)$ for $u \in \hat{U_2} = \{\infty, 0\}$.
 
 ### Getting the partitioning straight
 
@@ -306,7 +306,7 @@ and obviously
 
 $$l_2(\infty) = - r_1\quad\text{and}\quad l_2(0) = r_1$$
 
-Now comes the tough part of computing $t_2(X_2)$. Since this is computed via the SmallValue optimization, it involves combining the evaluations at the random challenge $r_1$ of the Lagrange interpolation polynomials using the pre-computed accumulators: this ends up being a sum of products and the authors usually show this as an inner product $$t_2(u) = \langle R_2, A_2(u) \rangle$$ where the challenge vector $R_2$ depends on $r_1$ and $U_2 = \\{\infty, 0, 1\\}$, and is calculated as:
+Now comes the tough part of computing $t_2(X_2)$. Since this is computed via the SmallValue optimization, it involves combining the evaluations at the random challenge $r_1$ of the Lagrange interpolation polynomials using the pre-computed accumulators: this ends up being a sum of products and the authors usually show this as an inner product $$t_2(u) = \langle R_2, A_2(u) \rangle$$ where the challenge vector $R_2$ depends on $r_1$ and $U_2 = \{\infty, 0, 1\}$, and is calculated as:
 
         * $R_2[\infty] = (r_1 - 0)(r_1 - 1) = r_1(r_1 - 1)$
         * $R_2[0] = \frac{r_1 - 1}{0 - 1} = 1 - r_1$
@@ -361,14 +361,14 @@ In this round, we combine the challenge vector using the accumulators as weights
 
         * **Computation of $t_2(0)$:**  
 \begin{align*}  
-t_2(0) &= \sum_{v \in U_2} R_2[v] \cdot A_2(v, 0) \newline  
-&= r_1(r_1 - 1) \cdot A_2(\infty, 0)) + (1 - r_1)\cdot A_2(0, 0) + r_1 \cdot A_2(1, 0) \newline  
+t_2(0) &= \sum_{v \in U_2} R_2[v] \cdot A_2(v, 0) \\  
+&= r_1(r_1 - 1) \cdot A_2(\infty, 0)) + (1 - r_1)\cdot A_2(0, 0) + r_1 \cdot A_2(1, 0) \\  
 &= r_1(r_1 - 1) \cdot 4 + (1 - r_1) \cdot 8 + r_1 \cdot 12  
 \end{align*}
         * **Computation of $t_2(\infty)$**  
 \begin{align*}  
-t_2(\infty) &= \sum_{v \in U_2} R_2[v] \cdot A_2(v, \infty) \newline  
-&= (r_1(r_1 - 1) \cdot A_2(\infty, \infty)) + ((1 - r_1)\cdot A_2(0, \infty)) + (r_1 \cdot A_2(1, \infty)) \newline  
+t_2(\infty) &= \sum_{v \in U_2} R_2[v] \cdot A_2(v, \infty) \\  
+&= (r_1(r_1 - 1) \cdot A_2(\infty, \infty)) + ((1 - r_1)\cdot A_2(0, \infty)) + (r_1 \cdot A_2(1, \infty)) \\  
 &= (r_1(r_1-1) \cdot 1) + ((1 - r_1) \cdot 2) + (r_1 \cdot 3)  
 \end{align*}
 

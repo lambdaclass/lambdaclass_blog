@@ -45,7 +45,7 @@ MACs could also be rendered insecure by replay attacks. In this situation, an ad
 
 ## Construction of MAC by pseudo-random functions (PRF)
 
-We saw examples of pseudo-random functions when we talked about block ciphers. We mentioned that these behave as pseudo-random permutations, where we take a message \\( m \\) and map it over one of all the possible output messages. For example, the AES block cipher is a function \\( f:K\times \\{0,1 \\}^{128} \rightarrow \\{0,1 \\}^{128} \\), taking a message of 16 bytes and outputting a random string of 16-bytes.
+We saw examples of pseudo-random functions when we talked about block ciphers. We mentioned that these behave as pseudo-random permutations, where we take a message \\( m \\) and map it over one of all the possible output messages. For example, the AES block cipher is a function \\( f:K\times \{0,1 \}^{128} \rightarrow \{0,1 \}^{128} \\), taking a message of 16 bytes and outputting a random string of 16-bytes.
 
 We can construct a MAC from a given PRF, taking messages in a space \\( X \\) (for example, messages up to GB long), and outputting a tag in \\( Y \\) (for example, a 128-bit string), \\( g: K\times X \rightarrow Y \\) by doing  
 \\[ t=g(k,m) \\]  
@@ -129,7 +129,7 @@ The problem with checking this way is that, as soon as two bytes differ, for exa
 
 ## Need to change the key
 
-To be secure, the MAC needs to be long enough. If not, they could be subjected to brute force attacks. We can find bounds for the number of messages we can MAC before changing keys. For example, in CBC-MAC, which outputs tags in \\( \\{0,1 \\}^n \\), if the adversary can query \\( q \\) messages of length \\( \ell \\), then we need that  
+To be secure, the MAC needs to be long enough. If not, they could be subjected to brute force attacks. We can find bounds for the number of messages we can MAC before changing keys. For example, in CBC-MAC, which outputs tags in \\( \{0,1 \}^n \\), if the adversary can query \\( q \\) messages of length \\( \ell \\), then we need that  
 \\[ \frac{q^2 \ell^2 }{ 2^n } \ll 1\\]  
 This means that \\( q\ell \ll 2^n \\). If we use AES where \\( n=128 \\) and we consider that \\( 2^{-32}\approx 2\times 10^{-10}\\) to be sufficiently small, then \\( q\ell \leq 2^{48} \\). Given that 1 GB of data is \\( 2^{30} \\) bytes, we can encrypt several messages containing up to several GB before changing the key.
 

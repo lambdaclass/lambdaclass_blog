@@ -79,9 +79,9 @@ The largest cost involves sharing the circuit, which takes 5 TB of memory. While
 
 The garbling of the circuit relies on RSA. Each wire in the circuit has two possible keys corresponding to 0 or 1. The garbler (Prover) generates these such that only the correct combination yields a meaningful output key. According to the BitVM3 text, the garbler selects an RSA modulus $N = (2p + 1)(2q + 1)$ (product of two safe primes) and some public exponents $e, e_1 , e_2 , e_3 , e_4$. There are also secret exponents, $d, d_1 , d_2 , d_3 , d_4$ and $h = e_1 e_4 d_2 - e_3$. The $e_i$ and $d_i$ are inverses modulo $\phi (N)/4 = pq$, that is $e_i d_i \equiv 1 \pmod{pq}$. Using the secret factors of $N$ (the trapdoor), the garbler computes wire label values such that the relationships between them hold if and only if the gate’s logical truth table is satisfied. For the output labels $c_0, c_1$ from the circuit, he computes the secret input wires $a_0, a_1, b_0, b_1$ from the following equations:  
 \begin{align*}  
-b_0 &= (c_1 c_0^{-1} )^{ h^{-1} } \pmod{N} \newline  
-b_1 &= b_0^{ e_1 d_2} \pmod{N} \newline  
-a_0 &= c_0^d b_0^{ - e_1 d} \pmod{N} \newline  
+b_0 &= (c_1 c_0^{-1} )^{ h^{-1} } \pmod{N} \\  
+b_1 &= b_0^{ e_1 d_2} \pmod{N} \\  
+a_0 &= c_0^d b_0^{ - e_1 d} \pmod{N} \\  
 a_1 &= c_0^d b_0^{ - e_3 d} \pmod{N}  
 \end{align*}
 

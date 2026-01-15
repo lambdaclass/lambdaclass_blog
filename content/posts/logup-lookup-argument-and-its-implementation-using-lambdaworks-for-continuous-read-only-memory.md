@@ -129,7 +129,7 @@ In our implementation, the function `read_only_logup_trace()` handles the constr
 Now, let’s see how to construct the auxiliary column. The auxiliary column, which we’ll call $s$, should accumulate the sums of the fractions corresponding to each row of the main table as follows:
 
 $$ \begin{align} s_0 &= \frac {m_0} {z - (a^\prime_0 + \alpha v^\prime_0)} - \frac {1} {z - (a_0 + \alpha v_0)},  
-\ \newline  
+\ \\  
 s_1 &= s_0 + \frac { m_1 } {z - (a^\prime_1 + \alpha v^\prime_1)} - \frac {1} {z - (a_1 + \alpha v_1)} \end{align}$$
 
 And so on, obtaining:
@@ -158,13 +158,13 @@ Observe that if the main trace indeed represents a permutation with multipliciti
 
 $$ \begin{align}  
 s_{n - 1} &= {\style{color: orange} {\frac {1} {z - (1 + \alpha 10)}}} - \style{color: cyan} {\frac {1} {z - (3 + \alpha 30)}}  
-\newline  
+\\  
 &\+ \style{color: magenta} {\frac {2} {z - (2 + \alpha 20)}} - {\style{color: orange} {\frac {1} {z - (1 + \alpha 10)}}}  
-\newline  
+\\  
 &\+ \style{color: cyan} {\frac {1} {z - (3 + \alpha 30)}} - \style{color: magenta} {\frac {1} {z - (2 + \alpha 20)}}  
-\newline  
+\\  
 &\+ \frac {0} {z - (3 + \alpha 30)} - \style{color: magenta} {\frac {1} {z - (2 + \alpha 20)}}  
-\ \newline  
+\ \\  
 &= 0  
 \end{align}  
 $$
@@ -225,22 +225,22 @@ $$s_{i+1} = s_i + \frac {m_{i+1}} {z - (a^\prime_{i + 1} + \alpha v^\prime_{i + 
 Since constraints must be expressed without division, we will multiply both sides of the equality by the common denominator. This transforms the constraint into the following form:
 
 $$\begin{align}s_{i+1} &\cdot (z - (a^\prime_{i+1} + \alpha v^\prime_{i+1})) \cdot (z - (a_{i+1} + \alpha v_{i+1})) =  
-\ \newline  
+\ \\  
 &=s_i \cdot (z - (a^\prime_{i+1} + \alpha v^\prime_{i+1})) \cdot (z - (a_{i+1} + \alpha v_{i+1}))  
-\ \newline  
+\ \\  
 &\+ m_{i+1} \cdot (z - (a_{i+1} + \alpha v_{i+1}))  
-\ \newline  
+\ \\  
 &\- (z - (a^\prime_{i+1} + \alpha v^\prime_{i+1}))  
 \end{align}$$
 
 Additionally, we will move the left-hand side of the equality to the right, subtracting it so that it can be interpreted as a polynomial in the variables $s$, $a$, $a'$, $v$ and $v'$ that is equal to zero:
 
 $$\begin{align} 0 &=s_i \cdot (z - (a^\prime_{i+1} + \alpha v^\prime_{i+1})) \cdot (z - (a_{i+1} + \alpha v_{i+1}))  
-\ \newline  
+\ \\  
 &\+ m_{i+1} \cdot (z - (a_{i+1} + \alpha v_{i+1}))  
-\ \newline  
+\ \\  
 &\- (z - (a^\prime_{i+1} + \alpha v^\prime_{i+1}))  
-\ \newline  
+\ \\  
 &\- s_{i+1} \cdot (z - (a^\prime_{i+1} + \alpha v^\prime_{i+1})) \cdot (z - (a_{i+1} + \alpha v_{i+1}))  
 \end{align}$$
 

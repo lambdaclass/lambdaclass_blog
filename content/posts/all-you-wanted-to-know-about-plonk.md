@@ -24,7 +24,7 @@ The symbol $\mathbb{F}$ denotes a finite field. It is fixed all along. The symbo
 
 All polynomials have coefficients in $\mathbb{F}$, and the variable is usually denoted by $X$; we denote this set as $\mathbb{F} [X]$. We represent polynomials by single letters like $p, a, b, z$. We only mark them as $z(X)$ when we want to emphasize that it is a polynomial in $X$ or we need to define a polynomial from another one explicitly. For example, when composing a polynomial $z$ with the polynomial $\omega X$, the result is denoted by $z' := z(\omega X)$. The symbol $'$ is **not** used to indicate derivatives.
 
-When interpolating at a domain $H = \\{h_0 , \dots , h_n \\} \subset \mathbb{F}$, the symbols $L_i$ denote the Lagrange basis. That is $L_i$ is the polynomial such that $L_i (h_j) = 0$ for all $j\neq i$, and that $L_i (h_i) = 1$.
+When interpolating at a domain $H = \{h_0 , \dots , h_n \} \subset \mathbb{F}$, the symbols $L_i$ denote the Lagrange basis. That is $L_i$ is the polynomial such that $L_i (h_j) = 0$ for all $j\neq i$, and that $L_i (h_i) = 1$.
 
 If $M$ is a matrix, then $M_{i,j}$ denotes the value at the row $i$ and column $j$.
 
@@ -299,20 +299,20 @@ The permutation in this case is the map $\sigma((0,0)) = (2,1)$, $\sigma((0,1)) 
 It's not hard to see that condition (2) is equivalent to: for all $(i,j)\in I$, $T_{i,j} = T_{\sigma((i,j))}$.
 
 A little less obvious is that this condition is, in turn, equivalent to checking whether the following sets $A$ and $B$ are equal  
-$$A = \\{((i,j), T_{i,j}): (i,j) \in I\\}$$  
-$$B = \\{(\sigma((i,j)), T_{i,j}): (i,j) \in I\\}.$$  
+$$A = \{((i,j), T_{i,j}): (i,j) \in I\}$$  
+$$B = \{(\sigma((i,j)), T_{i,j}): (i,j) \in I\}.$$  
 The proof of this equivalence is straightforward. Give it a try!
 
 In our example, the sets in question are respectively  
 $$  
 \begin{aligned}  
-\\{((0,0), T_{ 0,0 }), ((0,1), T_{ 0,1 }), ((0,2), T_{ 0,2 }), ((0,3), T_{ 0,3 }), \newline ((2,1), T_{ 2,1 }), ((3,1), T_{ 3,1 }), ((2,2), T_{ 2,2 })\\}  
+\{((0,0), T_{ 0,0 }), ((0,1), T_{ 0,1 }), ((0,2), T_{ 0,2 }), ((0,3), T_{ 0,3 }), \\ ((2,1), T_{ 2,1 }), ((3,1), T_{ 3,1 }), ((2,2), T_{ 2,2 })\}  
 \end{aligned}  
 $$  
 and  
 $$  
 \begin{aligned}  
-\\{((2,1), T_{0,0}), ((0,3), T_{0,1}), ((0,2), T_{0,2}), ((0,1), T_{0,3}), \newline ((0,0), T_{2,1}), ((2,2), T_{3,1}), ((3,1), T_{2,2}) \\}, \end{aligned}  
+\{((2,1), T_{0,0}), ((0,3), T_{0,1}), ((0,2), T_{0,2}), ((0,1), T_{0,3}), \\ ((0,0), T_{2,1}), ((2,2), T_{3,1}), ((3,1), T_{2,2}) \}, \end{aligned}  
 $$
 
 You can check these sets coincide by inspection. Recall our trace matrix $T$ is
@@ -328,22 +328,22 @@ Checking the equality of these sets can be reduced to polynomial equations. It i
 
 #### Equality of sets
 
-Suppose we have two sets $A = \\{a_0, a_1 \\}$ $B = \\{b_0, b_1\\}$ of two field elements in $\mathbb{F}$. And we are interested in checking whether they are equal.
+Suppose we have two sets $A = \{a_0, a_1 \}$ $B = \{b_0, b_1\}$ of two field elements in $\mathbb{F}$. And we are interested in checking whether they are equal.
 
 One thing we could do is compute $a_0a_1$ and $b_0b_1$ and compare them. If the sets are equal, then those elements are necessarily identical.
 
-But the converse is not true. For example the sets $A = \\{4, 15\\}$ and $B = \\{6, 10\\}$ both have $60$ as the result of the product of their elements. But they are not equal. So this is not good for checking equality.
+But the converse is not true. For example the sets $A = \{4, 15\}$ and $B = \{6, 10\}$ both have $60$ as the result of the product of their elements. But they are not equal. So this is not good for checking equality.
 
-Polynomials come to the rescue here. What we can do instead is consider the following sets _of polynomials_ $A' = \\{a_0 + X, a_1 + X\\}$, $B' = \\{b_0 + X, b_1 + X \\}$. Sets $A$ and $B$ are equal if and only if sets $A'$, and $B'$ are equal. This is because the equality of polynomials boils down to the equality of their coefficients. But the difference between $A'$ and $B'$ is that the approach of multiplying the elements works now. That is, $A'$ and $B'$ are equal if and only if $(a_0 + X)(a_1 + X) = (b_0 + X)(b_1 + X)$. This is not entirely evident but follows from a property that polynomials have called _unique factorization_. Here the important fact is that linear polynomials act like prime factors. Anyway, you can take that for granted. The last part of this trick is using the Schwartz-Zippel lemma and returning to the land of field elements. That means, if for some random element $\gamma$ we have $(a_0 + \gamma)(a_1 + \gamma) = (b_0 + \gamma)(b_1 + \gamma)$, then with overwhelming probability the equality $(a_0 + X)(a_1 + X) = (b_0 + X)(b_1 + X)$ holds.
+Polynomials come to the rescue here. What we can do instead is consider the following sets _of polynomials_ $A' = \{a_0 + X, a_1 + X\}$, $B' = \{b_0 + X, b_1 + X \}$. Sets $A$ and $B$ are equal if and only if sets $A'$, and $B'$ are equal. This is because the equality of polynomials boils down to the equality of their coefficients. But the difference between $A'$ and $B'$ is that the approach of multiplying the elements works now. That is, $A'$ and $B'$ are equal if and only if $(a_0 + X)(a_1 + X) = (b_0 + X)(b_1 + X)$. This is not entirely evident but follows from a property that polynomials have called _unique factorization_. Here the important fact is that linear polynomials act like prime factors. Anyway, you can take that for granted. The last part of this trick is using the Schwartz-Zippel lemma and returning to the land of field elements. That means, if for some random element $\gamma$ we have $(a_0 + \gamma)(a_1 + \gamma) = (b_0 + \gamma)(b_1 + \gamma)$, then with overwhelming probability the equality $(a_0 + X)(a_1 + X) = (b_0 + X)(b_1 + X)$ holds.
 
 Putting this altogether, if for some random element $\gamma$ we have $(a_0 + \gamma)(a_1 + \gamma) = (b_0 + \gamma)(b_1 + \gamma)$, then the sets $A$ and $B$ are equal. Of course, this also holds for sets with more than two elements. Let's write that down.
 
-_Fact:_ Let $A = \\{a_0, \dots, a_{k-1} \\}$ and $B = \\{b_0, \dots, b_{k-1} \\}$ be sets of field elements. If, for some random $\gamma$ the following equality holds  
+_Fact:_ Let $A = \{a_0, \dots, a_{k-1} \}$ and $B = \{b_0, \dots, b_{k-1} \}$ be sets of field elements. If, for some random $\gamma$ the following equality holds  
 $$\prod_{i = 0}^{ k - 1}(a_i + \gamma) = \prod_{i = 0}^{ k - 1 }(b_i + \gamma),$$  
 then with overwhelming probability $A$ is equal to $B$.
 
 And here comes the trick that reduces this check to polynomial equations. Let  
-$H$ be a domain of the form $\\{1, \omega, \dots, \omega^{k - 1} \\}$ for some primitive $k$-th root of unity $\omega$. Let $f$ and $g$ be the polynomials that interpolate the following values at $H$.  
+$H$ be a domain of the form $\{1, \omega, \dots, \omega^{k - 1} \}$ for some primitive $k$-th root of unity $\omega$. Let $f$ and $g$ be the polynomials that interpolate the following values at $H$.  
 $$(a_0 + \gamma, \dots, a_{k-1} + \gamma),$$  
 $$(b_0 + \gamma, \dots, b_{k-1} + \gamma),$$
 
@@ -358,7 +358,7 @@ The second equality holds because $\omega^k = \omega^0$ since it is a $k$-th roo
 
 In summary. We proved the following:
 
-_Fact:_ Let $A = \\{a_0, \dots, a_{k-1} \\}$ and $B = \\{b_0, \dots, b_{k-1} \\}$ be sets of field elements. Let $\gamma$ be a random field element. Let $\omega$ be a primitive $k$-th root of unity and $H = \\{1, \omega, \omega^2, \dots, \omega^{k-1} \\}$. Let $f$ and $g$ be respectively the polynomials that interpolate the values $\\{a_0 + \gamma, \dots, a_{k-1} + \gamma \\}$ and $\\{ b_0 + \gamma, \dots, b_{k-1} + \gamma \\}$ at $H$. If there exists a polynomial $Z$ such that  
+_Fact:_ Let $A = \{a_0, \dots, a_{k-1} \}$ and $B = \{b_0, \dots, b_{k-1} \}$ be sets of field elements. Let $\gamma$ be a random field element. Let $\omega$ be a primitive $k$-th root of unity and $H = \{1, \omega, \omega^2, \dots, \omega^{k-1} \}$. Let $f$ and $g$ be respectively the polynomials that interpolate the values $\{a_0 + \gamma, \dots, a_{k-1} + \gamma \}$ and $\{ b_0 + \gamma, \dots, b_{k-1} + \gamma \}$ at $H$. If there exists a polynomial $Z$ such that  
 $$Z(\omega^0 ) = 1$$  
 $$Z(X)f(X) = g(X)Z(\omega X)$$  
 for all $h\in H$, then with overwhelming probability the sets $A$ and $B$ are equal.
@@ -367,9 +367,9 @@ for all $h\in H$, then with overwhelming probability the sets $A$ and $B$ are eq
 
 In the previous section, we saw how to check whether two sets of field elements are equal using polynomial equations. To use it in our context, we need to extend it to groups of tuples of field elements. This is pretty straightforward.
 
-Let's start with the easy case. Let $A = \\{(a_0, a_1), (a_2, a_3) \\}$ and $B = \\{(b_0, b_1), (b_2, b_3)\\}$ be two sets of pairs of field elements. That is $a_i, b_i \in \mathbb{F}$ for all $i$. The trick is very similar to the previous section.  
-$$A' = \\{a_0 + a_1 Y + X, a_2 + a_3 Y + X \\}$$  
-$$B' = \\{b_0 + b_1 Y + X, b_2 + b_3 Y + X \\}$$
+Let's start with the easy case. Let $A = \{(a_0, a_1), (a_2, a_3) \}$ and $B = \{(b_0, b_1), (b_2, b_3)\}$ be two sets of pairs of field elements. That is $a_i, b_i \in \mathbb{F}$ for all $i$. The trick is very similar to the previous section.  
+$$A' = \{a_0 + a_1 Y + X, a_2 + a_3 Y + X \}$$  
+$$B' = \{b_0 + b_1 Y + X, b_2 + b_3 Y + X \}$$
 
 Just as before, by looking at coefficients, we can see that the sets $A$ and $B$ are equal if and only if $A'$ and $B'$ are equal.  
 And notice that these are sets of polynomials: we got rid of the tuples! Now, the situation is very similar to the previous section. We have that $A'$ and $B'$ are equal if and only if the product of their elements coincides. This is also true because polynomials in two variables are a unique factorization domain. So as before, we can use the Schwartz-Zippel lemma. Precisely, if for random $\beta, \gamma$, the elements  
@@ -380,10 +380,10 @@ coincide, then $A$ and $B$ are equal with overwhelming probability.
 
 Here is the statement for sets of more than two pairs of field elements.
 
-_Fact:_ Let $A = \\{\bar a_0, \dots, \bar a_{k-1} \\}$ and $B = \\{\bar b_0, \dots, \bar b_{k-1} \\}$ be sets of pairs of field elements. So that $\bar a_i = (a_{i,0}, a_{i,1})$ and the same for $\bar b_i$. Let $\beta, \gamma$ be random field elements. Let $\omega$ be a $k$-th root of unity and $H = \\{1, \omega, \omega^2, \dots, \omega^{k-1} \\}$. Let $f$ and $g$ be, respectively, the polynomials that interpolate the values  
-$$\\{a_{i,0} + a_{i,1}\beta + \gamma, \dots, a_{k-1,0} + a_{k-1,1}\beta + \gamma\\},$$  
+_Fact:_ Let $A = \{\bar a_0, \dots, \bar a_{k-1} \}$ and $B = \{\bar b_0, \dots, \bar b_{k-1} \}$ be sets of pairs of field elements. So that $\bar a_i = (a_{i,0}, a_{i,1})$ and the same for $\bar b_i$. Let $\beta, \gamma$ be random field elements. Let $\omega$ be a $k$-th root of unity and $H = \{1, \omega, \omega^2, \dots, \omega^{k-1} \}$. Let $f$ and $g$ be, respectively, the polynomials that interpolate the values  
+$$\{a_{i,0} + a_{i,1}\beta + \gamma, \dots, a_{k-1,0} + a_{k-1,1}\beta + \gamma\},$$  
 and  
-$$\\{b_{i,0} + b_{i,1}\beta + \gamma, \dots, b_{k-1,0} + b_{k-1,1}\beta + \gamma\\},$$  
+$$\{b_{i,0} + b_{i,1}\beta + \gamma, \dots, b_{k-1,0} + b_{k-1,1}\beta + \gamma\},$$  
 at $H$. If there exists a polynomial $Z$ such that  
 $$Z(\omega^0 ) = 1$$  
 $$Z(X)f(X) = g(X)Z(\omega X)$$  
@@ -392,50 +392,50 @@ for all $h\in H$, then with overwhelming probability the sets $A$ and $B$ are eq
 #### Going back to our case
 
 Recall we want to rephrase condition (b) in terms of polynomials. We have already seen that condition (b) is equivalent to $A$ and $B$ being equal, where  
-$$A = \\{((i,j), T_{i,j}): (i,j) \in I\\}$$  
+$$A = \{((i,j), T_{i,j}): (i,j) \in I\}$$  
 and  
-$$B = \\{(\sigma((i,j)), T_{i,j}): (i,j) \in I\\}.$$
+$$B = \{(\sigma((i,j)), T_{i,j}): (i,j) \in I\}.$$
 
 We cannot directly use the facts of the previous sections because our sets are not sets of field elements, nor are they sets of pairs of field elements. They are sets of pairs with some indexes $(i,j)$ in the first coordinate and a field element $v$ in the second one. So the solution is to convert them to sets of pairs of field elements and apply the result of the previous section. How do we map an element of the form $((i,j), v)$ to something of the form $(a_0, a_1)$ with $ a_0 $ and $ a_1 $ field elements? The second coordinate is trivial: we can leave $v$ as it is and take $a_1 = v$. There are multiple ways for the indexes pair $(i,j)$. The important thing to achieve here is that different pairs get mapped to different field elements. Recall that $i$ ranges from $0$ to $N-1$ and $j$ ranges from $0$ to $2$. One way is to take a $3N$-th primitive root of unity $\eta$ and define $a_0 = \eta^{3i + j}$. Putting it all together, we are mapping the pair $((i,j), v)$ to the pair $(\eta^{3i + j}, v)$, which is a pair of field elements. Now we can consider the sets  
-$$A = \\{(\eta^{3i + j}, T_{i,j}): (i,j) \in I\\}$$  
+$$A = \{(\eta^{3i + j}, T_{i,j}): (i,j) \in I\}$$  
 and  
-$$B = \\{(\eta^{3k + l}, T_{i,j}): (i,j) \in I, \sigma((i,j)) = (k, l)\\}.$$  
+$$B = \{(\eta^{3k + l}, T_{i,j}): (i,j) \in I, \sigma((i,j)) = (k, l)\}.$$  
 We have that condition (b) is equivalent to $A$ and $B$ being equal.
 
 Applying the method of the previous section to these sets, we obtain the following.
 
-_Fact:_ Let $\eta$ be a $3N$-th root of unity and $\beta$ and $\gamma$ random field elements. Let $D = \\{1, \eta, \eta^2, \dots, \eta^{3N-1}\\}$. Let $f$ and $g$ be the polynomials that interpolate, respectively, the following values at $D$:  
-$$\\{T_{i,j} + \eta^{3i + j}\beta + \gamma: (i,j) \in I\\},$$  
+_Fact:_ Let $\eta$ be a $3N$-th root of unity and $\beta$ and $\gamma$ random field elements. Let $D = \{1, \eta, \eta^2, \dots, \eta^{3N-1}\}$. Let $f$ and $g$ be the polynomials that interpolate, respectively, the following values at $D$:  
+$$\{T_{i,j} + \eta^{3i + j}\beta + \gamma: (i,j) \in I\},$$  
 and  
-$$\\{T_{i,j} + \eta^{3k + l}\beta + \gamma: (i,j) \in I, \sigma((i,j)) = (k,l)\\},$$  
+$$\{T_{i,j} + \eta^{3k + l}\beta + \gamma: (i,j) \in I, \sigma((i,j)) = (k,l)\},$$  
 Suppose there exists a polynomial $Z$ such that  
 $$Z(\eta^0 ) = 1$$  
 $$Z(d)f(d) = g(d)Z(\eta d),$$  
 for all $h\in D$.  
-Then the sets $A = \\{((i,j), T_{i,j}): (i,j) \in I \\}$ and $B = \\{(\sigma((i,j)), T_{i,j}): (i,j) \in I\\}$ are equal with overwhelming probability.
+Then the sets $A = \{((i,j), T_{i,j}): (i,j) \in I \}$ and $B = \{(\sigma((i,j)), T_{i,j}): (i,j) \in I\}$ are equal with overwhelming probability.
 
-One last-minute definition. Notice that $\omega=\eta^3$ is a primitive $N$-th root of unity. Let $H = \\{1, \omega, \omega^2, \dots, \omega^{N-1}\\}$.
+One last-minute definition. Notice that $\omega=\eta^3$ is a primitive $N$-th root of unity. Let $H = \{1, \omega, \omega^2, \dots, \omega^{N-1}\}$.
 
 Define $S_{\sigma 1}$ to be the interpolation at $H$ of  
-$$\\{\eta^{3k + l}: (i,0) \in I, \sigma((i,0)) = (k,l)\\},$$  
+$$\{\eta^{3k + l}: (i,0) \in I, \sigma((i,0)) = (k,l)\},$$  
 Similarly define $S_{\sigma 2}$ and $S_{\sigma 3}$ to be the interpolation at $H$ of the sets of values  
-$$\\{\eta^{3k + l}: (i,1) \in I, \sigma((i,1)) = (k,l)\\},$$  
-$$\\{\eta^{3k + l}: (i,2) \in I, \sigma((i,2)) = (k,l)\\},$$  
+$$\{\eta^{3k + l}: (i,1) \in I, \sigma((i,1)) = (k,l)\},$$  
+$$\{\eta^{3k + l}: (i,2) \in I, \sigma((i,2)) = (k,l)\},$$  
 These will be useful during the protocol to work with such polynomials $Z$ and the above equations.
 
 #### A more compact form
 
 The last fact is equivalent to the following. There's no new idea here, just a more compact form of the same thing that allows the polynomial $Z$ to be of degree at most $N$.
 
-_Fact:_ Let $\omega$ be a $N$-th root of unity. Let $H = \\{1, \omega, \omega^2, \dots, \omega^{N-1}\\}$. Let $k_1$ and $k_2$ be two field elements such that $\omega^i \neq \omega^jk_1 \neq \omega^l k_2$ for all $i,j,l$. Let $\beta$ and $\gamma$ be random field elements. Let $f$ and $g$ be the polynomials that interpolate, respectively, the following values at $H$:  
-$$\\{(T_{0,j} + \omega^{i} \beta + \gamma) (T_{1,j} + \omega^{i} k_1 \beta + \gamma) (T_{2,j} + \omega^{i} k_2\beta + \gamma): 0\leq i<N\\},$$  
+_Fact:_ Let $\omega$ be a $N$-th root of unity. Let $H = \{1, \omega, \omega^2, \dots, \omega^{N-1}\}$. Let $k_1$ and $k_2$ be two field elements such that $\omega^i \neq \omega^jk_1 \neq \omega^l k_2$ for all $i,j,l$. Let $\beta$ and $\gamma$ be random field elements. Let $f$ and $g$ be the polynomials that interpolate, respectively, the following values at $H$:  
+$$\{(T_{0,j} + \omega^{i} \beta + \gamma) (T_{1,j} + \omega^{i} k_1 \beta + \gamma) (T_{2,j} + \omega^{i} k_2\beta + \gamma): 0\leq i<N\},$$  
 and  
-$$\\{(T_{0,j} + S_{\sigma1}(\omega^i)\beta + \gamma)(T_{0,j} + S_{\sigma2}(\omega^i)\beta + \gamma)(T_{0,j} + S_{\sigma3}(\omega^i)\beta + \gamma): 0\leq i<N\\},$$  
+$$\{(T_{0,j} + S_{\sigma1}(\omega^i)\beta + \gamma)(T_{0,j} + S_{\sigma2}(\omega^i)\beta + \gamma)(T_{0,j} + S_{\sigma3}(\omega^i)\beta + \gamma): 0\leq i<N\},$$  
 Suppose there exists a polynomial $Z$ such that  
 $$Z(\omega^0) = 1$$  
 $$Z(d)f(d) = g(d)Z(\omega d),$$  
 for all $h\in D$.  
-Then the sets $A = \\{((i,j), T_{i,j}): (i,j) \in I\\}$ and $B = \\{(\sigma((i,j)), T_{i,j}): (i,j) \in I\\}$ are equal with overwhelming probability.
+Then the sets $A = \{((i,j), T_{i,j}): (i,j) \in I\}$ and $B = \{(\sigma((i,j)), T_{i,j}): (i,j) \in I\}$ are equal with overwhelming probability.
 
 ## Common preprocessed input
 
@@ -455,7 +455,7 @@ Executing the circuit leaves us with matrices $T$ and $PI$, called the trace mat
         1. for all $i$ the following equality holds $$A_i Q_{Li} + B_i Q_{Ri} + A_i B_i Q_{Mi} + C_i Q_{Oi} + Q_{Ci} + PI_i = 0,$$
         2. for all $i,j,k,l$ such that $V_{i,j} = V_{k,l}$ we have $T_{i,j} = T_{k,l}$, c) $PI_i = 0$ for all $i>n$.
 
-Then we constructed polynomials $q_L, q_R, q_M, q_O, q_C, S_{\sigma1},S_{\sigma2}, S_{\sigma3}$, $f$, $g$ from the matrices $Q$ and $V$. They result from interpolating at a domain $H = \\{1, \omega, \omega^2, \dots, \omega^{N-1}\\}$ for some $N$-th primitive root of unity and a few random values. We also constructed polynomials $a,b,c, pi$ from the matrices $T$ and $PI$. The above fact can be reformulated in terms of polynomial equations as follows.
+Then we constructed polynomials $q_L, q_R, q_M, q_O, q_C, S_{\sigma1},S_{\sigma2}, S_{\sigma3}$, $f$, $g$ from the matrices $Q$ and $V$. They result from interpolating at a domain $H = \{1, \omega, \omega^2, \dots, \omega^{N-1}\}$ for some $N$-th primitive root of unity and a few random values. We also constructed polynomials $a,b,c, pi$ from the matrices $T$ and $PI$. The above fact can be reformulated in terms of polynomial equations as follows.
 
 **Fact:** Let $z_H = X^N - 1$. Let $T$ be a $N \times 3$ matrix with columns $A, B, C$ and $PI$ a $N \times 1$ matrix. They correspond to a valid execution instance with public input given by $PI$ if and only if
 
@@ -470,9 +470,9 @@ Finally, both conditions (a) and (b) are equivalent to a single equation (c) if 
         3. Let $\alpha$ be a random field element. There is a polynomial $t$ such that  
 $$  
 \begin{aligned}  
-z_H t &= a q_L + b q_R + a b q_M + c q_O + q_C + pi \newline  
-&= \alpha(gz' - fz) \newline  
-&= \alpha^2(z-1)L_1 \newline  
+z_H t &= a q_L + b q_R + a b q_M + c q_O + q_C + pi \\  
+&= \alpha(gz' - fz) \\  
+&= \alpha^2(z-1)L_1 \\  
 \end{aligned}  
 $$
 
@@ -506,7 +506,7 @@ As you will see in the protocol, the prover reveals the value taken by a bunch o
 
 Let's take, for example, the polynomial $a$ the prover constructs. This results from interpolating the first column of the trace matrix $T$ at the domain $H$.  
 This matrix has all of the left operands of all the gates. The prover wishes to keep them secret.  
-Say the trace matrix $T$ has $N$ rows, and so $H$ is $\\{1, \omega,\omega^2, \dots, \omega^{N-1} \\}$. The invariant that the prover cannot violate is that $a_{\text{blinded}}(\omega^i)$ must take the value $T_{0, i}$, for all $i$. This is what the interpolation polynomial $a$ satisfies and is the unique such polynomial of degree at most $N-1$ with such property. But for higher degrees, there are many such polynomials.
+Say the trace matrix $T$ has $N$ rows, and so $H$ is $\{1, \omega,\omega^2, \dots, \omega^{N-1} \}$. The invariant that the prover cannot violate is that $a_{\text{blinded}}(\omega^i)$ must take the value $T_{0, i}$, for all $i$. This is what the interpolation polynomial $a$ satisfies and is the unique such polynomial of degree at most $N-1$ with such property. But for higher degrees, there are many such polynomials.
 
 The _blinding_ process takes $a$ and a desired degree $M\geq N$ and produces a new polynomial $a_{\text{blinded}}$ of degree exactly $M$. This new polynomial satisfies that $a_{\text{blinded}}(\omega^i) = a(\omega^i)$ for all $i$. But outside $H$ differs from $a$.
 
@@ -536,7 +536,7 @@ $$\left[ q_L \right] , \left[ q_R \right] , \left[ q_M \right] , \left[ q_O \rig
 
 ## Proving algorithm
 
-Next, we describe the proving algorithm for a program of size $N$, that includes public input. Let $\omega$ be a primitive $N$-th root of unity. Let $H = \\{1, \omega, \omega^2, \dots, \omega^{N-1} \\}$. Define $Z_H := X^N - 1$.
+Next, we describe the proving algorithm for a program of size $N$, that includes public input. Let $\omega$ be a primitive $N$-th root of unity. Let $H = \{1, \omega, \omega^2, \dots, \omega^{N-1} \}$. Define $Z_H := X^N - 1$.
 
 Assume the eight polynomials of common preprocessed input are already given.
 
@@ -585,8 +585,8 @@ Let
 
 $$  
 \begin{aligned}  
-p_1 &= aq_L + bq_R + abq_M + cq_O + q_C + pi \newline  
-p_2 &= (a + \beta X + \gamma)(b + \beta k_1 X + \gamma)(c + \beta k_2 X + \gamma)z - (a + \beta S_{\sigma1} + \gamma)(b + \beta S_{\sigma2} + \gamma)(c + \beta S_{\sigma3} + \gamma)z(\omega X)\newline  
+p_1 &= aq_L + bq_R + abq_M + cq_O + q_C + pi \\  
+p_2 &= (a + \beta X + \gamma)(b + \beta k_1 X + \gamma)(c + \beta k_2 X + \gamma)z - (a + \beta S_{\sigma1} + \gamma)(b + \beta S_{\sigma2} + \gamma)(c + \beta S_{\sigma3} + \gamma)z(\omega X)\\  
 p_3 &= (z - 1)L_1  
 \end{aligned}  
 $$
@@ -597,8 +597,8 @@ Sample random $b_{10}, b_{11}$ and define
 
 $$  
 \begin{aligned}  
-t_{lo} &= t_{lo}' + b_{10}X^{N+2} \newline  
-t_{mid} &= t_{mid}' - b_{10} + b_{11}X^{N+2} \newline  
+t_{lo} &= t_{lo}' + b_{10}X^{N+2} \\  
+t_{mid} &= t_{mid}' - b_{10} + b_{11}X^{N+2} \\  
 t_{hi} &= t_{hi}' - b_{11}  
 \end{aligned}  
 $$
@@ -619,8 +619,8 @@ Let
 
 $$  
 \begin{aligned}  
-\hat p_{nc1} &= \bar aq_L + \bar bq_R + \bar a\bar bq_M + \bar cq_O + q_C \newline  
-\hat p_{nc2} &=(\bar a + \beta\zeta + \gamma)(\bar b + \beta k_1\zeta + \gamma)(\bar c + \beta k_2\zeta + \gamma)z - (\bar a + \beta \bar s_{\sigma1} + \gamma)(\bar b + \beta \bar s_{\sigma2} + \gamma)\beta \bar z_\omega S_{\sigma3} \newline  
+\hat p_{nc1} &= \bar aq_L + \bar bq_R + \bar a\bar bq_M + \bar cq_O + q_C \\  
+\hat p_{nc2} &=(\bar a + \beta\zeta + \gamma)(\bar b + \beta k_1\zeta + \gamma)(\bar c + \beta k_2\zeta + \gamma)z - (\bar a + \beta \bar s_{\sigma1} + \gamma)(\bar b + \beta \bar s_{\sigma2} + \gamma)\beta \bar z_\omega S_{\sigma3} \\  
 \hat p_{nc3} &= L_1(\zeta) z  
 \end{aligned}  
 $$
@@ -629,7 +629,7 @@ Define
 
 $$  
 \begin{aligned}  
-p_{nc} &= p_{nc1} + \alpha p_{nc2} + \alpha^2 p_{nc3} \newline  
+p_{nc} &= p_{nc1} + \alpha p_{nc2} + \alpha^2 p_{nc3} \\  
 t_{\text{partial}} &= t_{lo} + \zeta^{N+2}t_{mid} + \zeta^{2(N+2)}t_{hi}  
 \end{aligned}  
 $$
@@ -694,8 +694,8 @@ For $[p_{nc}]$, first compute
 
 $$  
 \begin{aligned}  
-\left[\hat p_{nc1}\right] &= \bar a[q_L] + \bar b[q_R] + (\bar a\bar b)[q_M] + \bar c[q_O] + [q_C] \newline  
-[\hat p_{nc2}] &= (\bar a + \beta\zeta + \gamma)(\bar b + \beta k_1\zeta + \gamma)(\bar c + \beta k_2\zeta + \gamma)[z] - (\bar a + \beta \bar s_{\sigma1} + \gamma)(\bar b + \beta \bar s_{\sigma2} + \gamma)\beta \bar z_\omega [S_{\sigma3}] \newline  
+\left[\hat p_{nc1}\right] &= \bar a[q_L] + \bar b[q_R] + (\bar a\bar b)[q_M] + \bar c[q_O] + [q_C] \\  
+[\hat p_{nc2}] &= (\bar a + \beta\zeta + \gamma)(\bar b + \beta k_1\zeta + \gamma)(\bar c + \beta k_2\zeta + \gamma)[z] - (\bar a + \beta \bar s_{\sigma1} + \gamma)(\bar b + \beta \bar s_{\sigma2} + \gamma)\beta \bar z_\omega [S_{\sigma3}] \\  
 [\hat p_{nc3}] &= L_1(\zeta)[z]  
 \end{aligned}  
 $$

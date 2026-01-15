@@ -255,9 +255,9 @@ First, the verifier sends the prover two random field elements $z, \alpha \in \m
 secondly, using these challenges, the prover constructs an auxiliary column $p$, which is added to the main trace table. This column is computed as:
 
 $$ \begin{align} p_0 &= \frac {z - (a_0 + \alpha v_0)} {z - (a'_0 + \alpha v'_0)},  
-\ \newline  
+\ \\  
 p_1 &= \frac {z - (a_0 + \alpha v_0)} {z - (a'_0 + \alpha v'_0)} \cdot \frac {z - (a_1 + \alpha v_1)} {z - (a'_1 + \alpha v'_1)} = p_0 \cdot \frac {z - (a_1 + \alpha v_1)} {z - (a'_1 + \alpha v'_1)},  
-\ \newline  
+\ \\  
 p_2 &= p_1 \cdot \frac {z - (a_2 + \alpha v_2)} {z - (a'_2 + \alpha v'_2)}. \end{align}$$
 
 Continuing with this procedure we get:

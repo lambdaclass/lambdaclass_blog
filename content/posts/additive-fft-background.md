@@ -41,7 +41,7 @@ where $a_i \in F_q$ (in this discussion, assume $p$ is a prime number and $q = p
 
 Whenever we have a linearized polynomial $L$, the set of its roots (zeros) _forms a vector space over $\mathbb{F_q}$_ (called Kernel):
 
-$$Ker(L) = \\{v \in \mathbb{F_{ q^n }} : L(v) = 0 \\}\subset \mathbb{F_{ q^n }}$$
+$$Ker(L) = \{v \in \mathbb{F_{ q^n }} : L(v) = 0 \}\subset \mathbb{F_{ q^n }}$$
 
 fact that stems from the general theory of linear algebra; this means that linear combinations of roots are still roots of $L$. Lastly, the very form (along with the linearity just discussed) of linearized polynomials offers a very neat property: composition of linearized polynomials is again linearized. _This is the backbone of Cantor's description of towers of fields in positive characteristic_.
 
@@ -96,7 +96,7 @@ Building upon these generators, Cantor then defines basis elements $y_m$ accordi
 
 $$m = m_k 2^k + m_{ k - 1} 2^{ k - 1} + \cdots + m_0 2^0$$
 
-where $m_i \in \\{0 , 1 \\}$ are the bits of $m$, then:
+where $m_i \in \{0 , 1 \}$ are the bits of $m$, then:
 
 $$y_m = u_0^{ m_0 } u_1^{ m_1 } \cdots u_k^{ m_k }.$$
 
@@ -188,7 +188,7 @@ Here we collect some of their the main properties as an itemized list; most of t
 
 (This property stems from characterization of the field of $q$ elements as the [splitting field](https://en.wikipedia.org/wiki/Splitting_field) of the polynomial $X^{q} - X$.) Since $L$ is a linear map, then the set of its roots **forms a vector space over $\mathbb{F_q}$** :
 
-$$Ker(L) = \\{v\in\mathbb{F_{ q^n }} : L(v) = 0 \\} \subset \mathbb{F_{ q^n }}$$
+$$Ker(L) = \{v\in\mathbb{F_{ q^n }} : L(v) = 0 \} \subset \mathbb{F_{ q^n }}$$
 
         * **The uncanny effects of composition:** Usually, composition of polynomials produces a new polynomial and not much else can be said in the general setting. But since linearized polynomials can be seen as linear maps, there are some astonishing consequences:
 
@@ -238,17 +238,17 @@ $$y_m = \textbf{u}^{ E(m) } = u_0^{ m_0 }\cdot u_1^{ m_1 }\cdot u_k^{ m_k }$$
 and observe that in particular  
 $$y_{ p^r } = u_r$$
 
-It turns out that the collection $\\{y_0, y_1, \ldots \\}$ has _very nice_ properties, that come summarized in the following theorem
+It turns out that the collection $\{y_0, y_1, \ldots \}$ has _very nice_ properties, that come summarized in the following theorem
 
 **Theorem(Cantor's 1.11 Theorem):** In the same context as the conversation above  
-1\. $\\{y_0 , y_1 ,\ldots y_m \\}$ is a basis for $W_{ m + 1}$ and $y_m \in W_{ m + 1} - W_m$.  
+1\. $\{y_0 , y_1 ,\ldots y_m \}$ is a basis for $W_{ m + 1}$ and $y_m \in W_{ m + 1} - W_m$.  
 2\. When $m\geq 1$, then  
 $$S(y_m ) - \gamma_m y_{ m - 1} \in W_{ m - 1}$$  
-3\. the full collection $\\{y_0 , y_1 , \ldots \\}$ is a basis for $\tilde{F}$.
+3\. the full collection $\{y_0 , y_1 , \ldots \}$ is a basis for $\tilde{F}$.
 
 This specific basis is important for theoretical purposes, but it also may be convenient to consider basis for $W_m$ with nice properties respect to $S$; we have already encountered one such, the one defined by the $u$'s. Set
 
-$$\mathcal{U_m} = \\{u_0 ,u_1 ,\ldots, u_{ m - 1} \\}$$
+$$\mathcal{U_m} = \{u_0 ,u_1 ,\ldots, u_{ m - 1} \}$$
 
 as a basis for $W_m$. Now for each $x\in W_m$ there exist unique $\alpha_i \in\mathbb{F_p}$ such that
 

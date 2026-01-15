@@ -48,31 +48,31 @@ Reed-Solomon codes work by interpreting the message as the coefficients of a deg
 
 [Basefold](https://www.youtube.com/watch?v=OuKUqPbHLQ0) works with foldable linear codes. Remember that we can represent linear codes via the generator matrix, $G$. The generator matrix, $G_{k , n}$ of the foldable linear $(n, k, d )$ - code has the following block matrix structure:  
 $$G_{k,n} = \begin{bmatrix}  
-G_{k/2,n/2} & G_{k/2,n/2} \newline  
+G_{k/2,n/2} & G_{k/2,n/2} \\  
 G_{k/2,n/2} T_{k/2,n/2} & G_{k/2,n/2}T^\prime_{k/2,n/2}  
 \end{bmatrix}$$  
 where $G_{k/2,n/2}$ is the generator matrix of the foldable linear $[n/2, k/2, d^\prime ]_\Sigma$-code.
 
-For example, Reed-Solomon codes satisfy this property, when instantiated over a multiplicative subgroup of size $n = 2^m$ (we also assume that $\rho = 2^{- \beta}$). If we choose a generator $g$ of the subgroup and represent the points as $\\{ 1, g, g^2 , ... g^{m - 1} \\}$, we have  
+For example, Reed-Solomon codes satisfy this property, when instantiated over a multiplicative subgroup of size $n = 2^m$ (we also assume that $\rho = 2^{- \beta}$). If we choose a generator $g$ of the subgroup and represent the points as $\{ 1, g, g^2 , ... g^{m - 1} \}$, we have  
 $$G_{k,n} = \begin{bmatrix}  
-1 & 1 & 1 & 1 & \dots & 1 \newline  
-1 & g & g^2 & g^3 & \dots & g^{m - 1} \newline  
-1 & g^2 & g^4 & g^6 & \dots & g^{2(m - 1)} \newline  
-1 & g^3 & g^6 & g^9 & \dots & g^{3(m - 1)} \newline  
-\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \newline  
+1 & 1 & 1 & 1 & \dots & 1 \\  
+1 & g & g^2 & g^3 & \dots & g^{m - 1} \\  
+1 & g^2 & g^4 & g^6 & \dots & g^{2(m - 1)} \\  
+1 & g^3 & g^6 & g^9 & \dots & g^{3(m - 1)} \\  
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\  
 1 & g^{k - 1} & g^{2(k - 1)} & g^{3(k - 1)} & \dots & g^{(k - 1) (m - 1)}  
 \end{bmatrix}$$
 
 Let's reorder the matrices rows by placing first all the even-numbered rows, in increasing order, followed by all the odd-numbered rows. We get,  
 $$G_{k,n} = \begin{bmatrix}  
-1 & 1 & 1 & 1 & \dots & 1 \newline  
-1 & g^2 & g^4 & g^6 & \dots & g^{2(m - 1)} \newline  
-1 & g^4 & g^8 & g^{12} & \dots & g^{4(m - 1)} \newline  
-\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \newline  
-1 & g & g^2 & g^3 & \dots & g^{m - 1} \newline  
-1 & g^3 & g^6 & g^9 & \dots & g^{3(m - 1)} \newline  
-1 & g^5 & g^{10} & g^{15} & \dots & g^{15(m - 1)} \newline  
-\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \newline  
+1 & 1 & 1 & 1 & \dots & 1 \\  
+1 & g^2 & g^4 & g^6 & \dots & g^{2(m - 1)} \\  
+1 & g^4 & g^8 & g^{12} & \dots & g^{4(m - 1)} \\  
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\  
+1 & g & g^2 & g^3 & \dots & g^{m - 1} \\  
+1 & g^3 & g^6 & g^9 & \dots & g^{3(m - 1)} \\  
+1 & g^5 & g^{10} & g^{15} & \dots & g^{15(m - 1)} \\  
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\  
 1 & g^{k - 1} & g^{2(k - 1)} & g^{3(k - 1)} & \dots & g^{(k - 1) (m - 1)}  
 \end{bmatrix}$$
 

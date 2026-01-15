@@ -87,7 +87,7 @@ Knowing precisely which subgroups $\mathbb{G_2 }$ and $\mathbb{G_t }$ we should 
 ### What is a pairing?
 
 Let's better understand it now that we have defined everything necessary to build our pairing. A pairing is a bilinear map $e: \mathbb{G_1 } \times \mathbb{G_2 } \to \mathbb{G_t }$. _Bilinear_ means that it has the following property: For all points $P_1, P_2 \in \mathbb{G_1 }$ and $Q_1, Q_2 \in \mathbb{G_2 }$,  
-$$\begin{align} e(P_1, Q_1 + Q_2) &= e(P_1, Q_1) \cdot e(P_1, Q_2) \newline  
+$$\begin{align} e(P_1, Q_1 + Q_2) &= e(P_1, Q_1) \cdot e(P_1, Q_2) \\  
 e(P_1 + P_2, Q_1) &= e(P_1, Q_1) \cdot e(P_2, Q_1)\end{align}$$ And from this property, it can be deduced the next one: For all $n, m \in \mathbb{N}$,  
 $$e(nP, mQ) = e(mQ, nP) = e(P, mQ)^n = e(nP, Q)^m = e(P, Q)^{nm}.$$ Recall that in general, the additive notation $+$ is used to denote the operation of the groups $\mathbb{G_1 }$ and $\mathbb{G_2 }$, and multiplicative notation $\cdot$ is used to denote the operation of $\mathbb{G_t }$.
 
@@ -127,7 +127,7 @@ We will use the algorithm of the Ate pairing from [this paper](https://eprint.ia
 
 where:
 
-        * The number `MILLER_CONSTANT` $=6x + 2$ with $x$ as the curve parameter we mentioned before. However, we need a particular representation of this number using powers of 2 and the coefficients $\\{- 1, 0, 1 \\}$. This representation is similar to a [NAF representation](https://en.wikipedia.org/wiki/Non-adjacent_form#:~:text=The%20non%2Dadjacent%20form%20\(NAF,8%20%E2%88%92%202%20%2B%201%20%3D%207\)), although it isn't a NAF because it has non-zero values adjacent.
+        * The number `MILLER_CONSTANT` $=6x + 2$ with $x$ as the curve parameter we mentioned before. However, we need a particular representation of this number using powers of 2 and the coefficients $\{- 1, 0, 1 \}$. This representation is similar to a [NAF representation](https://en.wikipedia.org/wiki/Non-adjacent_form#:~:text=The%20non%2Dadjacent%20form%20\(NAF,8%20%E2%88%92%202%20%2B%201%20%3D%207\)), although it isn't a NAF because it has non-zero values adjacent.
               
               // MILLER_CONSTANT = 6x + 2 = 29793968203157093288 =
               // 2^3 + 2^5 - 2^7 + 2^10 - 2^11 + 2^14 + 2^17 + 2^18 - 2^20 + 2^23 
@@ -279,7 +279,7 @@ Finally, let's see how to implement the Frobenius morphisms $\pi_p$, $\pi_p^2$, 
 You may remember that we have already implemented a Frobenius morphism $\varphi$. Although they have the same name, there is a slight difference between $\varphi$ and $\pi_p$: The function $\pi_p$ raises elements of $\mathbb{F_{ p^{12} }}$ to the power $p$, while $\varphi$ raises the coordinates of the twisted curve points to the power $p$. In other words, $\pi_p : \mathbb{F_{ p^{12} }} \to \mathbb{F_{ p^{12} }}$ while $\varphi : E'(\mathbb{F_{ p^2 }}) \to E'(\mathbb{F_{ p^2 }})$. That is why their implementations are not exactly the same.
 
 To implement these morphisms we need to define for all $j = 1, \ldots 5$, the constants $$\begin{align}\gamma_{ 1 , j } &= (9 + u)^{ \frac{ j ( p - 1) }{6}} \  
-\gamma_{2,j} &= \gamma_{1,j} \cdot \overline{\gamma_{1,j}} \newline  
+\gamma_{2,j} &= \gamma_{1,j} \cdot \overline{\gamma_{1,j}} \\  
 \gamma_{3,j} &= \gamma_{1,j} \cdot \gamma_{2,j}\end{align}$$
     
     pub const GAMMA_11: Fp2E = Fp2E::const_from_raw([

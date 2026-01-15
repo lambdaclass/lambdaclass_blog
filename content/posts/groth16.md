@@ -92,9 +92,8 @@ Also, since the prover does not have $\alpha$ and $\beta$, he needs to be suppli
 $K_i^v = \gamma^{- 1} (C_{i} (\tau) + \beta A_i (\tau) + \alpha B_i (\tau)) g_1$  
 for $i = 0, 1, 2 ... , k$. For the witness, we have  
 $K_i^p = \delta^{- 1} (C_{i} (\tau) + \beta A_i (\tau) + \alpha B_i (\tau)) g_1$  
-With these new parameters, we get  
-$\begin{equation}\left( \alpha + \sum_j A_{j} (x) z_j \right) \left( \beta + \sum_j B_{j} (x) z_j \right) = \ \alpha \beta + \gamma \left( \sum_i^k \gamma^{- 1} (C_{i} (x) + \beta A_i (x) + \alpha B_i (x)) x_i \right) + \  
-\delta \left( \sum_{j = k + 1}^n \delta^{- 1} (C_{i} (x) + \beta A_i (x) + \alpha B_i (x)) x_i \right) + h(x)Z_D (x) \end{equation}$  
+With these new parameters, we get
+$$\left( \alpha + \sum_j A_{j} (x) z_j \right) \left( \beta + \sum_j B_{j} (x) z_j \right) = \alpha \beta + \gamma \left( \sum_i^k \gamma^{- 1} (C_{i} (x) + \beta A_i (x) + \alpha B_i (x)) x_i \right) + \delta \left( \sum_{j = k + 1}^n \delta^{- 1} (C_{i} (x) + \beta A_i (x) + \alpha B_i (x)) x_i \right) + h(x)Z_D (x)$$  
 We can combine the last two terms into one (since they contain all the information that the verifier must not learn)  
 $D = \left( \sum_{j = k + 1}^n \delta^{- 1} (C_{i} (x) + \beta A_i (x) + \alpha B_i (x)) x_i \right) + h(x)Z_D (x)\delta^{- 1}$
 

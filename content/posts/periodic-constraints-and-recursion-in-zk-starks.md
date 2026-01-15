@@ -37,7 +37,7 @@ $a_3-a_2-a_1=0$
 
 $a_4-a_3-a_2=0$
 
-and so on. We can convert the trace elements into polynomials by interpolating over a suitable domain. To make things easier, we choose the $n$-th roots of unity, which enables us to perform interpolation via the fast Fourier transform. The roots are spanned by one element (a generator, $g$): by taking its powers, we get all the $n$-th roots of unity, $\left\\{1,g,g^2,g^3,...,g^{n-1}\right\\}$.Let us call $t(x)$ the polynomial interpolating the trace, that is, the polynomial taking the following values:
+and so on. We can convert the trace elements into polynomials by interpolating over a suitable domain. To make things easier, we choose the $n$-th roots of unity, which enables us to perform interpolation via the fast Fourier transform. The roots are spanned by one element (a generator, $g$): by taking its powers, we get all the $n$-th roots of unity, $\left\{1,g,g^2,g^3,...,g^{n-1}\right\}$.Let us call $t(x)$ the polynomial interpolating the trace, that is, the polynomial taking the following values:
 
 $t(1)=a_0$
 
@@ -67,7 +67,7 @@ $$Q(x)=\frac{p(x)}{x-x_0} $$
 
 is a polynomial. Instead of showing that $Q(x)$ is a polynomial, the STARK IOP proves that it is close to a low-degree polynomial.
 
-In the case of the Fibonacci sequence, the constraint is valid for $x_0 \in \left\\{1,g,g^2,...g^{n-3} \right\\}$. Given that it is divisible by each factor, it is divisible by the product of all of them,
+In the case of the Fibonacci sequence, the constraint is valid for $x_0 \in \left\{1,g,g^2,...g^{n-3} \right\}$. Given that it is divisible by each factor, it is divisible by the product of all of them,
 
 $Z_D(x)=\prod_{0}^{n-3} (x-g^k)$
 
@@ -89,7 +89,7 @@ To fix ideas, suppose that we have a transition constraint of the form
 
 $f(x,gx,...g^d x)=0$
 
-Our Fibonacci sequence fits this form. We will now consider that it applies every four steps; that is, the constraint is enforced at $x_0 \in \left\\{1, g^4, g^8, g^{12},...\right\\}$
+Our Fibonacci sequence fits this form. We will now consider that it applies every four steps; that is, the constraint is enforced at $x_0 \in \left\{1, g^4, g^8, g^{12},...\right\}$
 
 The vanishing polynomial looks like
 
@@ -105,7 +105,7 @@ $f_1(x,g x)=0$
 
 $f_2(x, g x)=0$. 
 
-Constraint 2 is enforced every four steps, and constraint 1 is enforced every two (but not where constraint 2 is valid). To make it clear, constraint 2 is valid at $x_0 \in \left\\{1,g^4,g^8,g^{12},...\right\\}$ and constraint 1 is valid at $\left\\{g^2, g^6, g^{10},... \right\\}$. The vanishing polynomial for constraint 2 is
+Constraint 2 is enforced every four steps, and constraint 1 is enforced every two (but not where constraint 2 is valid). To make it clear, constraint 2 is valid at $x_0 \in \left\{1,g^4,g^8,g^{12},...\right\}$ and constraint 1 is valid at $\left\{g^2, g^6, g^{10},... \right\}$. The vanishing polynomial for constraint 2 is
 
 $Z_{D,2}(x)=\prod (x-g^{4k})$
 
@@ -125,7 +125,7 @@ From here, we can remove some points where the constraint is not enforced. For e
 
 $$Z_{D,1}(x)=\frac{x^{n/2}-1}{(x^{n/4}-1)(x-g^6)} $$
 
-If we added a constraint $f_3(x,gx)$ that is enforced on steps $\left\\{32,64,92,... \right\\}$, we would have 3 vanishing polynomials,
+If we added a constraint $f_3(x,gx)$ that is enforced on steps $\left\{32,64,92,... \right\}$, we would have 3 vanishing polynomials,
 
 $$Z_{D,3}=\frac{x^{n/32}-1}{x-1} $$
 

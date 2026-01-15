@@ -106,14 +106,14 @@ should be a polynomial. We can transform it into a more suitable form (so that a
 $$L_1 (x) (z_1 (x) - 1)$$
         3. The permutation argument's constraints  
 $$\begin{align}  
-(\gamma + \beta x + a (x) )(\gamma + k_1 \beta x + b (x) )(\gamma + k_2 \beta (x) + c (x) )z_1 (x) &\- \newline  
+(\gamma + \beta x + a (x) )(\gamma + k_1 \beta x + b (x) )(\gamma + k_2 \beta (x) + c (x) )z_1 (x) &\- \\  
 (\gamma + \beta S_{\sigma 1} (x) + a (x) )(\gamma + k_1 \beta S_{\sigma 2} (x) + b (x) )(\gamma + k_2 \beta S_{\sigma 3} (x) + c (x) )z_1 (g x)  
 \end{align}$$
         4. Enforcing the lookup gates,  
 $q_{lu} (x) ( a(x) + \zeta b(x) + \zeta^2 c(x) - f (x) )$
         5. The product check for the Plookup polynomial  
 $$\begin{align}  
-(1 + \beta')(\gamma' + f(x) )(\gamma'(1 + \beta') + t(x) + \beta' t(g x)) z_2 (x) &\- \newline  
+(1 + \beta')(\gamma' + f(x) )(\gamma'(1 + \beta') + t(x) + \beta' t(g x)) z_2 (x) &\- \\  
 (\gamma' (1 + \beta' ) + h_{1} (x) + \beta' h_{2} (x) )(\gamma' (1 + \beta' ) + h_{2} (x) + \beta' h_1 (gx) )z_2 (g x)  
 \end{align}$$
         6. The Plookup polynomial should be equal to one at the first point,  

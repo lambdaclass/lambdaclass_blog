@@ -54,7 +54,7 @@ $f_1(1)=x_{1,1}$
 $\vdots$  
 $f_1(T)=x_{1,T}$
 
-To make things easier and faster, we will use as trace evaluation domain a multiplicative subgroup, $\mathbb{Z_p}^\star$ of size $2^n$, such that $2^n \geq T$. That group has a generator, $\omega$, which spans all elements in the subgroup. The subgroup can be represented by the powers of $\omega$, $\\{ 1, \omega , \omega^2 , \omega^3 ,..., \omega^N \\}$. Our trace polynomial satisfies then  
+To make things easier and faster, we will use as trace evaluation domain a multiplicative subgroup, $\mathbb{Z_p}^\star$ of size $2^n$, such that $2^n \geq T$. That group has a generator, $\omega$, which spans all elements in the subgroup. The subgroup can be represented by the powers of $\omega$, $\{ 1, \omega , \omega^2 , \omega^3 ,..., \omega^N \}$. Our trace polynomial satisfies then  
 $f_1(1)=x_{1,0}$  
 $f_1(\omega)=x_{1,1}$  
 $\vdots$  
@@ -105,7 +105,7 @@ Given that proving that $CP(x)$ is a polynomial is difficult, we will show that 
 ## Committing to the trace
 
 We need to evaluate the trace polynomials over a much larger domain; the domain size is $\beta 2^n$, where $\beta$ is the blowup factor. To avoid problems, we shift the domain by multiplying the elements by $h$, which belongs to the coset. The low-degree extension domain (simply domain) is given by  
-$$D = \\{ h, h \eta , h \eta^2 , ... , h \eta^{ 2^n -1} \\} $$  
+$$D = \{ h, h \eta , h \eta^2 , ... , h \eta^{ 2^n -1} \} $$  
 Here $\eta$ is the generator of the subgroup of order $\beta 2^n$ so that it does not get confused with $\omega$ (though we could relate them by taking $\omega=\eta^\beta$).  
 We evaluate the trace polynomials over this large domain and obtain vectors representing each evaluation:  
 $$[ f_1 (h) , f_1 (h \eta) ,... , f_1 (h \eta^{ 2^n -1} )]$$  
@@ -116,7 +116,7 @@ To commit to these evaluations, we build Merkle trees, and the prover sends the 
 
 ## Committing to the composition polynomial
 
-We use the same domain $$D = \\{ h, h \eta , h \eta^2 , ... , h \eta^{ 2^n -1} \\} $$ to evaluate the composition polynomial. We can then create a Merkle tree from these evaluations and send the root to the verifier.
+We use the same domain $$D = \{ h, h \eta , h \eta^2 , ... , h \eta^{ 2^n -1} \} $$ to evaluate the composition polynomial. We can then create a Merkle tree from these evaluations and send the root to the verifier.
 
 ## Relating the LDE of execution trace and the composition polynomial
 
@@ -145,12 +145,12 @@ so that
 $$CP(x)=g(x^2)+x h(x^2)$$  
 The verifier chooses a random value $\alpha_0$, and the prover forms the polynomial,  
 $P_1(x)=g(x^2)+\alpha_0 h(x^2)$  
-with the new domain $D_1 = \\{ h^2 , h^2 \eta^2 , ... , h^2 \eta^m \\}$ having half the size of $D$.
+with the new domain $D_1 = \{ h^2 , h^2 \eta^2 , ... , h^2 \eta^m \}$ having half the size of $D$.
 
 The prover can perform the low-degree extension by evaluating $P_1(x)$ over $D_1$ and then commit to it by creating a Merkle tree and sending the root. He can continue with the procedure by halving the degree at each step. For step $k$, we have  
 $$P_k(y^2)=\frac{P_{k-1}(y)+P_{k-1}(-y)}{2}+\alpha_{k-1}\left(\frac{P_{k-1}(y)-P_{k-1}(-y)}{2}\right)$$  
 and  
-$$D_k = \\{ h^{ 2^{k-1} } , (h \eta)^{ 2^{k-1} } , ... ,( \eta^l h)^{ 2^{k-1} } \\}$$  
+$$D_k = \{ h^{ 2^{k-1} } , (h \eta)^{ 2^{k-1} } , ... ,( \eta^l h)^{ 2^{k-1} } \}$$  
 The prover evaluates $P_k(x)$ over $D_k$ and commits to it, sending the Merkle root.
 
 ### Decommitment
@@ -167,7 +167,7 @@ $$u_{k+1}=P_{k+1}(z^2)$$
 
 ## A toy example for FRI
 
-We will use a simple example to understand how everything works on FRI. We choose $p=17$, whose multiplicative group has order $16=2^4$ and set $\eta=3$, which is a primitive root of unity (that is, $3^{16}=1$ and $3^k \neq 1$ for $0 <k<16$). Our composition polynomial is $P_0 (x) = x^3 + x^2 + 1$. The domain for the LDE is simply $ D_0 = \mathbb{Z_{17}}^\star = \\{1 , 2 , 3 , 4 , 5 , 6 , ... , 16 \\}$. The following table contains the LDE of $P_0(x)$:
+We will use a simple example to understand how everything works on FRI. We choose $p=17$, whose multiplicative group has order $16=2^4$ and set $\eta=3$, which is a primitive root of unity (that is, $3^{16}=1$ and $3^k \neq 1$ for $0 <k<16$). Our composition polynomial is $P_0 (x) = x^3 + x^2 + 1$. The domain for the LDE is simply $ D_0 = \mathbb{Z_{17}}^\star = \{1 , 2 , 3 , 4 , 5 , 6 , ... , 16 \}$. The following table contains the LDE of $P_0(x)$:
 
 Index | $x$ | $P_0(x)$ | Index | $x$ | $P_0(x)$  
 ---|---|---|---|---|---  
@@ -198,7 +198,7 @@ Index | $y$ | $P_1(y)$ | Index | $y$ | $P_1(y)$
   
 The verifier samples $\beta_1=2$ and the prover folds $P_1(y)$ to get $P_2(z)$,  
 $P_2(z)=1+4\beta_1=9$  
-which is a constant polynomial. The domain $D_2 = \\{ 1 , 13 , 16 , 4 \\}$. All the elements in the LDE evaluate to 9, so there is no need for a table.
+which is a constant polynomial. The domain $D_2 = \{ 1 , 13 , 16 , 4 \}$. All the elements in the LDE evaluate to 9, so there is no need for a table.
 
 The evaluations of the polynomials $P_0(x)$, $P_1(x)$, and $P_2(x)$ are each committed using a Merkle tree and sent to the verifier.
 

@@ -87,7 +87,7 @@ $$
 where we can rewrite the evaluation as a sum:
 
 $$  
-p(w) = \sum_{x \in \\{0, 1\\}^\ell} \mathrm{eq}(w, x) p(x).  
+p(w) = \sum_{x \in \{0, 1\}^\ell} \mathrm{eq}(w, x) p(x).  
 $$
 
 The core insight of this algorithm: **use different strategies for different phases**. Here's the high-level structure:
@@ -149,25 +149,25 @@ The only heavy step is the first one. We want the prover to compute $S_i$ effici
 Recall that the claimed sum we want to prove is:
 
 $$  
-\sigma = p(w) = \sum_{x \in \\{0, 1\\}^\ell} \mathrm{eq}(w, x) p(x).  
+\sigma = p(w) = \sum_{x \in \{0, 1\}^\ell} \mathrm{eq}(w, x) p(x).  
 $$
 
 Then, for each round $i$, the prover needs to compute the univariate round polynomial $S_i (u)$ where:
 
 $$  
-S_i(u) = \sum_{x \in \\{0, 1\\}^{ \ell - i}} \mathrm{eq} \bigl(w_{[1, i -1]} ; r_{[1, i - 1]}, u, x\bigr) \cdot p(r_{[1, i - 1]}, u, x).  
+S_i(u) = \sum_{x \in \{0, 1\}^{ \ell - i}} \mathrm{eq} \bigl(w_{[1, i -1]} ; r_{[1, i - 1]}, u, x\bigr) \cdot p(r_{[1, i - 1]}, u, x).  
 $$
 
 Splitting the eq-poly, we can factorize $S_i$ in the following way, with $\ell$ the easy part and $t$ the hard part:
 
 $$  
 \begin{aligned}  
-S_i(u) &= \ell_i(u) t_i(u), \newline  
+S_i(u) &= \ell_i(u) t_i(u), \\  
 \ell_i(u) &=  
 \mathrm{eq}\bigl(w_{[1,i - 1]} ; r_{[1,i - 1]}\bigr)  
-\mathrm{eq}(w_i; u), \newline  
+\mathrm{eq}(w_i; u), \\  
 t_i(u) &=  
-\sum_{x \in \\{0,1 \\}^{\ell - i}}  
+\sum_{x \in \{0,1 \}^{\ell - i}}  
 \mathrm{eq}\bigl(w_{[i+1,\ell]}; x\bigr)  
 p(r_{[1,i - 1]}, u, x).  
 \end{aligned}  
@@ -188,7 +188,7 @@ This gives us the reformulation of $t_i(u)$ in terms of the precomputed accumula
 
 $$  
 t_i(u) =  
-\sum_{v \in \\{0, 1\\}^{i - 1}}  
+\sum_{v \in \{0, 1\}^{i - 1}}  
 L_v(r_{[1, i - 1]}) \cdot  
 \underbrace{  
 \left(  
@@ -212,8 +212,8 @@ A_i(v,u) =
 \left( w_{[(i + 1):\ell_0]}, w_{[(\ell/2 + \ell_0+1):]} \right),  
 (y, x_{\mathrm{out}})  
 \right)  
-\cdot \newline  
-\sum_{x_{\mathrm{in}} \in \\{0 , 1 \\}^{ \ell/2 }}  
+\cdot \\  
+\sum_{x_{\mathrm{in}} \in \{0 , 1 \}^{ \ell/2 }}  
 \mathrm{eq} \left(  
 w_{[(\ell_0+1):(\ell_0+\ell/2)]}, x_{\mathrm{in}}  
 \right)  
@@ -224,11 +224,11 @@ $$
 
 In the paper, we can see that _Procedure 9_ cleverly inverts the loops: instead of iterating by accumulator $A_i(v,u)$, it iterates over the data $(x_{\mathrm{out}}, x_{\mathrm{in}}, \beta)$ and "distributes" each result to the correct $A_i(v,u)$ bin. This is done in two stages:
 
-        1. **Temporal Accumulation** ($\mathrm{tA}[\beta]$): For a fixed $x_{\mathrm{out}}$, the algorithm computes the entire inner sum for every prefix $\beta \in \\{0,1 \\}^{ \ell_0 }$. This loop contains the dominant 𝔰𝔩 operation: `e_in_value * poly_evals[index]`.
+        1. **Temporal Accumulation** ($\mathrm{tA}[\beta]$): For a fixed $x_{\mathrm{out}}$, the algorithm computes the entire inner sum for every prefix $\beta \in \{0,1 \}^{ \ell_0 }$. This loop contains the dominant 𝔰𝔩 operation: `e_in_value * poly_evals[index]`.
 
 $$  
 \mathrm{tA}[\beta] =  
-\sum_{x_{\mathrm{in}} \in \\{0,1\\}^{ \ell/2}}  
+\sum_{x_{\mathrm{in}} \in \{0,1\}^{ \ell/2}}  
 E_{\mathrm{in}}[x_{\mathrm{in}}] \cdot  
 p(\beta, x_{\mathrm{in}}, x_{\mathrm{out}})  
 $$
@@ -280,7 +280,7 @@ First, we have an `Accumulators` struct where we store the values, along with a 
     }
     
 
-Notice that in the code we only compute the accumulators for $u \in \\{0,1 \\}$, even though initially, since $S(u)$ has degree 2, we should have three evaluations: at $0$, $1$, and at $\infty$. We'll explain this later on.
+Notice that in the code we only compute the accumulators for $u \in \{0,1 \}$, even though initially, since $S(u)$ has degree 2, we should have three evaluations: at $0$, $1$, and at $\infty$. We'll explain this later on.
 
 So let's see how we adapt _Procedure 9_ to our specific use case.
     
@@ -303,7 +303,7 @@ We can see in the paper that these are computed as follows:
 $$  
 E_{\text{in}} :=\left(\mathrm{eq} \left(  
 w_{\left[\ell_0 + 1 : (\ell_0 + \ell/2)\right]}, x_{\text{in}}  
-\right) \right) \quad \text{with} \quad { x_{\text{in } } \in \\{0,1 \\}^{ \ell/2 }}  
+\right) \right) \quad \text{with} \quad { x_{\text{in } } \in \{0,1 \}^{ \ell/2 }}  
 $$
 
 $$  
@@ -311,7 +311,7 @@ E_{\text{out},i} := \left( \mathrm{eq} \left(
 \left( w_{\left[(i+1):\ell_0\right]}, w_{\left[(\ell/2+\ell_0+1):\right]} \right),  
 (y, x_{\text{out}})  
 \right)  
-\right)\quad \text{with} \quad {(y, x_{ \text{out} }) \in \\{0, 1\\}^{ \ell_0 } \times \\{0, 1 \\}^{ \ell/2 - \ell_0 }}  
+\right)\quad \text{with} \quad {(y, x_{ \text{out} }) \in \{0, 1\}^{ \ell_0 } \times \{0, 1 \}^{ \ell/2 - \ell_0 }}  
 $$
 
 These values depend only on our challenge $w$, so we can precompute them as follows:
@@ -377,7 +377,7 @@ Now we can run the outer loop, where for each value of $x_{\mathrm{out}}$ we wil
 
 $$  
 \mathrm{tA}(x_{\mathrm{out}}) =  
-\sum_{\beta \in \\{0,1 \\}^{3}}  
+\sum_{\beta \in \{0,1 \}^{3}}  
 E_{\mathrm{in}}[x_{\mathrm{in}}] \cdot p(\beta, x_{\mathrm{in}}, x_{\mathrm{out}})  
 $$
     
@@ -457,7 +457,7 @@ The switchover strategy is critical. SVO is only cheaper for the first few round
 
 $$  
 p^{(3)} (x_4, \dots, x_\ell) =  
-\sum_{b \in \\{0,1 \\}^3} \mathrm{eq}\left((r_1, r_2, r_3), b\right) \cdot p(b, x_4, \dots, x_\ell)  
+\sum_{b \in \{0,1 \}^3} \mathrm{eq}\left((r_1, r_2, r_3), b\right) \cdot p(b, x_4, \dots, x_\ell)  
 $$
 
 The polynomial folding is done in the following line:
@@ -538,7 +538,7 @@ Once we have folded the polynomial, we proceed to use _Algorithm 5_ to execute t
 
 In each round $j$, the prover’s goal is the same as in the first three rounds. We need to:
 
-        * Compute and send the univariate polynomial evaluations $S_j (u)$ for $u \in \\{0,\infty \\}$.
+        * Compute and send the univariate polynomial evaluations $S_j (u)$ for $u \in \{0,\infty \}$.
         * Update variables for the next round.
 
 To do so, we'll continue using the factorization of $S_j$ in:
@@ -551,8 +551,8 @@ where, recall,
 
 $$  
 \begin{align}  
-\ell_j (u) &= \mathrm{eq}(w_{[1, j - 1]} ; r_{[1, j - 1]}) \cdot \mathrm{eq}(w_j; u) \newline  
-t_j (u) &= \sum_{x \in \\{0, 1\\}^{\ell - j}} \mathrm{eq}(w_{[j + 1, \ell]}; x)\cdot p(r_{[1, j - 1]}, u, x)  
+\ell_j (u) &= \mathrm{eq}(w_{[1, j - 1]} ; r_{[1, j - 1]}) \cdot \mathrm{eq}(w_j; u) \\  
+t_j (u) &= \sum_{x \in \{0, 1\}^{\ell - j}} \mathrm{eq}(w_{[j + 1, \ell]}; x)\cdot p(r_{[1, j - 1]}, u, x)  
 \end{align}  
 $$
 
@@ -604,7 +604,7 @@ $$
 t(0) &=  
 \sum_{x_R} \mathrm{eq}(w_{[\ell/2 + 1, \ell]}, x_R)  
 \sum_{x_L} \mathrm{eq}(w_{[j + 1, \ell/2]}, x_L) \cdot  
-p(r_{[1,j - 1]}, 0, x_L, x_R) \newline  
+p(r_{[1,j - 1]}, 0, x_L, x_R) \\  
 t(1) &=  
 \sum_{x_R} \mathrm{eq}(w_{[\ell/2 + 1, \ell]}, x_R)  
 \sum_{x_L} \mathrm{eq}(w_{[j+1, \ell/2]}, x_L) \cdot  
@@ -639,7 +639,7 @@ Similarly, in the case $j \geq \frac{\ell}{2}$, we compute $t_j(0)$ and $t_j(1)$
 
 $$  
 \begin{align}  
-t(0) &= \sum_x \mathrm{eq}(w_{[j + 1, \ell]}, x) \cdot p(r_{[1,j - 1]}, 0, x) \newline  
+t(0) &= \sum_x \mathrm{eq}(w_{[j + 1, \ell]}, x) \cdot p(r_{[1,j - 1]}, 0, x) \\  
 t(1) &= \sum_x \mathrm{eq}(w_{[j + 1, \ell]}, x) \cdot p(r_{[1,j - 1]}, 1, x)  
 \end{align}  
 $$
@@ -662,7 +662,7 @@ Once we have $t_j(0)$ and $t_j(1)$, we compute $\ell_j(0)$ and $\ell_j(1)$ and g
 
 $$  
 \begin{aligned}  
-S_j(0) &= \ell_j(0) \cdot t_j(0) \newline  
+S_j(0) &= \ell_j(0) \cdot t_j(0) \\  
 S_j(\infty) &= \bigl(\ell_j(1) - \ell_j(0)\bigr) \cdot \left(t_j (1) - t_j(0)\right)  
 \end{aligned}  
 $$

@@ -16,9 +16,9 @@ In this article we review some of the optimizations for the SUMCHECK protocol as
 
 As the reader might already know, the SUMCHECK protocol is a fundamental interactive proof system in verifiable computing and cryptography first introduced by Lund, Fortnow, Karloff, and Nisan around 1990-1991. We will begin by broadly describing its purpose and typical usage and then we'll start looking into details of implementation where some clever observations can lead to an enhanced performance. The reader familiar with the protocol can safely skip the first section; those who want a quick refresher are invited to read.
 
-The primary purpose of the SUMCHECK Protocol is for a _prover (P)_ to convince a _verifier (V)_ that a _large sum of polynomial evaluations_ equals a specified value, without the verifier having to compute the entire sum herself. This sum is typically over all inputs in the _Boolean hypercube_ , $\\{0,1 \\}^l$, for an $l$-variate polynomial $g$.
+The primary purpose of the SUMCHECK Protocol is for a _prover (P)_ to convince a _verifier (V)_ that a _large sum of polynomial evaluations_ equals a specified value, without the verifier having to compute the entire sum herself. This sum is typically over all inputs in the _Boolean hypercube_ , $\{0,1 \}^l$, for an $l$-variate polynomial $g$.
 
-> The core benefit for the verifier is a drastic reduction in computational work: the verifier could compute the sum by evaluating the polynomial at all $2^n$ possible inputs. However, using the SUMCHECK Protocol, the _verifier ultimately only needs to evaluate the polynomial at a single, randomly chosen point_ in a larger finite field. This random point is selected from a "much bigger space" than just $\\{0,1\ }^l$.
+> The core benefit for the verifier is a drastic reduction in computational work: the verifier could compute the sum by evaluating the polynomial at all $2^n$ possible inputs. However, using the SUMCHECK Protocol, the _verifier ultimately only needs to evaluate the polynomial at a single, randomly chosen point_ in a larger finite field. This random point is selected from a "much bigger space" than just $\{0,1\ }^l$.
 
 The protocol proceeds through an interactive series of rounds between the prover and the verifier:  
 1\. **Initial Claim:** At the start, the prover sends a value, $C_1$, which is claimed to be equal to the desired sum $H$.  
@@ -52,13 +52,13 @@ where by multilinear polynomial we mean a $\ell$ variate polynomial such that ea
 
 The key observation in the optimizations considered dwells on the realization that the polynomial sent in the $i - th$ round by the prover:
 
-$$s_i (X_i) = \sum\limits_{x^\prime \in \\{0,1\\}^{\ell - i}} \prod\limits_{ k = 1 }^d p(r, X_i ,x^\prime)$$
+$$s_i (X_i) = \sum\limits_{x^\prime \in \{0,1\}^{\ell - i}} \prod\limits_{ k = 1 }^d p(r, X_i ,x^\prime)$$
 
 is indeed a sum of univariate polynomials on the variable $X_i$. The way polynomials are handed over between prover and verifier is usually by means of passing their evaluations on an adequate set. From the evaluations of $s_i$ on a a sufficiently large set, the verifier is able to reconstruct the polynomial. from the data received.
 
 How big should the evaluation set be? Well, this question was answered many many years ago by the Fundamental Theorem of Algebra: for a polynomial $f$ of degree $deg(f)$ it suffices to have $deg(f) + 1$ evaluations to fully reconstruct its coefficients. So the prover needs to send $deg(s_i)_{i + 1}$ evaluations to the verifier, and now the problem becomes sending the elements
 
-$$s_i (u) = \sum\limits_{x^\prime \in \\{0,1\\}^{\ell -i }}\prod\limits_{ k = 1}^d p(r,u,x^\prime)$$
+$$s_i (u) = \sum\limits_{x^\prime \in \{0,1\}^{\ell -i }}\prod\limits_{ k = 1}^d p(r,u,x^\prime)$$
 
 for all $u$ in a set of size at least $deg(s_i)_i+1$.
 
@@ -71,7 +71,7 @@ $$\prod\limits_{ k = 1 }^d p_k(r,u,x^\prime)$$
 are not only products of evaluations of multilinear factors, but also: there are _different types of evaluations going on_ in each summand:
 
 i. On the one hand, factors $p_k$ are evaluated at $r = (r_1 ,r_2 ,\ldots r_{i - 1})$ in its first $i - 1$ variables - these evaluations involve interaction with the verifier since they employ random elements from a much bigger space than the boolean cube (typically a field extension of the base field) chosen by the verifier. Representation and algebraic manipulation of these challenges take up more memory and time than the demanded by the base field. In the context of BDDT, they involve $\frak{ll}$ and $\frak{ls}$ (large-large and large-small) multiplications.  
-ii. On the other hand we have $u$ which is simply a base field element and also the evaluation of the factors $p_k$ at points in the boolean hypercube $\\{0,1\\}^{ \ell - i}$ corresponding to the last $\ell - i$ variables: these evaluations need no interaction with the verifier and crucially, do not involve elements in an extension of the base field. These are considered $\frak{ss}$ multiplications since they are taken to be base field elements.
+ii. On the other hand we have $u$ which is simply a base field element and also the evaluation of the factors $p_k$ at points in the boolean hypercube $\{0,1\}^{ \ell - i}$ corresponding to the last $\ell - i$ variables: these evaluations need no interaction with the verifier and crucially, do not involve elements in an extension of the base field. These are considered $\frak{ss}$ multiplications since they are taken to be base field elements.
 
 > **This observation gives the following idea: if it were possible to de-couple such evaluations then there might be some margins for improving performance: evaluations not depending on the interaction with the verifier could be done offline as part of a pre-processing phase, and then the ones involving the random challenges could be tackled online...**
 
@@ -82,7 +82,7 @@ To see how this decoupling can be done, let's go for a very very simple example.
 $$f(x) = 2x^2 - 3x + 1$$
 
 Here's how we use interpolation to perform the task: since $f$ has degree 2, we need at least 3 points to evaluate $f$. Let's pick the set  
-$${\\{0, 1, 2\\}}$$
+$${\{0, 1, 2\}}$$
 
 First, we need to find the value of our polynomial $f(x)$ at each of these points.
 
@@ -90,9 +90,9 @@ First, we need to find the value of our polynomial $f(x)$ at each of these point
         * $f(1) = 2(1)^2 - 3(1) + 1 = 0$
         * $f(2) = 2(2)^2 - 3(2) + 1 = 8 - 6 + 1 = \mathbf{3}$
 
-Secondly, we build the Lagrange basis for the set $\\{0, 1, 2\\}$: it has three degree 2 polynomials
+Secondly, we build the Lagrange basis for the set $\{0, 1, 2\}$: it has three degree 2 polynomials
 
-$$\\{L_0 ,L_1 ,L_2 \\}$$  
+$$\{L_0 ,L_1 ,L_2 \}$$  
 that work just as the canonical basis: each basis polynomial $L_j(x)$ has the special property that
 
 $$L_i (j) = 1\quad\text{ if } j = i,\quad L_i (j) = 0\quad\text{ if } j\neq i,$$
@@ -103,7 +103,7 @@ Lagrange's formula for producing such polynomials is well known and produces
         * **$L_1(x)$:** (associated with $x_1 = 1$):$$L_1(x) = -x^2 + 2x$$
         * **$L_2(x)$:** (associated with $x_2 = 2$):$$L_2(x) = 0.5x^2 - 0.5x$$
 
-These three polynomials form the **Lagrange basis** for the set $\\{0, 1, 2\\}$.
+These three polynomials form the **Lagrange basis** for the set $\{0, 1, 2\}$.
 
 Finally, the Lagrange polynomial is constructed as a weighted sum of these basis polynomials, where each weight is the value of the function at the corresponding point. We have
 
@@ -124,13 +124,13 @@ Of course, this idea can be extrapolated to multivariate polynomials by the use 
 
 $$f(Y_1, Y_2) = Y_1 (2 + Y_2 )^2$$
 
-It has degree 1 as polynomial in $Y_1$ and degree 2 as polynomial in $Y_2$. We will consider now interpolating $f$ over the grid $\\{0,1,2\\}^2$; the next step is to find bivariate polynomials that play the same role as the univariate Lagrange polynomials. It is no wonder that if we consider the univariate basis
+It has degree 1 as polynomial in $Y_1$ and degree 2 as polynomial in $Y_2$. We will consider now interpolating $f$ over the grid $\{0,1,2\}^2$; the next step is to find bivariate polynomials that play the same role as the univariate Lagrange polynomials. It is no wonder that if we consider the univariate basis
 
-$$\\{L_0 ,L_1 ,L_2\\}$$
+$$\{L_0 ,L_1 ,L_2\}$$
 
 and define $L_{i,j} (Y_1 ,Y_2) = L_i (Y_1) L_j (Y_2)$ then the collection
 
-$$\mathcal{L} = \\{L_{i,j}: (i,j)\in\\{0,1,2\\}^2\\}$$
+$$\mathcal{L} = \{L_{i,j}: (i,j)\in\{0,1,2\}^2\}$$
 
 will verify
 
@@ -138,7 +138,7 @@ $$L_{i,j} (a,b) = 1\quad\text{ if }, (a,b) = (i,j),\quad L_{i,j}(a,b) = 0\quad\t
 
 and so
 
-$$f(Y_1,Y_2) = \sum\limits_{(i,j)\in \\{0,1,2\\}^2} f(i,j) L_{i,j}(Y_1, Y_2)$$
+$$f(Y_1,Y_2) = \sum\limits_{(i,j)\in \{0,1,2\}^2} f(i,j) L_{i,j}(Y_1, Y_2)$$
 
 ## Pushing forward
 
@@ -146,7 +146,7 @@ So the previous discussion will come to fruition within the SUMCHECK protocol at
 
 $$\prod\limits_{ k = 1}^d p_k(r,X_i ,x^\prime)$$
 
-for fixed $x^\prime$ in the boolean hypercube $\\{0,1\\}^{ \ell - i}$ and $u$ in a convenient subset of the base field as the evaluation of the polynomial
+for fixed $x^\prime$ in the boolean hypercube $\{0,1\}^{ \ell - i}$ and $u$ in a convenient subset of the base field as the evaluation of the polynomial
 
 $$F_{u,x^\prime} (Y_1 ,Y_2 ,\ldots,Y_{i - 1}) = \prod\limits_{k = 1}^d p_k(Y,u,x^\prime)$$
 
@@ -168,13 +168,13 @@ $$F(Y) = \sum\limits_{v\in G_d} F(v) L_v (Y)$$
 
 Now at the time of looking at $s_i (u)$, remember that we need to sum over the hypercube of the last $\ell - 1$ coordinates and that $u$ is now the evaluation of the $X_i$ variable. The point here is that we realize that **the sum over the hypercube interacts nicely with the sum coming from the interpolation: we will now make explicit the dependence of F with $u$ and $x^\prime$**
 
-$$s_i (u) = \sum\limits_{x^\prime \in \\{0,1\\}^{ \ell - i}} F_{u,x^\prime }(r) = \sum\limits_{x^\prime \in \\{0,1\\}^{ \ell - i}} \sum\limits_{v\in G_d} F_{ u,x^\prime } (v) L_v(r) = \sum\limits_{v\in G_d} \left(\sum\limits_{ x^\prime\in \\{0,1\\}^{ \ell - i}} F_{u,x^\prime}(v)\right) L_v(r)$$
+$$s_i (u) = \sum\limits_{x^\prime \in \{0,1\}^{ \ell - i}} F_{u,x^\prime }(r) = \sum\limits_{x^\prime \in \{0,1\}^{ \ell - i}} \sum\limits_{v\in G_d} F_{ u,x^\prime } (v) L_v(r) = \sum\limits_{v\in G_d} \left(\sum\limits_{ x^\prime\in \{0,1\}^{ \ell - i}} F_{u,x^\prime}(v)\right) L_v(r)$$
 
 From this expression we are able to see why this strategy works: the desired values $s_i(u)$ to be sent to the verifier are simply linear combinations of precomputed interpolation polynomials involving large multiplications (since they depend on the random challenges) weighted by sums indexed by the hypercube, of pre-computed evaluations over base field grid vectors, this is, _small_ coefficients.
 
 The coefficients in this linear combination are termed **accumulators** , mainly because they are a sum. For each fixed $v\in G_d$ and $u$, then
 
-$$\sum\limits_{x^\prime \in \\{0,1\\}^{ \ell - i}} F(v) = \sum\limits_{x^\prime \in \\{0,1\\}^{ \ell - 1}} \prod\limits_{ k = 1}^d p_k(v,u,x^\prime) = A_i(v,u)$$
+$$\sum\limits_{x^\prime \in \{0,1\}^{ \ell - i}} F(v) = \sum\limits_{x^\prime \in \{0,1\}^{ \ell - 1}} \prod\limits_{ k = 1}^d p_k(v,u,x^\prime) = A_i(v,u)$$
 
 None of these depend on interactions with the verifier and can be conveniently hanldled offline. The number of accumulators to be computed depends on the degree of the polynomial $s_i (X_i)$ to be sent, and that problem can be addressed generically by assuming it's a degree $d$ polynomial or by refining at each round deciding how many factors indeed contain the interesting variable.
 
@@ -208,14 +208,14 @@ Our article expanded on the general principles of decoupling the different types
 The variant of Lagrange interpolation presented by the authors reconstructs a polynomial of degree $d$ using its evaluations at $d$ distinct points plus its leading (highest-degree) coefficient, instead of the typical $d + 1$ evaluations. This leading coefficient is termed the _evaluation at infinity_ and is denoted as $s(\infty)$.
 
 The formula used for interpolation then becomes:  
-$$s(X) = a \cdot \prod_{ k = 1}^{d} (X - x_k ) + \sum_{k = 1}^{d} s(x_k ) \cdot \mathcal{L_{ \\{x_i\\},k}} (X)$$
+$$s(X) = a \cdot \prod_{ k = 1}^{d} (X - x_k ) + \sum_{k = 1}^{d} s(x_k ) \cdot \mathcal{L_{ \{x_i\},k}} (X)$$
 
 Where:
 
         * $a$ is the leading coefficient of $s(X)$, also denoted $s(\infty)$.
         * $x_1, \dots, x_d$ are the $d$ distinct evaluation points.
         * $s(x_k)$ is the evaluation of $s(X)$ at the point $x_k$.
-        * $\mathcal{L_{ \\{x_i\\},k}}(X)$ is the k-th Lagrange basis polynomial for the set of points $\\{x_1, \dots, x_d\\}$.
+        * $\mathcal{L_{ \{x_i\},k}}(X)$ is the k-th Lagrange basis polynomial for the set of points $\{x_1, \dots, x_d\}$.
 
 Let's cook up an example and show that this actually holds.
 
@@ -242,7 +242,7 @@ $$s(X) = 3X^2 - 3X + 2 - 2X$$
 $$s(X) = 3X^2 - 5X + 2$$  
 The result matches the original polynomial.
 
-> For practical purposes, BDDT concentrates on an evaluation set of the form $$U_d = \\{\infty,0,1,2,\ldots d - 1\\}$$ to interpolate a degree $d$ polynomial.
+> For practical purposes, BDDT concentrates on an evaluation set of the form $$U_d = \{\infty,0,1,2,\ldots d - 1\}$$ to interpolate a degree $d$ polynomial.
 
 ### Calculation of $s(\infty)$ for a Product of Polynomials
 

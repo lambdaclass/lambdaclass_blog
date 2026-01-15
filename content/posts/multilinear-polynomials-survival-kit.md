@@ -28,13 +28,13 @@ It should be noticed that multilinear polynomials of $\ell$ indeterminates have 
 
 ### Interpolation
 
-One of the great features of multilinear polynomials is that they allow a neat way of replacing arbitrary functions over a very special domain. Cutting to the chase, _any_ function $\varphi$ defined over the hypercube $\\{ 0,1 \\}^\ell$ can be interpolated with multilinear polynomials. This happens because the hypercube being discrete, it allows the identification of the function $\varphi$ with the list of its images ${\varphi(x): x \in \\{0,1 \\}^\ell}$ and crucially, for each $x$ in the hypercube we have a multilinear polynomial that takes the value 1 over $x$ and evaluates to zero elsewhere.
+One of the great features of multilinear polynomials is that they allow a neat way of replacing arbitrary functions over a very special domain. Cutting to the chase, _any_ function $\varphi$ defined over the hypercube $\{ 0,1 \}^\ell$ can be interpolated with multilinear polynomials. This happens because the hypercube being discrete, it allows the identification of the function $\varphi$ with the list of its images ${\varphi(x): x \in \{0,1 \}^\ell}$ and crucially, for each $x$ in the hypercube we have a multilinear polynomial that takes the value 1 over $x$ and evaluates to zero elsewhere.
 
-For example, take $b = (1,0,1,1) \in \\{0,1 \\}^4$. Then
+For example, take $b = (1,0,1,1) \in \{0,1 \}^4$. Then
 
 $$\chi_b (X_1 , X_2 , X_3 , X_4 ) = X_1 (1 - X_2 ) X_3 X_4$$
 
-is a multilinear polynomial evaluating to 1 over $b$ and to 0 elsewhere. Generally, for $b \in \\{0,1 \\}^\ell$, the multilinear polynomial having this property can be expressed as
+is a multilinear polynomial evaluating to 1 over $b$ and to 0 elsewhere. Generally, for $b \in \{0,1 \}^\ell$, the multilinear polynomial having this property can be expressed as
 
 $$\chi_b (X) = \prod_{ j = 1 }^{\ell} ( b_j X_j + (1 - b_j) (1 - X_j))$$
 
@@ -44,11 +44,11 @@ Suppose we are given the function
 
 $$\varphi (X_1 ,X_2 ) = (1 + X_1) (X_1 + X_2)$$
 
-As it is, this polynomial has degree 2 in $X_1$ so it is not a multilinear polynomial. However it can be interpolated over the cube $\\{0,1 \\}^2$, by the use of the equality or Lagrange polynomials: $\chi_b$ with $b$ in the boolean square $\\{0,1 \\}^2$.
+As it is, this polynomial has degree 2 in $X_1$ so it is not a multilinear polynomial. However it can be interpolated over the cube $\{0,1 \}^2$, by the use of the equality or Lagrange polynomials: $\chi_b$ with $b$ in the boolean square $\{0,1 \}^2$.
 
 \begin{align*}  
-\varphi(X_1, X_2) =& \sum\limits_{ b \in \\{0,1\\}^2 } g(b) \chi_b (x) =\newline  
-=& \varphi(0,0)(1 - X_1)(1 - X_2) + \varphi(1,0) X_1 (1 - X_2)\newline  
+\varphi(X_1, X_2) =& \sum\limits_{ b \in \{0,1\}^2 } g(b) \chi_b (x) =\\  
+=& \varphi(0,0)(1 - X_1)(1 - X_2) + \varphi(1,0) X_1 (1 - X_2)\\  
 +& \varphi(0,1) (1 - X_1) X_2 + \varphi(1,1) X_1 X_2  
 \end{align*}
 
@@ -56,11 +56,11 @@ where this equality is functionally understood: it is the equality of two functi
 
 **Fact number 1:** $\mathcal{M_\ell}$ is a vector space of dimension $2^\ell$ with basis the Lagrange polynomials
 
-$$\mathcal{L_\ell} = \\{ \chi_b : b\in \\{0,1\\}^\ell \\}$$
+$$\mathcal{L_\ell} = \{ \chi_b : b\in \{0,1\}^\ell \}$$
 
 As it is customarily done, there is an ordering of the dimension $\ell$ hypercube obtained by the binary expansion of the first $2^\ell$ non negative integers: if $0\leq m\leq 2^{\ell} - 1$ then
 
-$$m = m_0 2^0 + m_1 2^1 + \cdots m_{ \ell - 1 } 2^{ \ell - 1}\quad m_i\in \\{0,1 \\}$$
+$$m = m_0 2^0 + m_1 2^1 + \cdots m_{ \ell - 1 } 2^{ \ell - 1}\quad m_i\in \{0,1 \}$$
 
 we set the $m$-th basis polynomial to be the equality polynomial for the string $$(m_{ \ell - 1} ,\ldots m_1, m_0)$$ This will be the ordering we adopt for the Lagrange basis and the order we will use to obtain crucial information: the standard binary order. For those unfamiliar:
 
@@ -81,7 +81,7 @@ Don't fret, this is simply a choice to walk the cube and how we will consider th
 
         1. One can easily verify that the basis
 
-$$\mathcal{L_2} = \\{ (1 - X_1) (1 - X_2), (1 - X_1) X_2, X_1 (1 - X_2), X_1 X_2 \\}$$
+$$\mathcal{L_2} = \{ (1 - X_1) (1 - X_2), (1 - X_1) X_2, X_1 (1 - X_2), X_1 X_2 \}$$
 
 interpolates the boolean hypercube in the sense that the $k$-th basis vector takes the value 1 over the binary representation of $k$ and takes the value 0 elsewhere.
 
@@ -111,9 +111,9 @@ $$v = 2\cdot (1,0) + 3\cdot (0,1)$$
 
 This conversation yields
 
-> **Fact number 2:** Coordinates of a function $f$ defined over the boolean hypercube $\\{0,1 \\}^\ell$ respect to the Lagrange basis $\mathcal{L_\ell}$ are simply its evaluations:
+> **Fact number 2:** Coordinates of a function $f$ defined over the boolean hypercube $\{0,1 \}^\ell$ respect to the Lagrange basis $\mathcal{L_\ell}$ are simply its evaluations:
 
-$$coords(f)= \left[f(b) \right]_{ b\in \\{0,1 \\}^\ell}$$
+$$coords(f)= \left[f(b) \right]_{ b\in \{0,1 \}^\ell}$$
 
 For instance, for the multilinear polynomial
 
@@ -178,7 +178,7 @@ $$\mathcal{M_\ell} \left[X_1,\ldots X_\ell \right] = \mathcal{M_\ell} \left[X_1,
 
 and moreover, exploiting the associativity of the tensor product we arrive at a very natural fact:
 
-> **Fact number 3:** Let $\\{1,2,\ldots, \ell \\} = J \bigcup I$ with $J,I$ disjoint. Then multilinear polynomials with indeterminates $X_1,\ldots X_\ell$ can be regarded as multlinear polynomials with indeterminates $X_j\in J$ and coefficients being multilinear polynomials in the indeterminates $X_i\in I$.
+> **Fact number 3:** Let $\{1,2,\ldots, \ell \} = J \bigcup I$ with $J,I$ disjoint. Then multilinear polynomials with indeterminates $X_1,\ldots X_\ell$ can be regarded as multlinear polynomials with indeterminates $X_j\in J$ and coefficients being multilinear polynomials in the indeterminates $X_i\in I$.
 
 To fix the idea, take a look at the polynomial
 
@@ -186,7 +186,7 @@ $$h = X_1+X_1 X_3 + 2X_2 X_3 X_4 + 2X_4$$
 
 This naturally is a multilinear polynomial in $X_3$ and $X_4$, since they are raised to power at most 1. Using the Lagrange basis for multilinear polynomials in the variables $X_3$ and $X_4$
 
-$$\\{(1 - X_3) (1 - X_4), (1 - X_3 ) X_4, X_3 (1 - X_4), X_3 X_4 \\}$$
+$$\{(1 - X_3) (1 - X_4), (1 - X_3 ) X_4, X_3 (1 - X_4), X_3 X_4 \}$$
 
 we find the corresponding coefficients by making use of we what we already discussed: the coefficients will be polynomials in the remaining variables, $X_1$ and $X_2$ obtained by evaluating the original polynomial $h$ at the four points of the hypercube for $X_3$ and $X_4$.
 
@@ -291,13 +291,13 @@ So if we want to decide what is the degree of $g$ in the $X_i$ variable, we need
 
 > **Fact number 5:**  
 >  $$p(x_1, \dots, x_{k - 1}, 0, x_{k + 1}, \dots, x_\ell) = p(x_1, \dots, x_{k - 1}, 1, x_{k + 1}, \dots, x_\ell)$$  
->  for all $x_j \in \\{0,1 \\}$ where $j \neq k$ $\iff$ $p$ does not depend on $X_k$.
+>  for all $x_j \in \{0,1 \}$ where $j \neq k$ $\iff$ $p$ does not depend on $X_k$.
 
 To illustrate this fact, suppose we have
 
 $$p(X_1, X_2, X_3) = X_1 (X_2 + X_3)$$
 
-and we want to test if this polynomial includes the variable **$X_3$**. The test requires us to check if $$p(X_1, X_2, 0) = p(X_1, X_2, 1)$$ for all possible combinations of $(X_1, X_2) \in \\{0,1 \\}^2$.
+and we want to test if this polynomial includes the variable **$X_3$**. The test requires us to check if $$p(X_1, X_2, 0) = p(X_1, X_2, 1)$$ for all possible combinations of $(X_1, X_2) \in \{0,1 \}^2$.
 
         1. **First we check for $(x_1, x_2) = (0, 0)$:**
         * $p(0, 0, 0) = 0(0 + 0) = 0$

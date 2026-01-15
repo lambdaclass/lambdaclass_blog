@@ -12,7 +12,7 @@ authors = ["LambdaClass"]
 
 The development of general-purpose zkVMs has made writing verifiable applications easier, by allowing developers to write high-level code and then compiling it to RISC-V or another instruction set architecture (ISA) and running it on top of the virtual machine. The virtual machine then generates a succinct proof of execution using a proof system, such as STARKs or Groth16. Recent advances in proof systems have allowed to reduce proving times, and we are heading towards real-time proving of Ethereum blocks. [Binius](https://www.binius.xyz/) is a proof system that was developed focusing on how to create a technology that is hardware-friendly. Knowing how hardware works, a tailored proof system with really fast mathematics on it can yield significant improvements. [Petra](https://github.com/PetraProver/PetraVM) is the first virtual machine to leverage Binius. What makes Binius special and how does it work?
 
-In this article we will review the basic mathematics behind the Binius protocol, which exploits the boolean hypercube $\mathcal{B_\ell} = \\{0 , 1 \\}^\ell$. We'll concentrate in an elementary description of binary towers and the representation of field elements, as well as addition and multiplication of field elements exploiting their natural relation with circuit level operations. Throughout this article, we will cover some of the ground material from which binary towers emerge and came to life as a technologically interesting object, namely:
+In this article we will review the basic mathematics behind the Binius protocol, which exploits the boolean hypercube $\mathcal{B_\ell} = \{0 , 1 \}^\ell$. We'll concentrate in an elementary description of binary towers and the representation of field elements, as well as addition and multiplication of field elements exploiting their natural relation with circuit level operations. Throughout this article, we will cover some of the ground material from which binary towers emerge and came to life as a technologically interesting object, namely:
 
         * Diamond and Posen's work from 2023, ["Succint Arguments over Towers of Binary Fields"](https://eprint.iacr.org/2023/1784)
         * David Cantor's seminal 1989 paper ["On Arithmetical Algorithms over Finite Fields"](https://www.sciencedirect.com/science/article/pii/0097316589900204)
@@ -28,7 +28,7 @@ $$\mathbb{F}_{q} \equiv \mathbb{F}[X]/\langle f(X)\rangle$$
 
 where $f$ is any irreducible polynomial $f \in \mathbb{F_2} [X]$ of degree $d$: this field has exactly $q = 2^d$ elements and consists of all the remainders of polynomial division by $f$. In other words, it consists of polynomials of degree at most $d - 1$ with coefficients in $\mathbb{F_2}$. Also, this extension can be viewed as a vector space of dimension $d$ over the base field $\mathbb{F_2}$ which is a very nice feature. The collection
 
-$$B_q = \\{1 , X , X^2 ,\ldots, X^{d - 1} \\}$$
+$$B_q = \{1 , X , X^2 ,\ldots, X^{d - 1} \}$$
 
 commonly called "the monomial basis" and upon fixing this basis, an isomorphism identifying such a polynomial with its $\mathbb{F_2}$ coordinates is established. Addition and multiplication of field elements when viewed as polynomials, are performed modulo $f$.
 
@@ -40,11 +40,11 @@ $$\mathbb{F}[X]/\langle X^2+X+1\rangle $$
 
 is indeed a degree 2 extension of $\mathbb{F_2}$; this means that it can be considered as a dimension 2 vector space over the base field. The canonical basis for this vector space is then
 
-$$B_2 = \\{1 , X \\}$$
+$$B_2 = \{1 , X \}$$
 
 and all its elements can be listed as linear combinations of elements of $B_2$:
 
-$$\mathbb{F_4} = \\{0 , 1 , X , 1 + X \\}$$
+$$\mathbb{F_4} = \{0 , 1 , X , 1 + X \}$$
 
 The coordinate Representation of $\mathbb{F_4}$ over $\mathbb{F_2}$ can be viewed in the following table
 
@@ -77,7 +77,7 @@ Let's work two different realizations of the field of 16 elements and see how fi
 
 **First construction:** $\mathbb{F_{16}}$ as quotient by a degree 4 polynomial:
 
-To construct the field $\mathbb{F_{16}}$ we need to find an irreducible polynomial of degree 4 over the field of two elements, $\mathbb{F_2} = \\{0, 1 \\}$. One such irreducible polynomial is:  
+To construct the field $\mathbb{F_{16}}$ we need to find an irreducible polynomial of degree 4 over the field of two elements, $\mathbb{F_2} = \{0, 1 \}$. One such irreducible polynomial is:  
 $$p(X) = X^4 + X + 1$$
 
 To verify that this polynomial is irreducible over $\mathbb{F_2}$, we need to check that it has no roots in $\mathbb{F_2}$ **and** that it cannot be factored into the product of two irreducible polynomials of degree 2 over $\mathbb{F_2}$.
@@ -137,7 +137,7 @@ Since $\mathbb{F_4}$ has 4 elements, we need an irreducible polynomial of degree
         * $q(X_0) = X_0^2 + X_0 + X_0 = (X_0 + 1) + X_0 + X_0 = X_0 + 1 + 0 = X_0 + 1 \neq 0$
         * \begin{align*}  
 q(1 + X_0) &= (1 + X_0)^2 + (1 + X_0) + X_0  
-= (1 + X_0^2) + 1 + X_0 + X_0 \newline &= 1 + (X_0 + 1) + 1 + 0 = X_0 + 1 + 1 = X_0 \neq 0  
+= (1 + X_0^2) + 1 + X_0 + X_0 \\ &= 1 + (X_0 + 1) + 1 + 0 = X_0 + 1 + 1 = X_0 \neq 0  
 \end{align*}
 
 Since $q(t)$ has degree 2 and no roots in $\mathbb{F_4}$, it is irreducible over $\mathbb{F_4}$ and the extension obtained by adjoining a root $X_1$ of $q$ yields
@@ -151,11 +151,11 @@ subject to the relations:
 
 Each step is indeed defined by quotienting by an irreducible polynomial of degree 2, i.e. each step is a _quadratic extension_. More importantly, each element in $\mathbb{F_{16}}$ is a linear combination with coefficients in $\mathbb{F_2}$ of the basis elements
 
-$$\\{ 1 , X_0 ,X_1 ,X_0 \cdot X_1 \\}$$
+$$\{ 1 , X_0 ,X_1 ,X_0 \cdot X_1 \}$$
 
 ### A word about coordinates:
 
-Let's work out the coordinate representation of $\mathbb{F_{ 16 }}$ over $\mathbb{F_4}$ and over the base field $\mathbb{F_2}$. The elements of $\mathbb{F_{ 16 }}$ can be written in the form $$a + bX_1$$ where $a, b \in \mathbb{F_4}$. Since each of $a$ and $b$ has 4 choices, there are $4 \times 4 = 16$ elements in $\mathbb{F_{16}}$; also recall that a basis for $\mathbb{F_4}$ over $\mathbb{F_2}$ is $\\{1, X_0 \\}$ and that $\mathbb{F_{16}}$ over $\mathbb{F_4}$ is $\\{1, X_1\\}$.
+Let's work out the coordinate representation of $\mathbb{F_{ 16 }}$ over $\mathbb{F_4}$ and over the base field $\mathbb{F_2}$. The elements of $\mathbb{F_{ 16 }}$ can be written in the form $$a + bX_1$$ where $a, b \in \mathbb{F_4}$. Since each of $a$ and $b$ has 4 choices, there are $4 \times 4 = 16$ elements in $\mathbb{F_{16}}$; also recall that a basis for $\mathbb{F_4}$ over $\mathbb{F_2}$ is $\{1, X_0 \}$ and that $\mathbb{F_{16}}$ over $\mathbb{F_4}$ is $\{1, X_1\}$.
 
 It is a well known theorem of the theory of fields a basis for the upper field in a tower consists of the multiplication of the basis elements in the lower extensions. But there's a caveat: we will consider ordered basis. This means that in order to show a basis one must not only exhibit a linearly independent subset that spans the vector space, but also we need to make explicit _the order_ in which those elements lie in the basis. This order is needed in order to make available the use of coordinates. Considering the ordered basis above, let's take a look at the elements in $\mathbb{F_{16}}$:
 
@@ -178,7 +178,7 @@ $1 + (1 + X_0 ) X_1$ | $(1, 1 + X_0)$ | $(1, 0, 1, 1)$
 $X_0 + (1 + X_0 ) X_1$ | $(X_0, 1 + X_0)$ | $(0, 1, 1, 1)$  
 $(1 + X_0) + (1 + X_0 ) X_1$ | $(1 + X_0, 1 + X_0)$ | $(1, 1, 1, 1)$  
   
-The way monomial basis are chosen also show how coordinates in succesive basis relate to one another: for instance, suppose we take an element $$\omega=a + bX_1 \in \mathbb{F_{16}} \quad \text{ with } a, b \in \mathbb{F_4}$$ and we represent $\omega$ by its coordinates $(a, b)$. If we now express $a$ and $b$ in terms of the basis $\\{1, X_0 \\}$ over $\mathbb{F_2}$ then we'll be able to find the coordinates of $\omega$ over $\mathbb{F_2}$ by simply concatenating coordinates of $a$ and $b$!
+The way monomial basis are chosen also show how coordinates in succesive basis relate to one another: for instance, suppose we take an element $$\omega=a + bX_1 \in \mathbb{F_{16}} \quad \text{ with } a, b \in \mathbb{F_4}$$ and we represent $\omega$ by its coordinates $(a, b)$. If we now express $a$ and $b$ in terms of the basis $\{1, X_0 \}$ over $\mathbb{F_2}$ then we'll be able to find the coordinates of $\omega$ over $\mathbb{F_2}$ by simply concatenating coordinates of $a$ and $b$!
 
 To illustrate what the table is saying, take the element $\omega = X_0 + X_1$. Over $\mathbb{F_4}$, it is $X_0 \cdot 1 + 1 \cdot X_1$, so the coordinates are $$[\omega]^{ \mathbb{F_4} } = ( X_0 , 1)$$.  
 Now, $[ X_0 ]^{ \mathbb{F_2} } = (0 , 1)$ and $[1]^{\mathbb{F_2}} = (1,0)$, so
@@ -191,7 +191,7 @@ We repeat what we mentioned earlier: whenever a choice of basis is made, there's
 
 What we have just seen in the example of $\mathbb{F_{16}}$ is an instance of a _Wiedemann tower_ : a sequence of field extensions such that each extension is a quadratic extension of the previous one, represented in such a way that a basis of the extension can be obtained by adjoining roots of a certain sequence of irreducible polynomials at the time. In the case just seen, the basis was simply
 
-$$\mathcal{B} = \\{1, X_0 ,X_1 ,X_0 X_1 \\}$$
+$$\mathcal{B} = \{1, X_0 ,X_1 ,X_0 X_1 \}$$
 
 and the field elements are simply $\mathbb{F_2}$ linear combinations of these symbols: we will commonly view them as polynomials in 2 variables over $\mathbb{F_2}$ in which all the variables appear raised to the first power, at most. These polynomials are usually called "multilinear" in the cryptography context. These type of field extensions and polynomials are central to the work of Ben Diamond and Jim Posen in their proposition for a setting in which zero knowledge protocols can be implemented in characteristic 2 for more efficient performance relying on circuitry-level arithmetical operations: **BINIUS**. The binary tower defined in their work is defined just like an iterative quadratic sequence of extensions, inspired in the work of Wiedemann. To match their notation set $\mathcal{T_0} = \mathbb{F_2}$ and then recursively define
 
@@ -201,7 +201,7 @@ where $f_{ k + 1 } ( X_{ k + 1 }) = X_{ k + 1 }^2 + X_{k} X_{ k + 1 } + 1$; Wied
 
 $$\mathbb{F_2} = \mathcal{T_0},\quad \mathbb{F_4} = \mathcal{T_1} , \quad \mathbb{F_{16}} = \mathcal{T_2},\ldots $$
 
-We will usually refer to $\mathcal{T_k}$ as the $k-$th level or extension of $\mathcal{T_0}$; and such a field has exactly $2^{ 2^k }$ elements. In such level, elements are described as polynomials in the set of $k$ variables $\\{X_0 , X_1 , \ldots, X_{ k - 1} \\}$ such that every $X$ is raised to a power at most 1, this is, they are linear combinations over $\mathbb{F_2}$ of multilinear monomials. For simplicity, there is also an extremely convenient way to point to specific monomials and it relates to the binary expansion of the non-negative integers.
+We will usually refer to $\mathcal{T_k}$ as the $k-$th level or extension of $\mathcal{T_0}$; and such a field has exactly $2^{ 2^k }$ elements. In such level, elements are described as polynomials in the set of $k$ variables $\{X_0 , X_1 , \ldots, X_{ k - 1} \}$ such that every $X$ is raised to a power at most 1, this is, they are linear combinations over $\mathbb{F_2}$ of multilinear monomials. For simplicity, there is also an extremely convenient way to point to specific monomials and it relates to the binary expansion of the non-negative integers.
 
 To make this clear, suppose we need to find the $n-$th basis element, and we'll call it $y_n$. To do that, we simply expand $n$ in base 2:
 
@@ -246,20 +246,20 @@ To illustrate, consider $u,v \in \mathcal{T_2}$. Let's go slowly.
 
 **Multiplication as Polynomials in $X_1$ with Coefficients in $\mathcal{T_1}$:**  
 \begin{align*}  
-u \cdot v &= ((1 + X_0) + X_1)(X_0 + X_0X_1) \newline  
-&= (1 + X_0)X_0 + (1 + X_0)X_0X_1 + X_1X_0 + X_1(X_0X_1) \newline  
+u \cdot v &= ((1 + X_0) + X_1)(X_0 + X_0X_1) \\  
+&= (1 + X_0)X_0 + (1 + X_0)X_0X_1 + X_1X_0 + X_1(X_0X_1) \\  
 &= (X_0 + X_0^2) + (X_0 + X_0^2 ) X_1 + X_0 X_1 + X_0 X_1^2  
 \end{align*}
 
 Now, we substitute $X_0^2 = X_0 + 1$ and $X_1^2 = X_1 X_0 + 1$:  
 \begin{align*}  
-&= (X_0 + X_0 + 1) + (X_0 + X_0 + 1)X_1 + X_0 X_1 + X_0(X_1 X_0 + 1) \newline  
+&= (X_0 + X_0 + 1) + (X_0 + X_0 + 1)X_1 + X_0 X_1 + X_0(X_1 X_0 + 1) \\  
 &= (2X_0 + 1) + (2X_0 + 1)X_1 + X_0 X_1 + X_1 X_0^2 + X_0)  
 \end{align*}  
 Since we are in a field with characteristic 2, $2X_0 = 0$. So,  
 \begin{align*}  
-&= 1 + X_1 + X_0X_1 + X_1(X_0 + 1) + X_0 \newline  
-&= 1 + X_1 + X_0X_1 + X_0X_1 + X_1 + X_0 \newline  
+&= 1 + X_1 + X_0X_1 + X_1(X_0 + 1) + X_0 \\  
+&= 1 + X_1 + X_0X_1 + X_0X_1 + X_1 + X_0 \\  
 &= 1 + X_0  
 \end{align*}  
 So, $((1 + X_0 ) + X_1 )(X_0 + X_0 X_1 ) = 1 + X_0$ in $\mathcal{T_2}$.
@@ -342,7 +342,7 @@ using the aforementioned algorithm. Before going any further, and just because w
 $$  
 \boxed{  
 \begin{matrix}  
-0 & 1 \newline  
+0 & 1 \\  
 1 & 1  
 \end{matrix}  
 }  
@@ -353,7 +353,7 @@ and helps building a complete multiplication table; to multiply $\gamma$ by $X_0
 $$  
 [\gamma]^{1} \cdot \boxed{  
 \begin{matrix}  
-0 & 1 \newline  
+0 & 1 \\  
 1 & 1  
 \end{matrix}  
 } = [\gamma\cdot X_0 ]^1  
@@ -363,7 +363,7 @@ For a full multiplication table covering all possible field element multiplicati
 
 Let's get started. Remember that $\mathcal{T_3}$ is a field with $2^{ 2^3 } = 2^8 = 256$ elements, and as a vector space over $\mathbb{F_2} = \mathcal{T_0}$ is has dimension 8; its multilinear basis is then
 
-$$\\{1, X_0 ,X_1 ,X_0 X_1 ,X_2 ,X_0 X_2 ,X_1 X_2 ,X_0 X_1 X_2 \\}$$
+$$\{1, X_0 ,X_1 ,X_0 X_1 ,X_2 ,X_0 X_2 ,X_1 X_2 ,X_0 X_1 X_2 \}$$
 
 We will carry out the product of $u$ and $v$ in coordinates. First of all,
 
@@ -371,21 +371,21 @@ $$[u]^3 = (0,1,0,0,0,0,1,0) \quad\text{and }\quad [v]^3 =(1,0,1,0,0,1,0,0)$$
 
 are the coordinates of $u$ and $v$ in the multilinear basis for $\mathcal{T_3}$. Before carrying out Karatsuba's algorithm, we will display both set of coordinates in matrix form and hint a partition corresponding to the canonical description of both elements as elements of the last extension in the tower. This is
 
-$$\begin{pmatrix}u\newline \hline v\end{pmatrix}^3 = \begin{pmatrix}  
-0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 \newline  
+$$\begin{pmatrix}u\\ \hline v\end{pmatrix}^3 = \begin{pmatrix}  
+0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 \\  
 \hline  
 1 & 0 & 1 & 0 & 0 & 1 & 0 & 0  
 \end{pmatrix}=  
 \left(  
 \begin{array}{cccc:cccc} % 'c' for centered column, ':' for a dotted vertical line  
-0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 \newline  
+0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 \\  
 \hline % Solid horizontal line  
 1 & 0 & 1 & 0 & 0 & 1 & 0 & 0  
 \end{array}  
 \right)  
 = \left(  
 \begin{array}{c:c} % 'c' for centered column, ':' for a dotted vertical line  
-\alpha_0 & \alpha_1 \newline  
+\alpha_0 & \alpha_1 \\  
 \hline % Solid horizontal line  
 \beta_0 & \beta_1  
 \end{array}  
@@ -407,21 +407,21 @@ where **all of these elements belong to and action is done in the subfield $\mat
 
 i. To calculate $P_A$ we interpret the **coordinates over $\mathcal{T_2}$ in coordinates over $\mathcal{T_0}$** and just as in the previous layer and write
 
-$$\begin{pmatrix}\alpha_0\newline \hline \beta_0\end{pmatrix}^2=\begin{pmatrix}  
-0 & 1 & 0 & 0\newline  
+$$\begin{pmatrix}\alpha_0\\ \hline \beta_0\end{pmatrix}^2=\begin{pmatrix}  
+0 & 1 & 0 & 0\\  
 \hline % This command draws a solid horizontal line  
 1 & 0 & 1 & 0  
 \end{pmatrix}=  
 \left(  
 \begin{array}{cc:cc} % 'c' for centered column, ':' for a dotted vertical line  
-0 & 1 & 0 & 0 \newline  
+0 & 1 & 0 & 0 \\  
 \hline % Solid horizontal line  
 1 & 0 & 1 & 0  
 \end{array}  
 \right)  
 = \left(  
 \begin{array}{c:c} % 'c' for centered column, ':' for a dotted vertical line  
-\alpha_{00} & \alpha_{01} \newline  
+\alpha_{00} & \alpha_{01} \\  
 \hline % Solid horizontal line  
 \beta_{00} & \beta_{01}  
 \end{array}  
@@ -435,7 +435,7 @@ Applying Karatsuba's algorithm in this scenario requires reaching for the multip
         * And finally the product of the uncanny $P^\prime_B X_{0}$ term:  
 $$\boxed{0,0}\times\boxed{  
 \begin{matrix}  
-0 & 1 \newline  
+0 & 1 \\  
 1 & 1  
 \end{matrix}  
 }=\boxed{0,0}$$
@@ -458,9 +458,9 @@ $$[P^\prime_B X_0 ]^1 = \boxed{0,0} \implies [M + P^\prime_B X_0 ]^1 = \boxed{0,
 
 $$[(M + P^\prime_B X_0 )\cdot X_1 ]^2 = \boxed{0,1,0,0}\times \boxed{  
 \begin{matrix}  
-0 & 0 & 1 &0\newline  
-0 & 0 & 0 & 1\newline  
-1 & 0 & 0 & 1\newline  
+0 & 0 & 1 &0\\  
+0 & 0 & 0 & 1\\  
+1 & 0 & 0 & 1\\  
 0 & 1 & 1 & 1  
 \end{matrix}  
 } =\boxed{0,0,0,1}$$
@@ -473,21 +473,21 @@ which means that $P_A = \alpha_0 \beta_0 = X_0 + X_0 X_1 \in \mathcal{T_2}$
 
         * Once that we explained in detail the first case, we proceed to calculate $P_B:$
 
-$$\begin{pmatrix}\alpha_1\newline \hline \beta_1\end{pmatrix}^2=\begin{pmatrix}  
-0 & 0 & 1 & 0\newline  
+$$\begin{pmatrix}\alpha_1\\ \hline \beta_1\end{pmatrix}^2=\begin{pmatrix}  
+0 & 0 & 1 & 0\\  
 \hline % This command draws a solid horizontal line  
 0 & 1 & 0 & 0  
 \end{pmatrix}=  
 \left(  
 \begin{array}{cc:cc} % 'c' for centered column, ':' for a dotted vertical line  
-0 & 0 & 1 & 0 \newline  
+0 & 0 & 1 & 0 \\  
 \hline % Solid horizontal line  
 0 & 1 & 0 & 0  
 \end{array}  
 \right)  
 = \left(  
 \begin{array}{c:c} % 'c' for centered column, ':' for a dotted vertical line  
-\alpha_{10} & \alpha_{11} \newline  
+\alpha_{10} & \alpha_{11} \\  
 \hline % Solid horizontal line  
 \beta_{10} & \beta_{11}  
 \end{array}  
@@ -517,9 +517,9 @@ $$[P^\prime_B X_0 ]^1=\boxed{0,0}\implies [M + P^\prime_B X_0]^1 = \boxed{0,1} +
 
 $$[(M + P^\prime_B X_0 ) X_1]^2 = \boxed{0,1,0,0}\times \boxed{  
 \begin{matrix}  
-0 & 0 & 1 &0\newline  
-0 & 0 & 0 & 1\newline  
-1 & 0 & 0 & 1\newline  
+0 & 0 & 1 &0\\  
+0 & 0 & 0 & 1\\  
+1 & 0 & 0 & 1\\  
 0 & 1 & 1 & 1  
 \end{matrix}  
 }=\boxed{0,0,0,1}$$
@@ -530,23 +530,23 @@ $$\boxed{0,0,0,0} + \boxed{0,0,0,1} = \boxed{0,0,,0,1}$$
 
 which means that $P_B = \alpha_1 \beta_1 = X_0 X_1 \in \mathcal{T_2}$
 
-Now we want to compute $P_C = (\alpha_) + \alpha_1)(\beta_0 + \beta_1)$. By taking a look at the expression in coordinates of $u$ and $v$, the sum of its first and second halves is done quickly and now we have
+Now we want to compute $P_C = (\alpha_0 + \alpha_1)(\beta_0 + \beta_1)$. By taking a look at the expression in coordinates of $u$ and $v$, the sum of its first and second halves is done quickly and now we have
 
-$$\begin{pmatrix}\alpha_0 + \alpha_1\newline \hline \beta_0 + \beta_1\end{pmatrix}^2=\begin{pmatrix}  
-0 & 1 & 1 & 0\newline  
+$$\begin{pmatrix}\alpha_0 + \alpha_1\\ \hline \beta_0 + \beta_1\end{pmatrix}^2=\begin{pmatrix}  
+0 & 1 & 1 & 0\\  
 \hline % This command draws a solid horizontal line  
 1 & 1 & 1 & 0  
 \end{pmatrix}=  
 \left(  
 \begin{array}{cc:cc} % 'c' for centered column, ':' for a dotted vertical line  
-0 & 1 & 1 & 0 \newline  
+0 & 1 & 1 & 0 \\  
 \hline % Solid horizontal line  
 1 & 1 & 1 & 0  
 \end{array}  
 \right)  
 = \left(  
 \begin{array}{c:c} % 'c' for centered column, ':' for a dotted vertical line  
-a & b \newline  
+a & b \\  
 \hline % Solid horizontal line  
 c & d  
 \end{array}  

@@ -80,11 +80,7 @@ $(x_1, x_2, \dots, x_T),$
 where each $x_i$ is an integer index into a vocabulary. We map each $x_i$ to a **d** -dimensional embedding vector:  
 $\mathbf{E}(x_i) \in \mathbb{R}^d.$  
 Thus, the input sequence is transformed into an embedding matrix:  
-$\mathbf{X} ;=;  
-\bigl[  
-\mathbf{E}(x_1);, \mathbf{E}(x_2);, \ldots; ,\mathbf{E}(x_T)  
-\bigr]  
-;\in; \mathbb{R}^{T \times d}.$
+$$\mathbf{X} = \bigl[ \mathbf{E}(x_1), \mathbf{E}(x_2), \ldots, \mathbf{E}(x_T) \bigr] \in \mathbb{R}^{T \times d}.$$
 
 A decoder-only Transformer must still encode the notion of sequence position. Common methods include:
 

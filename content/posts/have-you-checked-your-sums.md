@@ -66,7 +66,7 @@ If the challenge subset $\mathcal{C}$ is a sampling subset, then the sumcheck pr
 a. Completeness.  
 b. Soundness, where the soundness error is bounded by $m d/ \vert \mathcal{C} \vert$ (the number of variables, the maximum degree in the polynomial, and the number of elements in the challenge subset).
 
-In many cases, we would like to work with $H^m = \\{ 0,1 \\}^m$, so that $x = (x_1 , x_2 , ... , x_m)$ is the collection of all bitstrings of length $m$ and we can use the encoding for vectors as multilinear polynomials.
+In many cases, we would like to work with $H^m = \{ 0,1 \}^m$, so that $x = (x_1 , x_2 , ... , x_m)$ is the collection of all bitstrings of length $m$ and we can use the encoding for vectors as multilinear polynomials.
 
 To make the sumcheck protocol zero-knowledge, we need to mask the polynomial. We can achieve this by adding a random polynomial.
 
