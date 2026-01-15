@@ -52,16 +52,5 @@
         {% endfor %}
     </div>
 
-    {% if paginator %}
-    <nav class="pagination">
-        {% if paginator.previous %}
-        <a href="{{ paginator.previous }}" class="pagination-link prev">Previous</a>
-        {% endif %}
-        <span class="pagination-info">Page {{ paginator.current_index }} of {{ paginator.number_pagers }}</span>
-        {% if paginator.next %}
-        <a href="{{ paginator.next }}" class="pagination-link next">Next</a>
-        {% endif %}
-    </nav>
-    {% endif %}
 </section>
 {% endblock %}
