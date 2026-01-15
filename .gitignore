@@ -23,5 +23,8 @@ target
 # Zola build output
 public/
 
+# Nix
+result
+
 # macOS
 .DS_Store
