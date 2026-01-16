@@ -1,3 +1,4 @@
++++
 title = "A Sharper Look at FRI"
 date = 2026-01-16
 description = "A review recent developments in the analysis of cryptographic security of one of the biggest pieces of the ZK engine: the FRI protocol implementing interactive oracle proofs of proximity, IOPPs."
