@@ -1,5 +1,6 @@
++++
 title = "Commit Boost"
-date = 2024-01-15
+date = 2026-01-16
 description = "Interview with Drew Van Der Werff on Commit-Boost, a new Ethereum validator sidecard focused on standardizing the communication between validators and third-party protocols,"
 
 [taxonomies]
