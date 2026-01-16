@@ -13,19 +13,19 @@ math = true
 
 # A sharper look at FRI
 
-In this article we will review recent developments in the analysis of cryptographic security of one of the biggest pieces of the ZK engine: the FRI protocol implementing interactive oracle proofs of proximity, IOPPs. A newly uploaded article by Eli Ben-Sasson, Dan Carmon, Swastik Kopparty and Shubhangi Saraf alongside Ulrich Habock (BCHKS25), revisits the foundational 2020 paper "Proximity Gaps for Reed Solomon Code" (BCIKS20) where the soundness of the RS-IOPP was established based on the Correlated Agreement Theorem. By a detailed and sharper use of linear algebra in the process under the list decoding regime, they obtained enhanced security performance bounds for the standard FRI. Here we will conceptually revise the protocol and give an outline of how their breakthrough was achieved.
+In this article, we will review recent developments in the analysis of cryptographic security of one of the biggest pieces of the ZK engine: the FRI protocol implementing interactive oracle proofs of proximity, IOPPs. A newly uploaded article by Eli Ben-Sasson, Dan Carmon, Swastik Kopparty and Shubhangi Saraf alongside Ulrich Habock (BCHKS25), revisits the foundational 2020 paper "Proximity Gaps for Reed Solomon Code" (BCIKS20) where the soundness of the RS-IOPP was established based on the Correlated Agreement Theorem. By a more detailed and sharper use of linear algebra in the process under the list-decoding regime, they obtained improved security performance bounds for the standard FRI. Here we will conceptually revise the protocol and give an outline of how their breakthrough was achieved.
 
 The acquainted reader may skip directly to section 4, while newcomers are encouraged to read the first sections to get familiar with notations and concepts involved.
 
 ## 1. Basic Reed-Solomon landscape
 
-Let us begin with an overview of one the basics of code-based cryptography: an interactive instance of information exchange between a Prover (P) and a Verifier (V) - where P wants to convince V that he has executed a certain task or possesses certain information. Usually, the information P claims to possess is in a fact the result of a computation, in the form of a low degree polynomial f, say $\deg(f) < k$ with coefficients in a suitable finite field $\mathbb{F}_q$ of $q$ elements.
+Let us begin with an overview of one of the basics of code-based cryptography: an interactive instance of information exchange between a Prover (P) and a Verifier (V) - where P wants to convince V that he has executed a certain task or possesses certain information. Usually, the information P claims to possess is, in fact, the result of a computation, in the form of a low-degree polynomial f, say $\deg(f) < k$ with coefficients in a suitable finite field $\mathbb{F}_q$ of $q$ elements.
 
-A completely naive approach would be for the prover to send the list of coefficients of the polynomial he claims to possess, or by the Fundamental Theorem of Algebra, a list of $\deg(f)+1 \leq k$ evaluations of his polynomial. It is clear that such an idea is cryptographically insecure, since any leak in the communication channel would surrender the information to any attacker in plain sight.
+A completely naive approach would be for the prover to send the list of coefficients of the polynomial he claims to possess, or, by the Fundamental Theorem of Algebra, a list of $\deg(f)+1 \leq k$ evaluations of his polynomial. It is clear that such an idea is inefficient, since we would have to communicate a lot of information through a channel.
 
 One of the ideas to circumvent the exposure of $f$ is to actually evaluate $f$ at many more points $\mathcal{D}$ with $n = |\mathcal{D}| >> k$ in the base field $\mathbb{F}_q$, so that now what the Prover and Verifier exchange are much longer lists of evaluations:
 
-The effect that this has is that any attacker will be faced to the challenge of distinguishing between lists of numbers corresponding to evaluations of low degree polynomials, and lists that do not come from evaluating such polynomials.
+The effect that this has is that any attacker will be faced with the challenge of distinguishing between lists of numbers corresponding to evaluations of low-degree polynomials, and lists that do not come from evaluating such polynomials.
 
 > **Reed-Solomon Code:** This is the very basic idea of a Reed-Solomon code $RS[q,n,k]$: length $n$ vectors consisting exactly of the evaluation of polynomials of degree bounded by $k$ over a domain $\mathcal{D} \subset \mathbb{F}_q$.
 
@@ -35,25 +35,25 @@ For a general code $\mathcal{C}$ defined over a finite field $\mathbb{F}_q$ with
 
 $$d(\mathbf{u}, \mathbf{v}) = \left| \{ i \in \{1, \dots, n\} : u_i \neq v_i \} \right|$$
 
-and typically one works with a fractional version of $d$ which takes in account the blocklength:
+and typically one works with a fractional version of $d$ which takes into account the blocklength:
 
 $$\Delta(\mathbf{u}, \mathbf{v}) = \frac{d(\mathbf{u}, \mathbf{v})}{n}$$
 
-This allows the **interpretation of the distance as the fraction of entries in which two codewords differ**. Finally we recall the notion of the rate of a code of dimension $k$ and blocklength $n$ as the ratio:
+This allows the **interpretation of the distance as the fraction of entries in which two codewords differ**. Finally, we recall the notion of the rate of a code of dimension $k$ and blocklength $n$ as the ratio:
 
 $$\rho = \frac{k}{n}$$
 
-This number can be interpreted in a few ways, namely as a measure of **information content:** $\rho$% of the transmitted symbols carry the actual information of the message. The **redundancy** is the remaining $(1-\rho)$% of the message, and is the resource consumed to provide error correction capabilities (more on this soon). A lower rate implies higher redundancy and theoretically higher resilience to noise, at the cost of throughput.
+This number can be interpreted in a few ways, namely as a measure of **information content:** $\rho$% of the transmitted symbols carry the actual information of the message. The **redundancy** is the remaining $(1-\rho)$% of the message and is the resource consumed to provide error-correction capabilities (more on this soon). A lower rate implies higher redundancy and theoretically higher resilience to noise, at the cost of throughput.
 
 An important concept in coding theory is the concept of a list around a word w: for $w \in \mathbb{F}_q^n$ and $\delta > 0$ it is the set
 
 $$List[w, \mathcal{C}, \delta]$$
 
-and this is comprised of the codewords belonging to the code $\mathcal{C}$ that have distance at most $\delta$ from the word $w$. An associated question is given $w$ to decide, in terms of $\delta$, how many elements a list has. For sufficiently small $\delta$, the list around $w$ has at most one element and in this sense we will say that $w$ can be "corrected" to the corresponding $u \in \mathcal{C}$; that is the usual information-theoretic view of goodness of the code. We will say that in those circumstances we're within the "unique decoding regime". For Reed-Solomon codes, this bound for $\delta$ can be given in terms of the rate of the code and this regime is characterized with
+and this is comprised of the codewords belonging to the code $\mathcal{C}$ that have distance at most $\delta$ from the word $w$. An associated question is given $w$ to decide, in terms of $\delta$, how many elements a list has. For sufficiently small $\delta$, the list around $w$ has at most one element, and in this sense we will say that $w$ can be "corrected" to the corresponding $u \in \mathcal{C}$; that is, the usual information-theoretic view of goodness of the code. We will say that in those circumstances, we're within the "unique decoding regime". For Reed-Solomon codes, this bound for $\delta$ can be given in terms of the rate of the code, and this regime is characterized by
 
 $$\delta < \frac{1-\rho}{2}$$
 
-However this will sometimes be too much of a restriction at the time of implementing efficient and fast code-based algorithms and **we will be willing to admit a list of candidate codewords sufficiently close to the received word $w$, instead of a single codeword.** At these times, we will we working in the "list decoding regime" and **it is crucial for lists $\mathcal{L}$ around $w$ not to have too many elements.** For that matter, there is a bound on $\delta$, usually called the Johnson bound that says that the number of elements in a list $\mathcal{L}$ is polynomially bounded. The Johnson bound is valid for any code, and is obtained by combinatorial and geometric arguments.
+However, this will sometimes be too much of a restriction at the time of implementing efficient and fast code-based algorithms, and **we will be willing to admit a list of candidate codewords sufficiently close to the received word $w$, instead of a single codeword.** At these times, we will we working in the "list decoding regime" and **it is crucial for lists $\mathcal{L}$ around $w$ not to have too many elements.** For that matter, there is a bound on $\delta$, usually called the Johnson bound that says that the number of elements in a list $\mathcal{L}$ is polynomially bounded. The Johnson bound is valid for any code, and is obtained by combinatorial and geometric arguments.
 
 > **Johnson Bound for Reed-Solomon Codes:** Specifically for Reed-Solomon codes, it can be given in terms of the rate and the list decoding regime is characterized as
 >
@@ -77,7 +77,7 @@ The dependency $\mathcal{L} = O(1/\eta)$ often cited in FRI literature is simply
 
 Going back at the problem of the Prover (P) and Verifier (V) exchanging information, let's see how to set up that stage. Actually, it would be nice to start by spelling out what IOPP actually stands for: Interactive Oracle Proofs of Proximity. We'll contextualize each of these titles in this itemized section:
 
-- Obviously, **Interactive** stands for the notion of prover and verifier interact with each other exchanging information.
+- Obviously, **Interactive** stands for the notion of prover and verifier interacting with each other, exchanging information.
 
 - Now comes the sketchy part: in these contexts, the Verifier ($V$) lacks the computational resources to read the entire Prover's ($P$) message; it is restricted to open or look up a limited number of times a small portion of the data produced by the prover. Technically, the Verifier has what is called **Oracle** access: $P$ commits to a function $f: D \to \mathbb{F}$ and $V$ accesses $f$ essentially as a black box oracle. $V$ selects an index $x \in D$, and the oracle responds with $f(x)$.
 
