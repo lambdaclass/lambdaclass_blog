@@ -146,13 +146,13 @@ This description leads to the article's central question: how safe is this gadge
 
 Here is where the novelty of the recent work, BCHKS25, improves the soundness analysis of the FRI protocol done in BCIKS20. In the foundational article "Proximity Gaps for Reed-Solomon codes," the authors proved a fundamental result (the Correlated Agreement Theorem), from which the soundness of the FRI protocol follows. In their most recent paper, a detailed analysis of a linear-algebraic fact is used to obtain tighter bounds on the soundness of the protocols, enabling their implementation in a wider setting. Before diving into the mathematics involved, we need to define the concept of $\delta$-soundness, which establishes and fine-tunes the protocol's security.
 
-> **Soundness Definition:** In order to define what it means for an IOPP to have a soundness with parameters $(\delta, \epsilon)$ we will simply take the simplest route first: the probability of the Verifier accepting a forged proof $f^*$ should be as small as possible. In terms of distance to a code, let us re-phrase the previous sentence as: the probability of the Verifier accepting a word $f^*$ which is $\delta$-far should be less than $\epsilon$.
+> **Soundness Definition:** In order to define what it means for an IOPP to have soundness with parameters $(\delta, \epsilon)$ we will simply take the simplest route first: the probability of the Verifier accepting a forged proof $f^*$ should be as small as possible. In terms of distance to a code, let us re-phrase the previous sentence as: the probability of the Verifier accepting a word $f^*$ which is $\delta$-far should be less than $\epsilon$.
 
 Mathematically, let $\mathcal{C} \subseteq \mathbb{F}_q^n$ be a Reed-Solomon code. Let $P^*$ be any (potentially malicious) prover strategy that outputs an oracle function $f^*: D \to \mathbb{F}$.
 
 **Definition:** The FRI protocol is said to have **soundness error $\epsilon$ for proximity parameter $\delta$** if the following implication holds:
 
-$$\text{If } \min_{c \in \mathcal{C}} \Delta(f^*, c) > \delta \quad \implies \quad \Pr\left[ V^{f^*} \text{ accepts} \right] \le \epsilon$$
+$$\text{If } \min_{c \in \mathcal{C}} \Delta(f^\star, c) > \delta \quad \implies \quad \Pr\left[ V^{f^\star} \text{ accepts} \right] \le \epsilon$$
 
 Where $\Delta(\cdot, \cdot)$ denotes the relative Hamming distance.
 
