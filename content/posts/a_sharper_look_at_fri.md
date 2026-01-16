@@ -3,11 +3,11 @@ date = 2026-01-16
 description = "A review recent developments in the analysis of cryptographic security of one of the biggest pieces of the ZK engine: the FRI protocol implementing interactive oracle proofs of proximity, IOPPs."
 
 [taxonomies]
-tags = ["cryptography", "zero knowledge proofs", ""]
+tags = ["cryptography", "zero knowledge proofs"]
 
 [extra]
 authors = ["Manuel Puebla"]
-feature_image = "/images/2026/Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg"
+feature_image = "/images/2026/Hans_Holbein_the_Younger_The_Ambassadors.jpg"
 math = true
 +++
 
