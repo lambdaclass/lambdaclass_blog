@@ -13,7 +13,7 @@ math = true
 
 # A sharper look at FRI
 
-In this article, we will review recent developments in the analysis of cryptographic security of one of the biggest pieces of the ZK engine: the FRI protocol implementing interactive oracle proofs of proximity, IOPPs. A newly uploaded article by Eli Ben-Sasson, Dan Carmon, Swastik Kopparty and Shubhangi Saraf alongside Ulrich Habock (BCHKS25), revisits the foundational 2020 paper "Proximity Gaps for Reed Solomon Code" (BCIKS20) where the soundness of the RS-IOPP was established based on the Correlated Agreement Theorem. By a more detailed and sharper use of linear algebra in the process under the list-decoding regime, they obtained improved security performance bounds for the standard FRI. Here we will conceptually revise the protocol and give an outline of how their breakthrough was achieved.
+In this article, we will review recent developments in the analysis of the cryptographic security of one of the biggest pieces of the ZK engine: the FRI protocol, implementing interactive oracle proofs of proximity, IOPPs. A newly uploaded article by Eli Ben-Sasson, Dan Carmon, Swastik Kopparty, and Shubhangi Saraf, alongside Ulrich Habock (BCHKS25), revisits the foundational 2020 paper "Proximity Gaps for Reed Solomon Code" (BCIKS20), in which the soundness of the RS-IOPP was established using the Correlated Agreement Theorem. By a more detailed and sharper use of linear algebra in the process under the list-decoding regime, they obtained improved security performance bounds for the standard FRI. Here, we will conceptually revise the protocol and give an outline of how their breakthrough was achieved.
 
 The acquainted reader may skip directly to section 4, while newcomers are encouraged to read the first sections to get familiar with notations and concepts involved.
 
@@ -25,7 +25,7 @@ A completely naive approach would be for the prover to send the list of coeffici
 
 One of the ideas to circumvent the exposure of $f$ is to actually evaluate $f$ at many more points $\mathcal{D}$ with $n = |\mathcal{D}| >> k$ in the base field $\mathbb{F}_q$, so that now what the Prover and Verifier exchange are much longer lists of evaluations:
 
-The effect that this has is that any attacker will be faced with the challenge of distinguishing between lists of numbers corresponding to evaluations of low-degree polynomials, and lists that do not come from evaluating such polynomials.
+The effect that this has is that any attacker will be faced with the challenge of distinguishing between lists of numbers corresponding to evaluations of low-degree polynomials and lists that do not come from evaluating such polynomials.
 
 > **Reed-Solomon Code:** This is the very basic idea of a Reed-Solomon code $RS[q,n,k]$: length $n$ vectors consisting exactly of the evaluation of polynomials of degree bounded by $k$ over a domain $\mathcal{D} \subset \mathbb{F}_q$.
 
