@@ -1,6 +1,6 @@
 # Introducing ethlambda: A Lean Consensus Client for Ethereum's Next Era
 
-We have been working at LambdaClass on an Ethereum Lean Consensus client called ethlambda. As Ethereum prepares for its most ambitious consensus layer redesign since the Merge, client diversity will be more important than ever. ethlambda is our contribution to that future—a minimalist, fast, and modular implementation of the Lean Ethereum consensus protocol, written in Rust.
+At LambdaClass we have been working on an Ethereum Lean Consensus client called ethlambda. As Ethereum prepares for its most ambitious consensus layer redesign since the Merge, client diversity will be more important than ever. ethlambda is our contribution to that future—a minimalist, fast, and modular implementation of the Lean Ethereum consensus protocol, written in Rust.
 
 This is not our first foray into Ethereum consensus. We have been building [lambda_ethereum_consensus](https://github.com/lambdaclass/lambda_ethereum_consensus), an Elixir-based Beacon Chain client, since 2023. That project taught us how consensus clients work from the inside out. Combined with our work on [ethrex](https://github.com/lambdaclass/ethrex) (our execution client), we now have deep insight into what makes Ethereum clients complex—and what can be simplified.
 
@@ -10,7 +10,7 @@ The ideas motivating ethlambda share the same core tenet as our other projects: 
 
 ## Why Lean Consensus Matters
 
-When Justin Drake unveiled the Lean Consensus proposal (originally called Beam Chain) at Devcon Bangkok in November 2024, it represented a rare opportunity: a clean-slate redesign of Ethereum's consensus layer, informed by five years of lessons from the Beacon Chain.
+When Justin Drake unveiled the Lean Consensus proposal (originally called Beam Chain) at Devcon Bangkok in November 2024, it represented a rare opportunity to make a clean-slate redesign of Ethereum's consensus layer, informed by five years of lessons from the previous Beacon Chain.
 
 Lean Consensus bundles several critical upgrades into a single cohesive redesign:
 
@@ -28,15 +28,17 @@ The Lean Consensus ecosystem already has several client teams: Ream (Rust), Zeam
 
 The answer lies in our approach to software.
 
-The more we work in the crypto space, the more we encounter codebases carrying unnecessary complexity—libraries with dozens of modules to modularize the slightest things, APIs with excessive traits and generics to abstract every contingency, macros used to save lines at the cost of readability. These are inconveniences we and others constantly deal with when integrating with crypto repositories.
+The more we work in the crypto space, the more we encounter codebases carrying unnecessary complexity. Libraries with dozens of modules to modularize the slightest things, APIs with excessive traits and generics to abstract every contingency, macros used to save lines at the cost of readability. These are inconveniences we and others constantly deal with when integrating with crypto repositories.
 
-ethlambda is our attempt at building the consensus client we wish existed. Diversity isn't just about having multiple implementations in different languages—it's about implementations that take genuinely different approaches to architecture, abstraction, and philosophy.
+ethlambda is our attempt at building the consensus client we wish existed. 
+
+Bolstering diversity needs implementations that take different approaches to architecture, abstraction, and philosophy in addition to merely implementing in different languages. 
 
 In line with the [LambdaClass work ethos](https://blog.lambdaclass.com/lambdas-engineering-philosophy/), our goal is to always keep things simple and minimal.
 
 ## Simplicity as Strategy
 
-**Lines of code matter.** We track LoC for all our projects, ensuring we never exceed a limit. Our ethrex execution client sits at 96k lines—including the EVM, L2 stack, ZK provers, and SDK—while comparable clients exceed 200k before counting external dependencies. ethlambda currently sits at under 5k lines with full devnet-1 consensus functionality complete. We have daily automated Slack messages monitoring project size, and regularly hunt for dead code and refactor opportunities.
+**Lines of code matter.** We track LoC for all our projects, ensuring we never exceed a limit. Our ethrex execution client sits at 96k lines—including the EVM, L2 stack, ZK provers, and SDK—while comparable clients exceed 200k before even counting external dependencies. ethlambda currently sits at under 5k lines with full devnet-1 consensus functionality complete. 
 
 **Vertical integration over fragmentation.** Rather than splitting code into dozens of packages, we favor a flat structure with self-explanatory crates. If you can't explain what a module does in one sentence, it's probably doing too much.
 
@@ -52,7 +54,7 @@ In line with the [LambdaClass work ethos](https://blog.lambdaclass.com/lambdas-e
 
 A key motivation for Lean Consensus is preparing Ethereum for a post-quantum world. Current BLS signatures will eventually fall to quantum computers. Lean Consensus uses hash-based signatures (leanSig) with XMSS aggregation (leanMultisig), which remain secure against both classical and quantum adversaries.
 
-This isn't just theoretical future-proofing. Hash-based signatures are also SNARK-friendly, enabling efficient proof aggregation. The same primitive serves two purposes—a beautiful example of the elegant design that Lean Ethereum embodies.
+In addition to protecting from theoretical future attacks, there is also a performance aspect: hash-based signatures are SNARK-friendly and enable efficient proof aggregation. The same primitive serves two purposes—a beautiful example of the elegant design that Lean Ethereum embodies.
 
 ## Current Status
 
@@ -83,15 +85,15 @@ With core consensus functionality complete, our immediate focus shifts to:
 3. **Observability**: Expanded metrics, structured logging, and Grafana dashboards
 4. **Performance**: Optimizing for the 4-second slot times Lean Consensus demands
 
-Production deployment is targeted for 2029–2030, but the real work happens now—in the specification discussions, the devnets, and the hard engineering of turning research into running code.
+Production deployment is projected for 2029–2030 (although recent events may move that timeline up :P). The real work happens now — in the specification discussions, the devnets, and the hard engineering of turning research into running code.
 
 ## The LambdaClass Vision
 
 At LambdaClass, we believe Ethereum should have a forward-looking, accelerationist attitude. This means moving fast, embracing change, and remaining lean by not being afraid of big redesigns when they're warranted. Lean Consensus is exactly this kind of necessary leap.
 
-Client diversity isn't just about having multiple implementations. It's about implementations that take genuinely different approaches—different languages, different architectures, different philosophies. ethlambda represents our philosophy: simplicity is not the opposite of capability, but its foundation.
+We can't emphasize enough that client diversity isn't just having multiple implementations but also ensuring that the various implementations embody different approaches and philosophies. ethlambda represents our philosophy: simplicity is not the opposite of capability, but its foundation.
 
-ethlambda is open source from day one.
+ethlambda is open source from day one:
 
 - **GitHub**: [github.com/lambdaclass/ethlambda](https://github.com/lambdaclass/ethlambda)
 - **Telegram**: [t.me/ethlambda_client](https://t.me/ethlambda_client)
