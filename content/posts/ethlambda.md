@@ -1,10 +1,22 @@
-# Introducing ethlambda: A Lean Consensus Client for Ethereum's Next Era
++++
+title = "Introducing ethlambda: A Lean Consensus Client for Ethereum's Next Era"
+date = 2026-01-20
+description = "At LambdaClass we have been working on an Ethereum Lean Consensus client called ethlambda. As Ethereum prepares for its most ambitious consensus layer redesign since the Merge, client diversity will be more important than ever."
+
+[taxonomies]
+tags = ["ethereum"]
+
+[extra]
+authors = ["LambdaClass"]
+feature_image = "/images/2026/The_Syndics_Rembrandt.jpg"
+math = false
++++
 
 At LambdaClass we have been working on an Ethereum Lean Consensus client called ethlambda. As Ethereum prepares for its most ambitious consensus layer redesign since the Merge, client diversity will be more important than ever. ethlambda is our contribution to that future—a minimalist, fast, and modular implementation of the Lean Ethereum consensus protocol, written in Rust.
 
 This is not our first foray into Ethereum consensus. We have been building [lambda_ethereum_consensus](https://github.com/lambdaclass/lambda_ethereum_consensus), an Elixir-based Beacon Chain client, since 2023. That project taught us how consensus clients work from the inside out. Combined with our work on [ethrex](https://github.com/lambdaclass/ethrex) (our execution client), we now have deep insight into what makes Ethereum clients complex—and what can be simplified.
 
-ethlambda is the synthesis of everything we've learned. Where lambda_ethereum_consensus targets the current Beacon Chain, ethlambda is purpose-built for Lean Consensus from day one—no legacy code, no backward compatibility concerns, just a clean implementation of the new protocol.
+ethlambda is the synthesis of everything we've learned. Where `lambda_ethereum_consensus` targets the current Beacon Chain, ethlambda is purpose-built for Lean Consensus from day one—no legacy code, no backward compatibility concerns, just a clean implementation of the new protocol.
 
 The ideas motivating ethlambda share the same core tenet as our other projects: simplicity. We recommend reading Vitalik's [recent post](https://vitalik.eth.limo/general/2025/05/03/simplel1.html) about simplifying the L1; it greatly resonates with us as a guiding principle and reflects much of what Lean Ethereum aims to achieve.
 
@@ -12,7 +24,7 @@ The ideas motivating ethlambda share the same core tenet as our other projects: 
 
 When Justin Drake unveiled the Lean Consensus proposal (originally called Beam Chain) at Devcon Bangkok in November 2024, it represented a rare opportunity to make a clean-slate redesign of Ethereum's consensus layer, informed by five years of lessons from the previous Beacon Chain.
 
-Lean Consensus bundles several critical upgrades into a single cohesive redesign:
+There are many changes bundled in Lean Consensus, but among the most critical upgrades that work toward a single cohesive redesign are:
 
 - **Faster finality**: From ~15 minutes to seconds using 3-slot finality (3SF)
 - **Post-quantum security**: Hash-based signatures (leanSig) ready for both SNARKs and quantum computers
@@ -32,7 +44,7 @@ The more we work in the crypto space, the more we encounter codebases carrying u
 
 ethlambda is our attempt at building the consensus client we wish existed. 
 
-Bolstering diversity needs implementations that take different approaches to architecture, abstraction, and philosophy in addition to merely implementing in different languages. 
+Bolstering diversity needs implementations that take different approaches to architecture, abstraction, and philosophy in addition to merely implementing in different languages.
 
 In line with the [LambdaClass work ethos](https://blog.lambdaclass.com/lambdas-engineering-philosophy/), our goal is to always keep things simple and minimal.
 
@@ -85,7 +97,7 @@ With core consensus functionality complete, our immediate focus shifts to:
 3. **Observability**: Expanded metrics, structured logging, and Grafana dashboards
 4. **Performance**: Optimizing for the 4-second slot times Lean Consensus demands
 
-Production deployment is projected for 2029–2030 (although recent events may move that timeline up :P). The real work happens now — in the specification discussions, the devnets, and the hard engineering of turning research into running code.
+Production deployment is projected for 2029–2030 (although recent events may move that timeline). The real work happens now — in the specification discussions, the devnets, and the hard engineering of turning research into running code.
 
 ## The LambdaClass Vision
 
