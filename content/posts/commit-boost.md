@@ -1,10 +1,10 @@
 +++
-title = "Commit Boost"
-date = 2026-01-16
-description = "Interview with Drew Van Der Werff on Commit-Boost, a new Ethereum validator sidecard focused on standardizing the communication between validators and third-party protocols,"
+title = "An interview with Drew Van der Werff, creator of the latest, most important public good of Ethereum"
+date = 2026-01-21
+description = "We interviewed Drew Van der Werff on Commit Boost, a new Ethereum validator sidecar focused on standardizing the communication between validators and third-party protocols."
 
 [taxonomies]
-tags = ["commit-boost", "ethereum"]
+tags = ["ethereum"]
 
 [extra]
 authors = ["LambdaClass"]
@@ -12,11 +12,15 @@ feature_image = "/images/2026/allegory-of-fortune-and-virtue-peter-paul-rubens.j
 math = false
 +++
 
+![Estimated percentage share of sidecars used by validators, taken from Commit-Boost](/images/2026/sidecars_used_by_validators.png)
+
+**TL;DR:** _Commit-Boost is one of Ethereum's fastest-growing public goods. As the chart above shows, this open-source validator sidecar now runs on ~35% of Ethereum validators and continues to climb, competing with MEV-Boost. Built as modular infrastructure, it offers not only block building, but also support for preconfirmations, inclusion lists, and future commitment protocols—all in a single, community-driven sidecar. In this post, we interview Drew Van der Werff, creator of Commit-Boost_
+
 ## Introduction
 
-For those not part of the community of Ethereum infrastructure operators, developers, and researchers, how the machine works can seem somewhat Rube-Goldberg-esque, especially the parts of the protocol related to block building and selection. Ethereum is a fascinating case study in the interaction of technical constraints and economic incentives, and how it has evolved to address the complexities and tradeoffs brought by the transaction supply chain, which merits its own long-form post. The transaction journey is a strange land, full of dark forests and myths, of actors looking for profit or fairness. 
+For those not part of the community of Ethereum infrastructure operators, developers, and researchers, how the machine works can seem somewhat Rube-Goldberg-esque, especially the parts of the protocol related to block building and selection. Ethereum is a fascinating case study in the interaction of technical constraints and economic incentives, and how it has evolved to address the complexities and trade-offs brought by the transaction supply chain, which merits its own long-form post. The transaction journey is a strange land, full of dark forests and myths, of actors looking for profit or fairness.
 
-Today, we interviewed one of its inhabitants, Drew Van der Werff. Previously investing at Brevan Howard Digital and one of the early members of the Digital Assets team at Goldman Sachs, today he is working on Commit Boost (@Commit_Boost) and EthereumFabric (@Fabric_ethereum). 
+Today, we interviewed one of its inhabitants, Drew Van der Werff. Previously investing at Brevan Howard Digital and one of the early members of the Digital Assets team at Goldman Sachs, today he is working on Commit Boost ([@Commit_Boost](https://x.com/commit_boost?ref=blog.lambdaclass.com)) and EthereumFabric ([@Fabric_ethereum]()https://x.com/Fabric_ethereum?ref=blog.lambdaclass.com). 
 
 Commit-Boost is a new Ethereum validator sidecar focused on standardizing communication between validators and third-party protocols. Its goal is to return autonomy to Ethereum validators, allowing them to set constraints on block construction and offer new services that improve Ethereum’s most important product: blockspace. Additionally, the project aims to enhance the quality of life and capabilities of validators while addressing key pain points that have emerged over the last few years.
 
@@ -40,11 +44,11 @@ MEV-Boost by design takes power and autonomy away from Ethereum’s decentralize
 
 ## What is the philosophical stance of Commit-Boost on protocol ossification vs. experimentation?
 
-Commit-Boost is a public good built by people across Ethereum. It brought together dozens of teams. The core team sustaining it is a non-profit funded by generous grants and time from dozens of teams. With all that in mind, of course we want to compete. It is in my DNA and is something that makes Ethereum better. The ticker is ETH.
+This is my personal view: You must keep innovating, or you will become irrelevant. Obviously, you can’t keep changing everything, but as much as possible, we must keep that mindset front and center. For me, the way transactions find blocks and blocks get constructed is top of mind and something we should continue to focus on!
 
 ## Is Commit-Boost designed to be a neutral standard, a reference implementation, or a competitive product?
 
-Commit-Boost is a public good built by people across Ethereum. The team sustaining it is a non-profit funded by generous grants and time from dozens of teams. 
+Commit-Boost is a public good built by people across Ethereum. It brought together dozens of teams. The core team sustaining it is a non-profit funded by generous grants and time from dozens of teams. With all that in mind, of course we want to compete. It is in my DNA and is something that makes Ethereum better. The ticker is ETH.
 
 ## What are the key architectural choices you made that differentiate Commit-Boost from MEV-Boost?
 
@@ -52,11 +56,7 @@ We mostly spoke with the end customer (validators / proposers) and reflected on 
 
 ## What are your thoughts on ePBS / EIP-7732?
 
-Again these are my thoughts… Time will tell, but I think this is a hardfork that is shipping something few will use and shouldn’t have been a priority over other alternative items we could have tackled. I suspect it will have negative impacts on Ethereum block construction, accelerating certain structures in the transaction journey. Beyond that, I hope it achieves what the core devs feel it will enable.
-
-## There seems to still be some ongoing discussions about whether all of ePBS will make it into Glamsterdam, especially regarding the trustless aspects. Do you think there is a chance that what gets included will be revised?
-
-No, the core devs made it clear here despite some pushback on the implications of this from market participants.
+Again these are my thoughts…Time will tell, but I think this is a hardfork that is shipping something few will use and shouldn’t have been a priority over other alternative items we could have tackled. I suspect it will have negative impacts on Ethereum block construction, accelerating certain structures in the transaction journey. Beyond that, I hope it achieves what the core devs feel it will enable.
 
 ## Can you explain the relationship between based rollups and Commit Boost today?
 
