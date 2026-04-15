@@ -1135,6 +1135,10 @@ button {
   color: var(--color-text-primary);
 }
 
+/* Styling added in 
+   https://github.com/lambdaclass/lambdaclass_blog/pull/19 
+   to make the buttondown form consistent with the rest of the site.
+ */
 .embeddable-buttondown-form {
   margin-top: var(--spacing-8);
   padding: var(--spacing-6);

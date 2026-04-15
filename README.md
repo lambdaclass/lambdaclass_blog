@@ -67,3 +67,6 @@ Place images in `static/images/` and reference them with absolute paths:
 ```markdown
 ![Alt text](/images/your-image.png)
 ```
+
+## Changelog, developer notes
+- `sass/style.scss` was modified to style the buttondown email subscriber input form. The relevant rule is `.embeddable-buttondown-form`.
