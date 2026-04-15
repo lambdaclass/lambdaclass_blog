@@ -1135,6 +1135,86 @@ button {
   color: var(--color-text-primary);
 }
 
+.embeddable-buttondown-form {
+  margin-top: var(--spacing-8);
+  padding: var(--spacing-6);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-card);
+
+  label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--spacing-2);
+
+    &::before {
+      content: ">> ";
+      color: var(--color-accent);
+    }
+  }
+
+  input[type="email"] {
+    width: 100%;
+    padding: var(--spacing-3);
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    outline: none;
+    transition: border-color var(--transition-fast);
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    &:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+    }
+  }
+
+  input[type="submit"] {
+    display: inline-block;
+    margin-top: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-6);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background: var(--color-accent-dim);
+      box-shadow: var(--glow-green);
+    }
+  }
+
+  p {
+    margin-top: var(--spacing-3);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+
+    a {
+      color: var(--color-text-tertiary);
+      transition: color var(--transition-fast);
+
+      &:hover {
+        color: var(--color-accent);
+      }
+    }
+  }
+}
+
 // --------------------------------------------
 // Taxonomy Pages
 // --------------------------------------------
