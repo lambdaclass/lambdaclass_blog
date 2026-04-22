@@ -2,12 +2,14 @@
 
 ## Adding a new post
 
-1. Create a new markdown file in `content/posts/`:
+To add a blog post, you must:
+
+1. Branch off of `main`
+2. Create a new markdown file in `content/posts/`:
    ```
    content/posts/your-post-title.md
    ```
-
-2. Add frontmatter at the top:
+3. Add frontmatter at the top:
    ```toml
    +++
    title = "Your Post Title"
@@ -15,7 +17,7 @@
    description = "Brief description for SEO (max 160 chars)"
 
    [taxonomies]
-   tags = ["rust", "cryptography"]
+   tags = ["rust", "cryptography"] # grep or ask claude for existing tags
 
    [extra]
    authors = ["Author Name"]
@@ -23,8 +25,7 @@
    math = true  # optional, enables KaTeX for LaTeX math
    +++
    ```
-
-3. Write your content in markdown below the frontmatter.
+4. Write your content in markdown below the frontmatter.
 
 ### Math support
 
@@ -41,3 +42,9 @@ Place images in `static/images/` and reference them with absolute paths:
 
 - Choose a background image by prompting claude for a classical or renaissance painting that hasn't been used yet. 
 - If your post contains many images consider creating a subfolder for them. 
+
+5. Commit and create a PR.
+6. Have two reviewers approve the PR. 
+7. Merge. Once merged to main the [deploy workflow](https://github.com/lambdaclass/lambdaclass_blog/blob/main/.github/workflows/deploy.yml) will run and render and deploy the site to Github pages. 
+   The site build and deploy will also update the [RSS feed](https://lambdaclass.github.io/lambdaclass_blog/rss.xml). 
+   Buttondown is [configured](https://buttondown.com/feeds) to read this feed and send an email to subscribers when it is updated. How this works is explained [here](https://docs.buttondown.com/rss-to-email).
